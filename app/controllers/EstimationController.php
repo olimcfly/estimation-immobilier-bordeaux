@@ -6,9 +6,11 @@ namespace App\Controllers;
 
 use App\Core\Validator;
 use App\Core\View;
+use App\Models\DesignTemplate;
 use App\Models\Lead;
 use App\Services\EstimationService;
 use App\Services\LeadScoringService;
+use App\Services\PerplexityService;
 
 final class EstimationController
 {
@@ -62,9 +64,19 @@ final class EstimationController
             $motivation = Validator::string($_POST, 'motivation', 3, 80);
             $notesRaw = trim((string) ($_POST['notes'] ?? ($_POST['message'] ?? '')));
             $contactPrefere = trim((string) ($_POST['contact_prefere'] ?? ''));
+            $layout = trim((string) ($_POST['layout'] ?? ''));
             $notes = $notesRaw;
             if ($contactPrefere !== '') {
                 $notes = $notes !== '' ? "Contact préféré: {$contactPrefere}\n{$notes}" : "Contact préféré: {$contactPrefere}";
+            }
+            if ($layout !== '') {
+                $template = (new DesignTemplate())->findBySlug($layout);
+                if ($template === null) {
+                    throw new \InvalidArgumentException("Template layout inconnu: {$layout}");
+                }
+
+                $layoutNote = 'Template layout: ' . (string) $template['slug'];
+                $notes = $notes !== '' ? "{$layoutNote}\n{$notes}" : $layoutNote;
             }
             if (mb_strlen($notes) > 1500) {
                 throw new \InvalidArgumentException('Les notes ne doivent pas dépasser 1500 caractères.');
