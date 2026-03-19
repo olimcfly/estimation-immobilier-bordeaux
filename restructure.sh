@@ -387,24 +387,27 @@ if [ ! -f "app/controllers/PageController.php" ]; then
     cat > app/controllers/PageController.php << 'EOH'
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controllers;
 
-class PageController {
-    
-    public function home() {
-        require 'app/views/pages/home.php';
+use App\Core\View;
+
+final class PageController
+{
+    public function services(): void
+    {
+        View::render('pages/services');
     }
 
-    public function about() {
-        require 'app/views/pages/about.php';
+    public function aPropos(): void
+    {
+        View::render('pages/a_propos');
     }
 
-    public function services() {
-        require 'app/views/pages/services.php';
-    }
-
-    public function contact() {
-        require 'app/views/pages/contact.php';
+    public function contact(): void
+    {
+        View::render('pages/contact');
     }
 }
 EOH
@@ -420,23 +423,19 @@ if [ ! -f "routes/web.php" ]; then
     cat > routes/web.php << 'EOH'
 <?php
 
-/**
- * Routes de l'application
- * Format: $router->METHOD('path', 'Controller@method')
- */
+declare(strict_types=1);
 
-// Pages
-$router->get('/', 'PageController@home');
-$router->get('/about', 'PageController@about');
-$router->get('/services', 'PageController@services');
-$router->get('/contact', 'PageController@contact');
+use App\Controllers\EstimationController;
+use App\Controllers\PageController;
 
-// Estimation
-$router->post('/estimation', 'EstimationController@store');
-$router->get('/estimation/result', 'EstimationController@result');
+$router->get('/', [EstimationController::class, 'index']);
+$router->get('/estimation', [EstimationController::class, 'index']);
+$router->post('/estimation', [EstimationController::class, 'estimate']);
+$router->post('/lead', [EstimationController::class, 'storeLead']);
 
-// Contact
-$router->post('/contact', 'PageController@contactSubmit');
+$router->get('/services', [PageController::class, 'services']);
+$router->get('/a-propos', [PageController::class, 'aPropos']);
+$router->get('/contact', [PageController::class, 'contact']);
 EOH
     echo -e "${GREEN}✓ routes/web.php créé${NC}"
 else
@@ -472,7 +471,8 @@ echo "2. Vérifie les routes dans routes/web.php"
 echo ""
 echo "3. Teste les URLs :"
 echo "   → http://localhost/"
-echo "   → http://localhost/about"
+echo "   → http://localhost/estimation"
+echo "   → http://localhost/a-propos"
 echo "   → http://localhost/services"
 echo "   → http://localhost/contact"
 echo ""
