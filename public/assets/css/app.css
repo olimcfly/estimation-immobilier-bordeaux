@@ -169,11 +169,11 @@ label {
   font-size: .95rem;
 }
 
-input, select, button {
+input, select, textarea, button {
   font: inherit;
 }
 
-input, select {
+input, select, textarea {
   width: 100%;
   padding: .72rem .78rem;
   border: 1px solid #cbd5e1;
@@ -216,6 +216,28 @@ input, select {
 .alert { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
 .success { background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; }
 
+
+.lead-sheet-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: .9rem;
+  margin-bottom: 1rem;
+}
+
+.lead-sheet-grid p,
+.lead-notes p {
+  margin: .2rem 0 0;
+  font-weight: 500;
+}
+
+.lead-notes {
+  padding: .95rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #f8fafc;
+  margin-bottom: 1rem;
+}
+
 .muted { color: var(--muted); }
 
 .site-footer {
@@ -239,5 +261,6 @@ input, select {
   .steps-grid,
   .faq-grid,
   .grid-3,
+  .lead-sheet-grid,
   .footer-grid { grid-template-columns: 1fr; }
 }

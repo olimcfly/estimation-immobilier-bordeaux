@@ -47,6 +47,10 @@
       </select>
     </label>
 
+    <label>Notes
+      <textarea name="notes" rows="4" placeholder="Ajoutez un contexte utile (travaux, disponibilité, contraintes, etc.)"></textarea>
+    </label>
+
     <button type="submit">Enregistrer mon lead</button>
   </form>
 </section>
