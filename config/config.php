@@ -18,4 +18,9 @@ return [
         'model' => $_ENV['PERPLEXITY_MODEL'] ?? 'sonar-pro',
         'endpoint' => $_ENV['PERPLEXITY_ENDPOINT'] ?? 'https://api.perplexity.ai/chat/completions',
     ],
+    'openai' => [
+        'api_key' => $_ENV['OPENAI_API_KEY'] ?? '',
+        'model' => $_ENV['OPENAI_MODEL'] ?? 'gpt-4o-mini',
+        'endpoint' => $_ENV['OPENAI_ENDPOINT'] ?? 'https://api.openai.com/v1/chat/completions',
+    ],
 ];
