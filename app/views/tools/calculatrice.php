@@ -1,5 +1,4 @@
 <?php $page_title = 'Calculatrice Immobilière Bordeaux - Estimation Rapide'; ?>
-<?php require 'app/views/layouts/header.php'; ?>
 
 <section class="section page-hero">
   <div class="container">
@@ -79,5 +78,3 @@
     });
   });
 </script>
-
-<?php require 'app/views/layouts/footer.php'; ?>

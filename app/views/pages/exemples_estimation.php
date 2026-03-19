@@ -1,5 +1,4 @@
 <?php $page_title = 'Exemple Estimation - Cas Réels Bordeaux | Nos Résultats'; ?>
-<?php require 'app/views/layouts/header.php'; ?>
 
 <!-- ============================================ -->
 <!-- HERO SECTION -->
@@ -557,5 +556,3 @@
     </div>
   </div>
 </section>
-
-<?php require 'app/views/layouts/footer.php'; ?>

@@ -1,5 +1,4 @@
 <?php $page_title = 'Estimation Immobilière Bordeaux | Évaluez Votre Bien en 1 Minute'; ?>
-<?php require 'app/views/layouts/header.php'; ?>
 
 <!-- ============================================ -->
 <!-- HERO ULTRA-PREMIUM -->
@@ -505,5 +504,3 @@
     </div>
   </div>
 </section>
-
-<?php require 'app/views/layouts/footer.php'; ?>

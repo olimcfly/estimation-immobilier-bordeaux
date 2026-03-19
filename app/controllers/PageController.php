@@ -37,6 +37,27 @@ final class PageController
         $this->about();
     }
 
+    public function processusEstimation(): void
+    {
+        View::render('pages/processus_estimation', [
+            'page_title' => 'Processus d\'Estimation - Estimation Immobilier Bordeaux',
+        ]);
+    }
+
+    public function newsletter(): void
+    {
+        View::render('pages/newsletter', [
+            'page_title' => 'Newsletter - Estimation Immobilier Bordeaux',
+        ]);
+    }
+
+    public function guides(): void
+    {
+        View::render('pages/guides', [
+            'page_title' => 'Guides Immobiliers Bordeaux - Conseils & Astuces',
+        ]);
+    }
+
 
     public function exemplesEstimation(): void
     {
