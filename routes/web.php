@@ -6,6 +6,7 @@ use App\Controllers\AdminBlogController;
 use App\Controllers\BlogController;
 use App\Controllers\EstimationController;
 use App\Controllers\PageController;
+use App\Controllers\ToolController;
 
 $router->get('/', [PageController::class, 'home']);
 $router->get('/estimation', [EstimationController::class, 'index']);
@@ -21,3 +22,5 @@ $router->get('/processus-estimation', [PageController::class, 'processusEstimati
 $router->get('/contact', [PageController::class, 'contact']);
 $router->get('/exemples-estimation', [PageController::class, 'exemplesEstimation']);
 $router->post('/contact', [PageController::class, 'contactSubmit']);
+
+$router->get('/tools/calculatrice', [ToolController::class, 'calculatrice']);
