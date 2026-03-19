@@ -11,9 +11,10 @@
       <div>
         <h4>Pages</h4>
         <ul class="footer-links">
-          <li><a href="/#avantages">Avantages</a></li>
-          <li><a href="/#process">Processus</a></li>
-          <li><a href="/#faq">FAQ</a></li>
+          <li><a href="/">Accueil</a></li>
+          <li><a href="/about">À propos</a></li>
+          <li><a href="/services">Services</a></li>
+          <li><a href="/contact">Contact</a></li>
           <li><a href="/mentions-legales">Mentions légales</a></li>
         </ul>
       </div>
