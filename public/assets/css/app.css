@@ -241,3 +241,62 @@ input, select {
   .grid-3,
   .footer-grid { grid-template-columns: 1fr; }
 }
+
+textarea {
+  width: 100%;
+  padding: .72rem .78rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.blog-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 1.25rem 0;
+}
+
+.blog-card h2 { font-size: 1.25rem; }
+
+.badge {
+  display: inline-block;
+  background: #ecfeff;
+  color: #155e75;
+  border: 1px solid #a5f3fc;
+  padding: .22rem .6rem;
+  border-radius: 999px;
+  font-size: .78rem;
+  font-weight: 700;
+}
+
+.article-container { width: min(840px, calc(100% - 2.5rem)); }
+.article-content { margin: 1rem 0; }
+.article-content h2 { margin-top: 1.1rem; }
+.cta-card { margin-top: 1rem; }
+
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.table-wrap { overflow: auto; }
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-table th,
+.admin-table td {
+  border-bottom: 1px solid #e2e8f0;
+  text-align: left;
+  padding: .7rem .5rem;
+}
+
+@media (max-width: 980px) {
+  .blog-grid { grid-template-columns: 1fr; }
+}
