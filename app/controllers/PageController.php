@@ -42,6 +42,14 @@ final class PageController
         ]);
     }
 
+
+    public function processusEstimation(): void
+    {
+        View::render('pages/processus_estimation', [
+            'page_title' => "Processus d'Estimation - Estimation Immobilier Bordeaux",
+        ]);
+    }
+
     public function contact(): void
     {
         View::render('pages/contact', [
