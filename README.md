@@ -9,6 +9,7 @@ Application SaaS immobilière en **PHP 8+**, architecture MVC légère, **MySQL 
 - Capture lead après estimation
 - Stockage lead sécurisé en MySQL via requêtes préparées
 - Scoring lead (`chaud`, `tiede`, `froid`)
+- Liste des leads avec filtres par score (`/leads?score=chaud|tiede|froid`)
 
 ## Arborescence
 
@@ -50,3 +51,4 @@ export PERPLEXITY_API_KEY=''
 - `GET /estimation` → formulaire
 - `POST /estimation` → calcul estimation
 - `POST /lead` → insertion lead
+- `GET /leads` → visualisation + filtres des leads

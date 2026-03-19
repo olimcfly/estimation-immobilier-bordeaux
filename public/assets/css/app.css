@@ -218,6 +218,62 @@ input, select {
 
 .muted { color: var(--muted); }
 
+.filters-row {
+  display: flex;
+  gap: .8rem;
+  align-items: end;
+  margin: 1rem 0;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+.leads-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 760px;
+}
+
+.leads-table th,
+.leads-table td {
+  text-align: left;
+  padding: .7rem .55rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.leads-table th {
+  font-size: .88rem;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: #334155;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: .15rem .55rem;
+  font-size: .82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.badge-chaud {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.badge-tiede {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.badge-froid {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
 .site-footer {
   margin-top: 2rem;
   border-top: 1px solid #d9e2ef;

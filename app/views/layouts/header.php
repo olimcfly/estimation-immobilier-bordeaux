@@ -19,8 +19,9 @@
       <a href="#avantages">Avantages</a>
       <a href="#process">Process</a>
       <a href="#faq">FAQ</a>
+      <a href="/leads">Leads</a>
     </nav>
-    <a href="#simulateur" class="btn btn-small">Estimer mon bien</a>
+    <a href="/estimation#simulateur" class="btn btn-small">Estimer mon bien</a>
   </div>
 </header>
 <main>
