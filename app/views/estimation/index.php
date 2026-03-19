@@ -1,4 +1,4 @@
-<?php $page_title = 'Estimer - Formulaire d\'Estimation Immobilière Bordeaux'; ?>
+<?php $page_title = 'Estimation Immobilière Bordeaux - Évaluez Votre Bien'; ?>
 <?php require 'app/views/layouts/header.php'; ?>
 
 <!-- ============================================ -->
@@ -319,33 +319,3 @@
 </section>
 
 <?php require 'app/views/layouts/footer.php'; ?>
-
-<script>
-// Fonction pour mettre à jour les champs selon le type de bien
-function updateChamps(typeBien) {
-  const etagField = document.getElementById('etage');
-  const chambreField = document.getElementById('chambres');
-  
-  if (typeBien === 'terrain') {
-    etagField.disabled = true;
-    chambreField.disabled = true;
-  } else {
-    etagField.disabled = false;
-    chambreField.disabled = false;
-  }
-}
-
-// Fonction pour mettre à jour les quartiers
-function updateQuartiers(zone) {
-  console.log('Zone sélectionnée:', zone);
-}
-
-// Form submission
-document.getElementById('estimation-form')?.addEventListener('submit', function(e) {
-  e.preventDefault();
-  // Redirection vers page résultat avec données
-  const formData = new FormData(this);
-  const params = new URLSearchParams(formData);
-  window.location.href = '/estimation/result?' + params.toString();
-});
-</script>
