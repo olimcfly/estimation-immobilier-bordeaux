@@ -1,5 +1,13 @@
-<?php $page_title = 'Contact - Estimation Immobilier Bordeaux'; ?>
-<?php include 'header.php'; ?>
+<?php if (!empty($success_message)): ?>
+<section class="section">
+  <div class="container">
+    <div class="card" style="border-left: 4px solid #2e7d32;">
+      <p><strong><?= htmlspecialchars($success_message, ENT_QUOTES, 'UTF-8') ?></strong></p>
+    </div>
+  </div>
+</section>
+<?php endif; ?>
+
 
 <!-- HERO PAGE -->
 <section class="section page-hero">

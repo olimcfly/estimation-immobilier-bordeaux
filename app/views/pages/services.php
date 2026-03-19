@@ -1,5 +1,3 @@
-<?php $page_title = 'Nos Services - Estimation Immobilier Bordeaux'; ?>
-<?php include 'header.php'; ?>
 
 <!-- HERO PAGE -->
 <section class="section page-hero">
