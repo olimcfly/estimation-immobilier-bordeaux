@@ -13,7 +13,13 @@ spl_autoload_register(static function (string $class): void {
     }
 
     $relative = str_replace('\\', '/', substr($class, strlen($prefix)));
-    $file = __DIR__ . '/../' . $relative . '.php';
+    $segments = explode('/', $relative);
+
+    if (isset($segments[0])) {
+        $segments[0] = strtolower($segments[0]);
+    }
+
+    $file = __DIR__ . '/../' . implode('/', $segments) . '.php';
 
     if (is_file($file)) {
         require_once $file;

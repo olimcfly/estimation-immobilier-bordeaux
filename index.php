@@ -11,9 +11,9 @@ if (version_compare(PHP_VERSION, '8.1.0', '<')) {
 
 use App\Core\Router;
 
-require_once dirname(__DIR__) . '/app/core/bootstrap.php';
+require_once __DIR__ . '/app/core/bootstrap.php';
 
 $router = new Router();
-require dirname(__DIR__) . '/routes/web.php';
+require __DIR__ . '/routes/web.php';
 
 $router->dispatch($_SERVER['REQUEST_METHOD'] ?? 'GET', $_SERVER['REQUEST_URI'] ?? '/');

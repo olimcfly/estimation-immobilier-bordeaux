@@ -24,6 +24,19 @@ final class Router
     public function dispatch(string $method, string $uri): void
     {
         $path = parse_url($uri, PHP_URL_PATH) ?: '/';
+
+        if ($path === '/public' || $path === '/public/') {
+            $path = '/';
+        } elseif (str_starts_with($path, '/public/')) {
+            $path = substr($path, strlen('/public'));
+        }
+
+        if ($path === '/index.php') {
+            $path = '/';
+        } elseif (str_starts_with($path, '/index.php/')) {
+            $path = substr($path, strlen('/index.php'));
+        }
+
         $action = $this->routes[$method][$path] ?? null;
 
         if ($action === null) {
