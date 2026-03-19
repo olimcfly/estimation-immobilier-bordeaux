@@ -24,7 +24,7 @@ final class PageController
 
     public function about(): void
     {
-        View::render('pages/about', [
+        View::render('pages/a_propos', [
             'page_title' => 'À Propos - Estimation Immobilier Bordeaux',
         ]);
     }
@@ -39,6 +39,14 @@ final class PageController
     {
         View::render('pages/exemples_estimation', [
             'page_title' => "Exemple Estimation - Cas Réels Bordeaux | Nos Résultats",
+        ]);
+    }
+
+
+    public function processusEstimation(): void
+    {
+        View::render('pages/processus_estimation', [
+            'page_title' => "Processus d'Estimation - Estimation Immobilier Bordeaux",
         ]);
     }
 
