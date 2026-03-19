@@ -34,6 +34,14 @@ final class PageController
         $this->about();
     }
 
+
+    public function processusEstimation(): void
+    {
+        View::render('pages/processus_estimation', [
+            'page_title' => 'Processus Estimation - Notre Méthodologie',
+        ]);
+    }
+
     public function contact(): void
     {
         View::render('pages/contact', [

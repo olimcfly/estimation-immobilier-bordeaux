@@ -17,5 +17,6 @@ $router->get('/admin/leads', [EstimationController::class, 'leads']);
 $router->get('/services', [PageController::class, 'services']);
 $router->get('/about', [PageController::class, 'about']);
 $router->get('/a-propos', [PageController::class, 'aPropos']);
+$router->get('/processus-estimation', [PageController::class, 'processusEstimation']);
 $router->get('/contact', [PageController::class, 'contact']);
 $router->post('/contact', [PageController::class, 'contactSubmit']);
