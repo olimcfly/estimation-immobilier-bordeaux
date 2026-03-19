@@ -6,9 +6,11 @@ namespace App\Controllers;
 
 use App\Core\Validator;
 use App\Core\View;
+use App\Models\DesignTemplate;
 use App\Models\Lead;
 use App\Services\EstimationService;
 use App\Services\LeadScoringService;
+use App\Services\PerplexityService;
 
 final class EstimationController
 {
@@ -48,18 +50,66 @@ final class EstimationController
         }
     }
 
+    public function apiEstimate(): void
+    {
+        header('Content-Type: application/json; charset=utf-8');
+
+        try {
+            $input = $this->readApiInput();
+            $sanitized = $this->sanitizeEstimationPayload($input);
+
+            $cityKey = $sanitized['ville'] !== '' ? 'ville' : 'localisation';
+            $typeKey = $sanitized['type'] !== '' ? 'type' : 'type_bien';
+
+            $city = Validator::string($sanitized, $cityKey, 2, 120);
+            $propertyType = Validator::string($sanitized, $typeKey, 2, 80);
+            $surface = Validator::float($sanitized, 'surface', 5, 10000);
+            $rooms = Validator::int($sanitized, 'pieces', 1, 50);
+
+            $estimate = $this->estimationService->estimate($city, $propertyType, $surface, $rooms);
+
+            http_response_code(200);
+            echo json_encode([
+                'success' => true,
+                'data' => $estimate,
+            ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
+        } catch (\Throwable $throwable) {
+            http_response_code(422);
+            echo json_encode([
+                'success' => false,
+                'error' => $throwable->getMessage(),
+            ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
+        }
+    }
+
     public function storeLead(): void
     {
         try {
             $nom = Validator::string($_POST, 'nom', 2, 120);
             $email = Validator::email($_POST, 'email');
             $telephone = Validator::string($_POST, 'telephone', 6, 30);
-            $adresse = Validator::string($_POST, 'adresse', 5, 255);
+            $adresseInput = trim((string) ($_POST['adresse'] ?? ''));
+            $adresse = $adresseInput !== '' ? Validator::string($_POST, 'adresse', 5, 255) : 'Non renseignée';
             $ville = Validator::string($_POST, 'ville', 2, 120);
             $estimation = Validator::float($_POST, 'estimation', 10000, 100000000);
             $urgence = Validator::string($_POST, 'urgence', 3, 40);
             $motivation = Validator::string($_POST, 'motivation', 3, 80);
-            $notes = trim((string) ($_POST['notes'] ?? ''));
+            $notesRaw = trim((string) ($_POST['notes'] ?? ($_POST['message'] ?? '')));
+            $contactPrefere = trim((string) ($_POST['contact_prefere'] ?? ''));
+            $layout = trim((string) ($_POST['layout'] ?? ''));
+            $notes = $notesRaw;
+            if ($contactPrefere !== '') {
+                $notes = $notes !== '' ? "Contact préféré: {$contactPrefere}\n{$notes}" : "Contact préféré: {$contactPrefere}";
+            }
+            if ($layout !== '') {
+                $template = (new DesignTemplate())->findBySlug($layout);
+                if ($template === null) {
+                    throw new \InvalidArgumentException("Template layout inconnu: {$layout}");
+                }
+
+                $layoutNote = 'Template layout: ' . (string) $template['slug'];
+                $notes = $notes !== '' ? "{$layoutNote}\n{$notes}" : $layoutNote;
+            }
             if (mb_strlen($notes) > 1500) {
                 throw new \InvalidArgumentException('Les notes ne doivent pas dépasser 1500 caractères.');
             }
@@ -103,5 +153,68 @@ final class EstimationController
                 'errors' => [$throwable->getMessage()],
             ]);
         }
+    }
+
+    private function readApiInput(): array
+    {
+        $contentType = (string) ($_SERVER['CONTENT_TYPE'] ?? '');
+
+        if (str_contains($contentType, 'application/json')) {
+            $raw = file_get_contents('php://input');
+            $decoded = json_decode((string) $raw, true);
+
+            if (!is_array($decoded)) {
+                throw new \InvalidArgumentException('Payload JSON invalide.');
+            }
+
+            return $decoded;
+        }
+
+        return $_POST;
+    }
+
+    private function sanitizeEstimationPayload(array $input): array
+    {
+        $payload = [
+            'ville' => $this->sanitizeText($input['ville'] ?? ''),
+            'localisation' => $this->sanitizeText($input['localisation'] ?? ''),
+            'type' => $this->sanitizeText($input['type'] ?? ''),
+            'type_bien' => $this->sanitizeText($input['type_bien'] ?? ''),
+            'surface' => $this->sanitizeNumber($input['surface'] ?? ''),
+            'pieces' => $this->sanitizeRooms($input['pieces'] ?? ''),
+        ];
+
+        if ($payload['ville'] === '' && $payload['localisation'] !== '') {
+            $payload['ville'] = $payload['localisation'];
+        }
+
+        if ($payload['type'] === '' && $payload['type_bien'] !== '') {
+            $payload['type'] = $payload['type_bien'];
+        }
+
+        return $payload;
+    }
+
+    private function sanitizeText(mixed $value): string
+    {
+        $clean = trim(strip_tags((string) $value));
+        return preg_replace('/\s+/u', ' ', $clean) ?? '';
+    }
+
+    private function sanitizeNumber(mixed $value): string
+    {
+        $raw = str_replace(',', '.', trim((string) $value));
+        return preg_replace('/[^0-9.\-]/', '', $raw) ?? '';
+    }
+
+    private function sanitizeRooms(mixed $value): string
+    {
+        $clean = $this->sanitizeText($value);
+
+        if (preg_match('/^(\d+)\+$/', $clean, $matches) === 1) {
+            return $matches[1];
+        }
+
+        return preg_replace('/[^0-9\-]/', '', $clean) ?? '';
     }
 }

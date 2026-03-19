@@ -3,6 +3,9 @@
     <a href="/admin/blog" class="btn btn-small btn-ghost">← Retour CMS</a>
     <h1><?= e($submitLabel) ?></h1>
 
+    <?php if (($message ?? '') !== ''): ?><p class="success"><?= e((string) $message) ?></p><?php endif; ?>
+    <?php if (($error ?? '') !== ''): ?><p class="alert"><?= e((string) $error) ?></p><?php endif; ?>
+
     <?php foreach ($errors as $err): ?>
       <p class="alert"><?= e((string) $err) ?></p>
     <?php endforeach; ?>
@@ -45,5 +48,39 @@
 
       <button class="btn" type="submit"><?= e($submitLabel) ?></button>
     </form>
+
+    <?php if (!empty($article['id']) && !empty($revisions)): ?>
+      <section class="card" style="margin-top:1.5rem;">
+        <h2>Historique des révisions</h2>
+        <div class="table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Version</th>
+                <th>Titre</th>
+                <th>Statut</th>
+                <th>Date</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <?php foreach ($revisions as $revision): ?>
+                <tr>
+                  <td>v<?= (int) $revision['revision_number'] ?></td>
+                  <td><?= e((string) $revision['title']) ?></td>
+                  <td><?= e((string) $revision['status']) ?></td>
+                  <td><?= e((string) $revision['created_at']) ?></td>
+                  <td>
+                    <form method="post" action="/admin/blog/restore/<?= (int) $article['id'] ?>/<?= (int) $revision['id'] ?>" onsubmit="return confirm('Restaurer cette version ?');">
+                      <button type="submit" class="btn btn-small btn-ghost">Restaurer</button>
+                    </form>
+                  </td>
+                </tr>
+              <?php endforeach; ?>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    <?php endif; ?>
   </div>
 </section>

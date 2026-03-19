@@ -85,8 +85,4 @@ final class Lead
         return $stmt->rowCount() > 0;
     }
 
-    public function create(array $data): int
-    {
-        return $this->insertLead($data);
-    }
 }
