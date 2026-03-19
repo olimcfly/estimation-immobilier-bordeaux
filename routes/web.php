@@ -6,6 +6,7 @@ use App\Controllers\AdminBlogController;
 use App\Controllers\BlogController;
 use App\Controllers\EstimationController;
 use App\Controllers\PageController;
+use App\Controllers\SeoController;
 
 $router->get('/', [PageController::class, 'home']);
 $router->get('/estimation', [EstimationController::class, 'index']);
@@ -23,9 +24,4 @@ $router->get('/newsletter', [PageController::class, 'newsletter']);
 $router->get('/exemples-estimation', [PageController::class, 'exemplesEstimation']);
 $router->get('/guides', [PageController::class, 'guides']);
 $router->post('/contact', [PageController::class, 'contactSubmit']);
-
-$router->get('/admin/blog', [AdminBlogController::class, 'index']);
-$router->get('/admin/blog/create', [AdminBlogController::class, 'create']);
-$router->post('/admin/blog/store', [AdminBlogController::class, 'store']);
-$router->get('/admin/blog/edit/{id}', [AdminBlogController::class, 'edit']);
-$router->post('/admin/blog/update/{id}', [AdminBlogController::class, 'update']);
+$router->get('/sitemap.xml', [SeoController::class, 'sitemap']);
