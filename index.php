@@ -38,10 +38,10 @@ if (PHP_SAPI !== 'cli') {
     header('Content-Security-Policy: ' . $csp);
 }
 
-if (version_compare(PHP_VERSION, '8.1.0', '<')) {
+if (version_compare(PHP_VERSION, '8.0.0', '<')) {
     http_response_code(500);
     header('Content-Type: text/plain; charset=utf-8');
-    echo 'Configuration PHP invalide : cette application nécessite PHP 8.1+ (version détectée : ' . PHP_VERSION . ').';
+    echo 'Configuration PHP invalide : cette application nécessite PHP 8.0+ (version détectée : ' . PHP_VERSION . ').';
     exit;
 }
 
