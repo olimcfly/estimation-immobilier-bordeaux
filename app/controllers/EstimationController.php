@@ -9,10 +9,21 @@ use App\Core\View;
 use App\Models\Lead;
 use App\Services\EstimationService;
 use App\Services\LeadScoringService;
-use App\Services\PerplexityService;
 
 final class EstimationController
 {
+    public function leads(): void
+    {
+        $score = isset($_GET['score']) ? (string) $_GET['score'] : null;
+        $leadModel = new Lead();
+        $leads = $leadModel->listByScore($score);
+
+        View::render('estimation/leads', [
+            'leads' => $leads,
+            'scoreFilter' => $score,
+        ]);
+    }
+
     public function index(): void
     {
         View::render('estimation/index');
@@ -22,11 +33,12 @@ final class EstimationController
     {
         try {
             $city = Validator::string($_POST, 'ville', 2, 120);
-            $propertyType = Validator::string($_POST, 'type_bien', 2, 80);
+            $typeKey = array_key_exists('type', $_POST) ? 'type' : 'type_bien';
+            $propertyType = Validator::string($_POST, $typeKey, 2, 80);
             $surface = Validator::float($_POST, 'surface', 5, 10000);
             $rooms = Validator::int($_POST, 'pieces', 1, 50);
 
-            $service = new EstimationService(new PerplexityService());
+            $service = new EstimationService();
             $estimate = $service->estimate($city, $propertyType, $surface, $rooms);
 
             View::render('estimation/result', [

@@ -13,12 +13,12 @@ final class Router
 
     public function get(string $path, array $action): void
     {
-        $this->routes['GET'][$path] = $action;
+        $this->routes['GET'][] = ['path' => $path, 'action' => $action];
     }
 
     public function post(string $path, array $action): void
     {
-        $this->routes['POST'][$path] = $action;
+        $this->routes['POST'][] = ['path' => $path, 'action' => $action];
     }
 
     public function dispatch(string $method, string $uri): void
@@ -37,7 +37,7 @@ final class Router
             $path = substr($path, strlen('/index.php'));
         }
 
-        $action = $this->routes[$method][$path] ?? null;
+        [$action, $params] = $this->resolveRoute($method, $path);
 
         if ($action === null) {
             http_response_code(404);
@@ -47,6 +47,51 @@ final class Router
 
         [$controllerClass, $controllerMethod] = $action;
         $controller = new $controllerClass();
-        $controller->{$controllerMethod}();
+        $controller->{$controllerMethod}(...$params);
+    }
+
+    private function resolveRoute(string $method, string $path): array
+    {
+        foreach ($this->routes[$method] ?? [] as $route) {
+            $matched = $this->match($route['path'], $path);
+            if ($matched !== null) {
+                return [$route['action'], $matched];
+            }
+        }
+
+        return [null, []];
+    }
+
+    private function match(string $routePath, string $currentPath): ?array
+    {
+        if ($routePath === $currentPath) {
+            return [];
+        }
+
+        if (!str_contains($routePath, '{')) {
+            return null;
+        }
+
+        $pattern = preg_replace_callback('/\{([a-zA-Z_][a-zA-Z0-9_]*)\}/', static function (array $matches): string {
+            return '(?P<' . $matches[1] . '>[^/]+)';
+        }, $routePath);
+
+        if ($pattern === null) {
+            return null;
+        }
+
+        $regex = '#^' . $pattern . '$#';
+        if (preg_match($regex, $currentPath, $matches) !== 1) {
+            return null;
+        }
+
+        $params = [];
+        foreach ($matches as $key => $value) {
+            if (is_string($key)) {
+                $params[] = urldecode((string) $value);
+            }
+        }
+
+        return $params;
     }
 }
