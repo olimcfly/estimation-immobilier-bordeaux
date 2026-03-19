@@ -48,10 +48,6 @@
       <input type="text" name="telephone" required>
     </label>
 
-    <label>Adresse du bien
-      <input type="text" name="adresse" required>
-    </label>
-
     <label>Urgence
       <select name="urgence" required>
         <option value="rapide">Rapide</option>
