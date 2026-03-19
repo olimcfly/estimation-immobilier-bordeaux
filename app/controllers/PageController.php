@@ -49,6 +49,13 @@ final class PageController
         ]);
     }
 
+    public function newsletter(): void
+    {
+        View::render('pages/newsletter', [
+            'page_title' => 'Newsletter - Estimation Immobilier Bordeaux',
+        ]);
+    }
+
     public function contactSubmit(): void
     {
         View::render('pages/contact', [
