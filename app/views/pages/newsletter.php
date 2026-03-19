@@ -1,5 +1,4 @@
 <?php $page_title = 'Newsletter - Estimation Immobilière Bordeaux | Conseils & Tendances'; ?>
-<?php require 'app/views/layouts/header.php'; ?>
 
 <section class="section page-hero">
   <div class="container">
@@ -54,5 +53,3 @@
     </article>
   </div>
 </section>
-
-<?php require 'app/views/layouts/footer.php'; ?>

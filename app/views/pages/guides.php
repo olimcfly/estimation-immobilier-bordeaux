@@ -1,5 +1,4 @@
 <?php $page_title = 'Guides - Estimation Immobilier Bordeaux'; ?>
-<?php require 'app/views/layouts/header.php'; ?>
 
 <section class="section page-hero">
   <div class="container">
@@ -25,5 +24,3 @@
     </div>
   </div>
 </section>
-
-<?php require 'app/views/layouts/footer.php'; ?>

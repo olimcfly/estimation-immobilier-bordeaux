@@ -1,5 +1,4 @@
 <?php $page_title = 'À Propos - Estimation Immobilière Bordeaux | Notre Histoire & Équipe'; ?>
-<?php require 'app/views/layouts/header.php'; ?>
 
 <!-- ============================================ -->
 <!-- HERO SECTION -->
@@ -473,5 +472,3 @@
     </div>
   </div>
 </section>
-
-<?php require 'app/views/layouts/footer.php'; ?>

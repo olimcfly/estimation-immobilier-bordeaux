@@ -1,5 +1,4 @@
 <?php $page_title = 'À Propos - Estimation Immobilier Bordeaux'; ?>
-<?php require 'app/views/layouts/header.php'; ?>
 
 <!-- HERO PAGE -->
 <section class="section page-hero">

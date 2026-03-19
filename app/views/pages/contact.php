@@ -1,5 +1,4 @@
 <?php $page_title = 'Contact - Estimation Immobilière Bordeaux | Nous Sommes Disponibles'; ?>
-<?php require 'app/views/layouts/header.php'; ?>
 
 <!-- ============================================ -->
 <!-- HERO SECTION -->
@@ -432,5 +431,3 @@
     </div>
   </div>
 </section>
-
-<?php require 'app/views/layouts/footer.php'; ?>

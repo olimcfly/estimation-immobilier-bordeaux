@@ -1,5 +1,4 @@
 <?php $page_title = 'Quartiers de Bordeaux - Estimation Immobilier Bordeaux'; ?>
-<?php require 'app/views/layouts/header.php'; ?>
 
 <section class="section page-hero">
   <div class="container">
@@ -29,5 +28,3 @@
     </article>
   </div>
 </section>
-
-<?php require 'app/views/layouts/footer.php'; ?>
