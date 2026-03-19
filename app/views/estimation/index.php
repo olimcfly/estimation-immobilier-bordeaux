@@ -62,14 +62,17 @@
       <article class="card feature-card">
         <h3>Données locales fines</h3>
         <p>Nous nous appuyons sur des références de transactions en Gironde pour une évaluation réaliste de votre bien.</p>
+        <a class="btn btn-small" href="#simulateur">Estimer mon bien</a>
       </article>
       <article class="card feature-card">
         <h3>Résultat immédiat</h3>
         <p>En moins d'une minute, obtenez une fourchette de prix basse, moyenne et haute avec prix au m².</p>
+        <a class="btn btn-small" href="#simulateur">Estimer mon bien</a>
       </article>
       <article class="card feature-card">
         <h3>Passage à l'action</h3>
         <p>Recevez ensuite un accompagnement sur-mesure pour vendre rapidement et sécuriser votre projet.</p>
+        <a class="btn btn-small" href="#simulateur">Estimer mon bien</a>
       </article>
     </div>
   </div>
@@ -86,16 +89,19 @@
         <p class="step-number">01</p>
         <h3>Renseignez votre bien</h3>
         <p>Ville, type, surface et nombre de pièces suffisent pour lancer la simulation.</p>
+        <a class="btn btn-small" href="#simulateur">Estimer mon bien</a>
       </article>
       <article class="card">
         <p class="step-number">02</p>
         <h3>Recevez l'estimation</h3>
         <p>Une fourchette de prix cohérente avec la dynamique actuelle du marché bordelais.</p>
+        <a class="btn btn-small" href="#simulateur">Estimer mon bien</a>
       </article>
       <article class="card">
         <p class="step-number">03</p>
         <h3>Activez l'accompagnement</h3>
         <p>Laissez vos coordonnées et avancez avec des conseils d'expert pour concrétiser votre vente.</p>
+        <a class="btn btn-small" href="#simulateur">Estimer mon bien</a>
       </article>
     </div>
   </div>
@@ -111,14 +117,17 @@
       <article class="card">
         <h3>L'estimation est-elle gratuite ?</h3>
         <p>Oui, la simulation en ligne est gratuite et sans engagement.</p>
+        <a class="btn btn-small" href="#simulateur">Estimer mon bien</a>
       </article>
       <article class="card">
         <h3>En combien de temps j'obtiens mon résultat ?</h3>
         <p>Le résultat est généré immédiatement après validation du formulaire.</p>
+        <a class="btn btn-small" href="#simulateur">Estimer mon bien</a>
       </article>
       <article class="card">
         <h3>Puis-je être recontacté ensuite ?</h3>
         <p>Oui, si vous le souhaitez, vous pouvez laisser vos coordonnées pour être accompagné.</p>
+        <a class="btn btn-small" href="#simulateur">Estimer mon bien</a>
       </article>
     </div>
   </div>
