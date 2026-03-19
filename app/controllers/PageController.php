@@ -56,4 +56,34 @@ final class PageController
             'success_message' => 'Merci ! Votre message a bien été reçu. Nous vous répondrons sous 24h.',
         ]);
     }
+
+
+    public function mentionsLegales(): void
+    {
+        View::render('legal/mentions', [
+            'page_title' => 'Mentions légales - Estimation Immobilier Bordeaux',
+        ]);
+    }
+
+    public function politiqueConfidentialite(): void
+    {
+        View::render('legal/confidentialite', [
+            'page_title' => 'Politique de confidentialité - Estimation Immobilier Bordeaux',
+        ]);
+    }
+
+    public function conditionsUtilisation(): void
+    {
+        View::render('legal/cgu', [
+            'page_title' => 'Conditions d\'utilisation - Estimation Immobilier Bordeaux',
+        ]);
+    }
+
+    public function rgpd(): void
+    {
+        View::render('legal/rgpd', [
+            'page_title' => 'RGPD - Estimation Immobilier Bordeaux',
+        ]);
+    }
+
 }

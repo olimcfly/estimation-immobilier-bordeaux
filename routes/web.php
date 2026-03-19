@@ -21,3 +21,7 @@ $router->get('/processus-estimation', [PageController::class, 'processusEstimati
 $router->get('/contact', [PageController::class, 'contact']);
 $router->get('/exemples-estimation', [PageController::class, 'exemplesEstimation']);
 $router->post('/contact', [PageController::class, 'contactSubmit']);
+$router->get('/mentions-legales', [PageController::class, 'mentionsLegales']);
+$router->get('/politique-confidentialite', [PageController::class, 'politiqueConfidentialite']);
+$router->get('/conditions-utilisation', [PageController::class, 'conditionsUtilisation']);
+$router->get('/rgpd', [PageController::class, 'rgpd']);
