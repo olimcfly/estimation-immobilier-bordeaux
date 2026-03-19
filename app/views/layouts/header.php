@@ -1,14 +1,24 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<?php
-  $colors = $config['colors'] ?? [];
-  $rgbColors = $config['rgb_colors'] ?? [];
-?>
+  <?php
+    $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
+    $canonicalPath = (string) parse_url($requestUri, PHP_URL_PATH);
+    $canonicalPath = $canonicalPath !== '' ? $canonicalPath : '/';
+    if ($canonicalPath !== '/') {
+        $canonicalPath = rtrim($canonicalPath, '/');
+    }
+
+    $isHttps = !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
+    $scheme = $isHttps ? 'https' : 'http';
+    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+    $canonicalUrl = $scheme . '://' . $host . $canonicalPath;
+  ?>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="<?= htmlspecialchars((string) ($meta_description ?? 'Estimation immobilière Bordeaux - Évaluez votre bien gratuitement et découvrez nos guides immobiliers.'), ENT_QUOTES, 'UTF-8') ?>">
   <meta name="theme-color" content="#8B1538">
+  <link rel="canonical" href="<?= e($canonicalUrl) ?>">
   <title><?= isset($page_title) ? $page_title : 'Estimation Immobilière Bordeaux' ?></title>
 
   <!-- Google Fonts -->
