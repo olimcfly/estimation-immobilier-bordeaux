@@ -127,5 +127,18 @@
   </div>
 </footer>
 
+<script>
+  document.querySelectorAll('img[data-address][data-bedrooms]').forEach((propertyImage) => {
+    const address = (propertyImage.dataset.address || '').trim();
+    const bedrooms = (propertyImage.dataset.bedrooms || '').trim();
+
+    if (!address || !bedrooms) {
+      return;
+    }
+
+    propertyImage.alt = `${address} - ${bedrooms} pièces`;
+  });
+</script>
+
 </body>
 </html>
