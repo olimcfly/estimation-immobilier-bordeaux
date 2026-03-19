@@ -14,6 +14,9 @@ use App\Services\PerplexityService;
 
 final class EstimationController
 {
+    private const LEAD_FORM_TTL_SECONDS = 1800;
+    private const LEAD_SUBMIT_COOLDOWN_SECONDS = 60;
+
     private EstimationService $estimationService;
 
     public function __construct(?EstimationService $estimationService = null)
@@ -38,6 +41,12 @@ final class EstimationController
             $rooms = Validator::int($_POST, 'pieces', 1, 50);
 
             $estimate = $this->estimationService->estimate($city, $propertyType, $surface, $rooms);
+            $now = time();
+            $_SESSION['lead_form_context'] = [
+                'ip' => $this->getClientIp(),
+                'issued_at' => $now,
+                'expires_at' => $now + self::LEAD_FORM_TTL_SECONDS,
+            ];
 
             View::render('estimation/result', [
                 'estimate' => $estimate,
@@ -85,6 +94,8 @@ final class EstimationController
     public function storeLead(): void
     {
         try {
+            $this->assertLeadRequestAllowed();
+
             $nom = Validator::string($_POST, 'nom', 2, 120);
             $email = Validator::email($_POST, 'email');
             $telephone = Validator::string($_POST, 'telephone', 6, 30);
@@ -132,6 +143,11 @@ final class EstimationController
                 'statut' => 'nouveau',
             ]);
 
+            $_SESSION['lead_last_submit'] = [
+                'ip' => $this->getClientIp(),
+                'submitted_at' => time(),
+            ];
+
             View::render('estimation/lead_saved', [
                 'leadId' => $leadId,
                 'temperature' => $temperature,
@@ -155,66 +171,57 @@ final class EstimationController
         }
     }
 
-    private function readApiInput(): array
+
+    private function assertLeadRequestAllowed(): void
     {
-        $contentType = (string) ($_SERVER['CONTENT_TYPE'] ?? '');
+        $context = $_SESSION['lead_form_context'] ?? null;
 
-        if (str_contains($contentType, 'application/json')) {
-            $raw = file_get_contents('php://input');
-            $decoded = json_decode((string) $raw, true);
+        if (!is_array($context)) {
+            throw new \RuntimeException('Session expirée. Merci de relancer une estimation avant de soumettre vos coordonnées.');
+        }
 
-            if (!is_array($decoded)) {
-                throw new \InvalidArgumentException('Payload JSON invalide.');
+        $ip = $this->getClientIp();
+        $issuedAt = (int) ($context['issued_at'] ?? 0);
+        $expiresAt = (int) ($context['expires_at'] ?? 0);
+
+        if (($context['ip'] ?? '') !== $ip) {
+            unset($_SESSION['lead_form_context']);
+            throw new \RuntimeException('Vérification de sécurité invalide. Merci de refaire une estimation.');
+        }
+
+        $now = time();
+        if ($issuedAt <= 0 || $now > $expiresAt) {
+            unset($_SESSION['lead_form_context']);
+            throw new \RuntimeException('Le formulaire a expiré. Merci de relancer une estimation.');
+        }
+
+        $lastSubmit = $_SESSION['lead_last_submit'] ?? null;
+        if (is_array($lastSubmit) && ($lastSubmit['ip'] ?? '') === $ip) {
+            $lastSubmittedAt = (int) ($lastSubmit['submitted_at'] ?? 0);
+            $secondsSinceLastSubmit = $now - $lastSubmittedAt;
+
+            if ($lastSubmittedAt > 0 && $secondsSinceLastSubmit < self::LEAD_SUBMIT_COOLDOWN_SECONDS) {
+                throw new \RuntimeException('Merci de patienter une minute avant d\'envoyer une nouvelle demande.');
             }
+        }
+    }
 
-            return $decoded;
+    private function getClientIp(): string
+    {
+        $forwardedFor = trim((string) ($_SERVER['HTTP_X_FORWARDED_FOR'] ?? ''));
+        if ($forwardedFor !== '') {
+            $forwardedIp = trim(explode(',', $forwardedFor)[0]);
+            if ($forwardedIp !== '') {
+                return $forwardedIp;
+            }
         }
 
-        return $_POST;
-    }
-
-    private function sanitizeEstimationPayload(array $input): array
-    {
-        $payload = [
-            'ville' => $this->sanitizeText($input['ville'] ?? ''),
-            'localisation' => $this->sanitizeText($input['localisation'] ?? ''),
-            'type' => $this->sanitizeText($input['type'] ?? ''),
-            'type_bien' => $this->sanitizeText($input['type_bien'] ?? ''),
-            'surface' => $this->sanitizeNumber($input['surface'] ?? ''),
-            'pieces' => $this->sanitizeRooms($input['pieces'] ?? ''),
-        ];
-
-        if ($payload['ville'] === '' && $payload['localisation'] !== '') {
-            $payload['ville'] = $payload['localisation'];
+        $realIp = trim((string) ($_SERVER['HTTP_X_REAL_IP'] ?? ''));
+        if ($realIp !== '') {
+            return $realIp;
         }
 
-        if ($payload['type'] === '' && $payload['type_bien'] !== '') {
-            $payload['type'] = $payload['type_bien'];
-        }
-
-        return $payload;
+        return trim((string) ($_SERVER['REMOTE_ADDR'] ?? 'unknown'));
     }
 
-    private function sanitizeText(mixed $value): string
-    {
-        $clean = trim(strip_tags((string) $value));
-        return preg_replace('/\s+/u', ' ', $clean) ?? '';
-    }
-
-    private function sanitizeNumber(mixed $value): string
-    {
-        $raw = str_replace(',', '.', trim((string) $value));
-        return preg_replace('/[^0-9.\-]/', '', $raw) ?? '';
-    }
-
-    private function sanitizeRooms(mixed $value): string
-    {
-        $clean = $this->sanitizeText($value);
-
-        if (preg_match('/^(\d+)\+$/', $clean, $matches) === 1) {
-            return $matches[1];
-        }
-
-        return preg_replace('/[^0-9\-]/', '', $clean) ?? '';
-    }
 }
