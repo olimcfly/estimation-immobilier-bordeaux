@@ -2,6 +2,31 @@
 
 declare(strict_types=1);
 
+if (!defined('CITY_NAME')) {
+    define('CITY_NAME', 'Bordeaux');
+}
+if (!defined('CITY_REGION')) {
+    define('CITY_REGION', 'Nouvelle-Aquitaine');
+}
+if (!defined('CITY_CODE_POSTAL')) {
+    define('CITY_CODE_POSTAL', '33000');
+}
+if (!defined('QUARTIERS')) {
+    define('QUARTIERS', ['Chartrons', 'Saint-Pierre', 'Saint-Michel', 'Caudéran', 'Bastide', 'Mériadeck']);
+}
+if (!defined('PRIX_M2_MOYEN')) {
+    define('PRIX_M2_MOYEN', 4800);
+}
+if (!defined('COLOR_PRIMARY')) {
+    define('COLOR_PRIMARY', '#8B1538');
+}
+if (!defined('COLOR_SECONDARY')) {
+    define('COLOR_SECONDARY', '#FFFFFF');
+}
+if (!defined('COLOR_ACCENT')) {
+    define('COLOR_ACCENT', '#D4AF37');
+}
+
 return [
     'app_name' => $_ENV['APP_NAME'] ?? 'Estimateur Immobilier SaaS',
     'base_url' => $_ENV['APP_BASE_URL'] ?? '',
@@ -11,7 +36,7 @@ return [
     'db' => [
         'host' => $_ENV['DB_HOST'] ?? '127.0.0.1',
         'port' => (int) ($_ENV['DB_PORT'] ?? 3306),
-        'name' => $_ENV['DB_NAME'] ?? 'immobilier_saas',
+        'name' => $_ENV['DB_NAME'] ?? 'immobilier_bordeaux',
         'user' => $_ENV['DB_USER'] ?? 'root',
         'pass' => $_ENV['DB_PASS'] ?? '',
         'charset' => $_ENV['DB_CHARSET'] ?? 'utf8mb4',
@@ -29,6 +54,18 @@ return [
         'model' => $_ENV['OPENAI_MODEL'] ?? 'gpt-4o-mini',
         'endpoint' => $_ENV['OPENAI_ENDPOINT'] ?? 'https://api.openai.com/v1/chat/completions',
     ],
+    'city' => [
+        'name' => CITY_NAME,
+        'region' => CITY_REGION,
+        'code_postal' => CITY_CODE_POSTAL,
+        'quartiers' => QUARTIERS,
+        'prix_m2_moyen' => PRIX_M2_MOYEN,
+        'colors' => [
+            'primary' => COLOR_PRIMARY,
+            'secondary' => COLOR_SECONDARY,
+            'accent' => COLOR_ACCENT,
+        ],
+    ],
     'site' => [
         'colors' => [
             'bg' => $_ENV['SITE_COLOR_BG'] ?? '#faf9f7',
@@ -45,6 +82,13 @@ return [
             'danger' => $_ENV['SITE_COLOR_DANGER'] ?? '#e24b4a',
             'info' => $_ENV['SITE_COLOR_INFO'] ?? '#3b82f6',
             'neutral' => $_ENV['SITE_COLOR_NEUTRAL'] ?? '#000000',
+        ],
+    ],
+    'maintenance' => [
+        'enabled' => filter_var($_ENV['MAINTENANCE_MODE'] ?? false, FILTER_VALIDATE_BOOLEAN),
+        'retry_after' => (int) ($_ENV['MAINTENANCE_RETRY_AFTER'] ?? 3600),
+        'allowed_paths' => [
+            '/admin/leads',
         ],
     ],
 ];
