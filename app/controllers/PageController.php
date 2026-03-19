@@ -34,6 +34,14 @@ final class PageController
         $this->about();
     }
 
+
+    public function exemplesEstimation(): void
+    {
+        View::render('pages/exemples_estimation', [
+            'page_title' => "Exemple Estimation - Cas Réels Bordeaux | Nos Résultats",
+        ]);
+    }
+
     public function contact(): void
     {
         View::render('pages/contact', [

@@ -517,7 +517,6 @@
 
 <main>
 
-<!-- SCRIPT POUR MOBILE MENU -->
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     const menuToggle = document.getElementById('menuToggle');
