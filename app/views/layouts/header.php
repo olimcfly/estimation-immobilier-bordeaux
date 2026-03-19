@@ -15,11 +15,13 @@
   <div class="container nav-wrapper">
     <a href="/" class="brand">Bordeaux<span>Estimate</span></a>
     <nav class="top-nav" aria-label="Navigation principale">
-      <a href="/estimation">Simulateur</a>
-      <a href="/blog">Blog</a>
-      <a href="/admin/blog">Admin CMS</a>
+      <a href="#simulateur">Simulateur</a>
+      <a href="#avantages">Avantages</a>
+      <a href="#process">Process</a>
+      <a href="#faq">FAQ</a>
+      <a href="/leads">Leads</a>
     </nav>
-    <a href="/estimation" class="btn btn-small">Estimer mon bien</a>
+    <a href="/estimation#simulateur" class="btn btn-small">Estimer mon bien</a>
   </div>
 </footer>
 

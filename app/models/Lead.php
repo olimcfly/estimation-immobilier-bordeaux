@@ -9,16 +9,30 @@ use PDO;
 
 final class Lead
 {
-    public function all(): array
+    public function listByScore(?string $score = null): array
     {
-        $sql = 'SELECT id, nom, email, telephone, ville, estimation, urgence, motivation, score, statut, created_at
-                FROM leads
-                ORDER BY created_at DESC, id DESC';
+        $allowedScores = ['chaud', 'tiede', 'froid'];
+        $isFiltered = $score !== null && in_array($score, $allowedScores, true);
 
-        $stmt = Database::connection()->query($sql);
-        $rows = $stmt->fetchAll();
+        if ($isFiltered) {
+            $stmt = Database::connection()->prepare(
+                'SELECT id, nom, email, telephone, ville, estimation, urgence, motivation, score, statut, created_at
+                 FROM leads
+                 WHERE score = :score
+                 ORDER BY created_at DESC'
+            );
+            $stmt->execute([':score' => $score]);
 
-        return is_array($rows) ? $rows : [];
+            return $stmt->fetchAll() ?: [];
+        }
+
+        $stmt = Database::connection()->query(
+            'SELECT id, nom, email, telephone, ville, estimation, urgence, motivation, score, statut, created_at
+             FROM leads
+             ORDER BY created_at DESC'
+        );
+
+        return $stmt->fetchAll() ?: [];
     }
 
     public function create(array $data): int

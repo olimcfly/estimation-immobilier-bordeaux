@@ -14,10 +14,13 @@ final class EstimationController
 {
     public function leads(): void
     {
+        $score = isset($_GET['score']) ? (string) $_GET['score'] : null;
         $leadModel = new Lead();
+        $leads = $leadModel->listByScore($score);
 
-        View::render('admin/leads', [
-            'leads' => $leadModel->all(),
+        View::render('estimation/leads', [
+            'leads' => $leads,
+            'scoreFilter' => $score,
         ]);
     }
 
