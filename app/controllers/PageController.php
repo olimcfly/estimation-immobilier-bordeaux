@@ -35,10 +35,10 @@ final class PageController
     }
 
 
-    public function processusEstimation(): void
+    public function exemplesEstimation(): void
     {
-        View::render('pages/processus_estimation', [
-            'page_title' => 'Processus Estimation - Notre Méthodologie',
+        View::render('pages/exemples_estimation', [
+            'page_title' => "Exemple Estimation - Cas Réels Bordeaux | Nos Résultats",
         ]);
     }
 
