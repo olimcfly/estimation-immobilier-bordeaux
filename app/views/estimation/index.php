@@ -378,7 +378,7 @@
         <!-- DROITE: RÉSULTAT ESTIMATION -->
         <div>
           <h3 style="margin: 0 0 1.5rem; font-size: 1.1rem;">Résultat de l'estimation</h3>
-          <div style="background: linear-gradient(135deg, rgba(139, 21, 56, 0.05), rgba(212, 175, 55, 0.03)); border: 2px solid var(--accent); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem;">
+          <div style="background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.05), rgba(var(--accent-rgb), 0.03)); border: 2px solid var(--accent); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem;">
             
             <!-- FOURCHETTE PRIX -->
             <div style="margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border);">
@@ -409,7 +409,7 @@
             </div>
 
             <!-- ANALYSE -->
-            <div style="background: rgba(139, 21, 56, 0.05); border-radius: 8px; padding: 1rem; font-size: 0.9rem;">
+            <div style="background: rgba(var(--primary-rgb), 0.05); border-radius: 8px; padding: 1rem; font-size: 0.9rem;">
               <p style="margin: 0 0 0.5rem; font-weight: 600; color: var(--primary);">✓ Analyse positive</p>
               <p style="margin: 0; color: var(--muted); font-size: 0.85rem;">Quartier Chartrons dynamique, prix au m² 12% au-dessus de la moyenne bordelaise, bon potentiel de vente.</p>
             </div>

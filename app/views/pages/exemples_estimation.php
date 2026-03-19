@@ -103,7 +103,7 @@
           </h3>
 
           <!-- FOURCHETTE PRIX -->
-          <div style="background: linear-gradient(135deg, rgba(139, 21, 56, 0.05), rgba(212, 175, 55, 0.03)); border: 2px solid var(--accent); border-radius: 12px; padding: 2rem; margin-bottom: 1.5rem; text-align: center;">
+          <div style="background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.05), rgba(var(--accent-rgb), 0.03)); border: 2px solid var(--accent); border-radius: 12px; padding: 2rem; margin-bottom: 1.5rem; text-align: center;">
             <p style="margin: 0 0 1rem; color: var(--muted); font-size: 0.85rem; text-transform: uppercase; font-weight: 700;">Fourchette de prix</p>
             
             <div style="display: grid; grid-template-columns: 1fr 1.5fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
@@ -139,7 +139,7 @@
           </div>
 
           <!-- ANALYSE -->
-          <div style="background: rgba(34, 197, 94, 0.05); border-left: 4px solid #22c55e; border-radius: 8px; padding: 1rem;">
+          <div style="background: rgba(var(--success-rgb), 0.05); border-left: 4px solid #22c55e; border-radius: 8px; padding: 1rem;">
             <p style="margin: 0 0 0.5rem; font-weight: 600; color: #22c55e;">✓ Analyse très positive</p>
             <p style="margin: 0; color: var(--muted); font-size: 0.9rem;">Quartier Chartrons très demandé. Prix au m² 12% au-dessus de la moyenne bordelaise. Potentiel de vente excellent. Surface et type adaptés au marché.</p>
           </div>
@@ -235,7 +235,7 @@
           </h3>
 
           <!-- FOURCHETTE PRIX -->
-          <div style="background: linear-gradient(135deg, rgba(139, 21, 56, 0.05), rgba(212, 175, 55, 0.03)); border: 2px solid var(--accent); border-radius: 12px; padding: 2rem; margin-bottom: 1.5rem; text-align: center;">
+          <div style="background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.05), rgba(var(--accent-rgb), 0.03)); border: 2px solid var(--accent); border-radius: 12px; padding: 2rem; margin-bottom: 1.5rem; text-align: center;">
             <p style="margin: 0 0 1rem; color: var(--muted); font-size: 0.85rem; text-transform: uppercase; font-weight: 700;">Fourchette de prix</p>
             
             <div style="display: grid; grid-template-columns: 1fr 1.5fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
@@ -271,7 +271,7 @@
           </div>
 
           <!-- ANALYSE -->
-          <div style="background: rgba(249, 115, 22, 0.05); border-left: 4px solid #f97316; border-radius: 8px; padding: 1rem;">
+          <div style="background: rgba(var(--warning-rgb), 0.05); border-left: 4px solid #f97316; border-radius: 8px; padding: 1rem;">
             <p style="margin: 0 0 0.5rem; font-weight: 600; color: #f97316;">⚠ Analyse modérée</p>
             <p style="margin: 0; color: var(--muted); font-size: 0.9rem;">Prix légèrement en-dessous de la moyenne. Travaux importants nécessaires réduisent l'attrait. Prix devrait augmenter après rénovation (potentiel +50k-80k€).</p>
           </div>
@@ -367,7 +367,7 @@
           </h3>
 
           <!-- FOURCHETTE PRIX -->
-          <div style="background: linear-gradient(135deg, rgba(139, 21, 56, 0.05), rgba(212, 175, 55, 0.03)); border: 2px solid var(--accent); border-radius: 12px; padding: 2rem; margin-bottom: 1.5rem; text-align: center;">
+          <div style="background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.05), rgba(var(--accent-rgb), 0.03)); border: 2px solid var(--accent); border-radius: 12px; padding: 2rem; margin-bottom: 1.5rem; text-align: center;">
             <p style="margin: 0 0 1rem; color: var(--muted); font-size: 0.85rem; text-transform: uppercase; font-weight: 700;">Fourchette de prix</p>
             
             <div style="display: grid; grid-template-columns: 1fr 1.5fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
@@ -403,7 +403,7 @@
           </div>
 
           <!-- ANALYSE -->
-          <div style="background: rgba(34, 197, 94, 0.05); border-left: 4px solid #22c55e; border-radius: 8px; padding: 1rem;">
+          <div style="background: rgba(var(--success-rgb), 0.05); border-left: 4px solid #22c55e; border-radius: 8px; padding: 1rem;">
             <p style="margin: 0 0 0.5rem; font-weight: 600; color: #22c55e;">✓ Analyse positive</p>
             <p style="margin: 0; color: var(--muted); font-size: 0.9rem;">T2 moderne rénové dans quartier demandé. Prix au m² premium justifié par qualité et localisation. Attrait jeunes actifs/investisseurs. Vente rapide envisageable.</p>
           </div>
