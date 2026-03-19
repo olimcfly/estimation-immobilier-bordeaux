@@ -199,6 +199,32 @@ input, select {
 .faq-grid p,
 .steps-grid p { color: var(--muted); margin: 0; }
 
+.result-layout {
+  display: grid;
+  grid-template-columns: 1.4fr .8fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.result-summary h2 { margin-bottom: .2rem; }
+
+.result-kpi p {
+  margin: .25rem 0 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.result-price {
+  margin-top: 1rem;
+  font-size: 1.05rem;
+}
+
+.lead-cta {
+  display: grid;
+  gap: .45rem;
+  align-content: center;
+}
+
 .step-number {
   color: var(--primary);
   font-weight: 800;
@@ -239,5 +265,6 @@ input, select {
   .steps-grid,
   .faq-grid,
   .grid-3,
-  .footer-grid { grid-template-columns: 1fr; }
+  .footer-grid,
+  .result-layout { grid-template-columns: 1fr; }
 }
