@@ -24,7 +24,7 @@ final class PageController
 
     public function about(): void
     {
-        View::render('pages/about', [
+        View::render('pages/a_propos', [
             'page_title' => 'À Propos - Estimation Immobilier Bordeaux',
         ]);
     }
