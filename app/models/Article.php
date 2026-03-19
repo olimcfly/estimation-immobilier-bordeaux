@@ -13,7 +13,8 @@ final class Article
         $sql = 'SELECT id, title, slug, content, meta_title, meta_description, persona, awareness_level, status, created_at
                 FROM articles
                 WHERE status = :status
-                ORDER BY created_at DESC';
+                ORDER BY created_at DESC
+                LIMIT 10 OFFSET 0';
 
         $stmt = Database::connection()->prepare($sql);
         $stmt->execute([':status' => 'published']);
