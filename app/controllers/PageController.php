@@ -43,10 +43,10 @@ final class PageController
     }
 
 
-    public function processusEstimation(): void
+    public function quartiers(): void
     {
-        View::render('pages/processus_estimation', [
-            'page_title' => "Processus d'Estimation - Estimation Immobilier Bordeaux",
+        View::render('pages/quartiers', [
+            'page_title' => 'Quartiers de Bordeaux - Estimation Immobilier Bordeaux',
         ]);
     }
 

@@ -20,6 +20,7 @@ $router->get('/services', [PageController::class, 'services']);
 $router->get('/about', [PageController::class, 'about']);
 $router->get('/a-propos', [PageController::class, 'aPropos']);
 $router->get('/processus-estimation', [PageController::class, 'processusEstimation']);
+$router->get('/quartiers', [PageController::class, 'quartiers']);
 $router->get('/contact', [PageController::class, 'contact']);
 $router->get('/newsletter', [PageController::class, 'newsletter']);
 $router->get('/exemples-estimation', [PageController::class, 'exemplesEstimation']);
