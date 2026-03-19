@@ -2,14 +2,22 @@
 
 declare(strict_types=1);
 
-$isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
-    || (($_SERVER['SERVER_PORT'] ?? null) === '443')
-    || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
+$httpsIndicators = [
+    (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off'),
+    (($_SERVER['SERVER_PORT'] ?? null) === '443'),
+    (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https'),
+    (($_SERVER['HTTP_X_FORWARDED_SSL'] ?? '') === 'on'),
+    (($_SERVER['HTTP_FRONT_END_HTTPS'] ?? '') === 'on'),
+    (($_SERVER['REQUEST_SCHEME'] ?? '') === 'https'),
+    (($_SERVER['HTTP_CF_VISITOR'] ?? '') !== '' && str_contains((string) $_SERVER['HTTP_CF_VISITOR'], '"https"')),
+];
+
+$isHttps = in_array(true, $httpsIndicators, true);
 
 $host = $_SERVER['HTTP_HOST'] ?? '';
 $isLocalHost = str_starts_with($host, 'localhost') || str_starts_with($host, '127.0.0.1');
 
-if (PHP_SAPI !== 'cli' && !$isHttps && !$isLocalHost) {
+if (PHP_SAPI !== 'cli' && $host !== '' && !$isHttps && !$isLocalHost) {
     $target = 'https://' . $host . ($_SERVER['REQUEST_URI'] ?? '/');
     header('Location: ' . $target, true, 301);
     exit;
