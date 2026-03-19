@@ -1,16 +1,38 @@
-<section class="card">
-  <h2>Résultat d'estimation</h2>
-  <div class="grid-3">
-    <div><strong>Basse</strong><p><?= number_format((float) $estimate['estimated_low'], 0, ',', ' ') ?> €</p></div>
-    <div><strong>Moyenne</strong><p><?= number_format((float) $estimate['estimated_mid'], 0, ',', ' ') ?> €</p></div>
-    <div><strong>Haute</strong><p><?= number_format((float) $estimate['estimated_high'], 0, ',', ' ') ?> €</p></div>
-  </div>
-  <p>Prix moyen au m²: <strong><?= number_format((float) $estimate['per_sqm_mid'], 0, ',', ' ') ?> €/m²</strong></p>
+<section class="result-layout">
+  <article class="card result-summary">
+    <p class="eyebrow">Estimation obtenue</p>
+    <h2>Votre estimation à <?= e((string) $estimate['city']) ?></h2>
+    <p class="muted">Voici la fourchette de valeur calculée pour votre bien.</p>
+
+    <div class="grid-3">
+      <div class="result-kpi">
+        <strong>Basse</strong>
+        <p><?= number_format((float) $estimate['estimated_low'], 0, ',', ' ') ?> €</p>
+      </div>
+      <div class="result-kpi">
+        <strong>Moyenne</strong>
+        <p><?= number_format((float) $estimate['estimated_mid'], 0, ',', ' ') ?> €</p>
+      </div>
+      <div class="result-kpi">
+        <strong>Haute</strong>
+        <p><?= number_format((float) $estimate['estimated_high'], 0, ',', ' ') ?> €</p>
+      </div>
+    </div>
+
+    <p class="result-price">Prix moyen au m² : <strong><?= number_format((float) $estimate['per_sqm_mid'], 0, ',', ' ') ?> €/m²</strong></p>
+  </article>
+
+  <article class="card lead-cta">
+    <p class="eyebrow">Passer à l'action</p>
+    <h3>Activez votre accompagnement vendeur</h3>
+    <p class="muted">Laissez vos coordonnées pour être rappelé et transformer cette estimation en projet concret.</p>
+    <a href="#lead-form" class="btn">Je veux être recontacté</a>
+  </article>
 </section>
 
-<section class="card">
-  <h3>Recevoir un accompagnement</h3>
-  <form action="/lead" method="post">
+<section class="card" id="lead-form">
+  <h3>Laisser mes coordonnées</h3>
+  <form action="/lead" method="post" class="form-grid">
     <input type="hidden" name="ville" value="<?= e((string) $estimate['city']) ?>">
     <input type="hidden" name="estimation" value="<?= e((string) $estimate['estimated_mid']) ?>">
 
@@ -47,6 +69,6 @@
       </select>
     </label>
 
-    <button type="submit">Enregistrer mon lead</button>
+    <button type="submit" class="btn">Enregistrer mon lead</button>
   </form>
 </section>
