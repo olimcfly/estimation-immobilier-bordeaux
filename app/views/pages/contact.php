@@ -1,293 +1,436 @@
-<?php if (!empty($success_message)): ?>
-<section class="section">
-  <div class="container">
-    <div class="card" style="border-left: 4px solid #2e7d32;">
-      <p><strong><?= htmlspecialchars($success_message, ENT_QUOTES, 'UTF-8') ?></strong></p>
-    </div>
-  </div>
-</section>
-<?php endif; ?>
+<?php $page_title = 'Contact - Estimation Immobilière Bordeaux | Nous Sommes Disponibles'; ?>
+<?php require 'app/views/layouts/header.php'; ?>
 
-
-<!-- HERO PAGE -->
+<!-- ============================================ -->
+<!-- HERO SECTION -->
+<!-- ============================================ -->
 <section class="section page-hero">
   <div class="container">
     <div class="page-hero-inner card">
-      <p class="eyebrow"><i class="fas fa-envelope"></i> Nous contacter</p>
+      <p class="eyebrow">
+        <i class="fas fa-envelope"></i> Nous contacter
+      </p>
       <h1>Parlons de votre projet immobilier</h1>
-      <p class="lead">Besoin d'un avis expert avant de vendre ? Questions sur une estimation ? Notre équipe bordelaise vous répond rapidement et sans engagement.</p>
+      <p class="lead">
+        Besoin d'un avis expert ? Des questions sur une estimation ? Notre équipe bordelaise est disponible pour vous accompagner.
+      </p>
     </div>
   </div>
 </section>
 
-<!-- CONTACT INFO & FORM -->
+<!-- ============================================ -->
+<!-- CONTACT INFO + FORMULAIRE -->
+<!-- ============================================ -->
 <section class="section">
   <div class="container">
     <div class="contact-layout">
-      <!-- COORDONNÉES & HORAIRES -->
+      
+      <!-- GAUCHE: INFOS CONTACT -->
       <article class="card contact-info">
-        <h2><i class="fas fa-map-marker-alt"></i> Nos coordonnées</h2>
-        
-        <div class="info-block">
-          <p class="info-label"><i class="fas fa-phone"></i> Téléphone</p>
-          <p class="info-value"><a href="tel:+33556000000">+33 5 56 00 00 00</a></p>
-          <p class="info-desc">Du lundi au vendredi, 9h à 19h</p>
-        </div>
+        <h2>
+          <i class="fas fa-map-marker-alt"></i> Nos coordonnées
+        </h2>
 
+        <!-- TÉLÉPHONE -->
         <div class="info-block">
-          <p class="info-label"><i class="fas fa-envelope"></i> Email</p>
-          <p class="info-value"><a href="mailto:contact@estimation-bordeaux.fr">contact@estimation-bordeaux.fr</a></p>
-          <p class="info-desc">Réponse en moins de 24h</p>
-        </div>
-
-        <div class="info-block">
-          <p class="info-label"><i class="fas fa-map-pin"></i> Adresse</p>
-          <p class="info-value">12 Quai des Chartrons</p>
-          <p class="info-value">33000 Bordeaux</p>
-          <p class="info-desc">Quartier historique du Vieux Bordeaux</p>
-        </div>
-
-        <div class="info-block">
-          <p class="info-label"><i class="fas fa-clock"></i> Horaires d'ouverture</p>
+          <p class="info-label">
+            <i class="fas fa-phone"></i> Téléphone
+          </p>
+          <p class="info-value">
+            <a href="tel:+33556000000">+33 5 56 00 00 00</a>
+          </p>
           <ul class="hours-list">
-            <li><span>Lundi - Vendredi</span> <strong>9h - 19h</strong></li>
-            <li><span>Samedi</span> <strong>10h - 17h</strong></li>
-            <li><span>Dimanche</span> <strong>Fermé</strong></li>
+            <li>
+              <span>Lundi - Vendredi :</span>
+              <strong>9h - 19h</strong>
+            </li>
+            <li>
+              <span>Samedi :</span>
+              <strong>10h - 17h</strong>
+            </li>
+            <li>
+              <span>Dimanche :</span>
+              <strong>Fermé</strong>
+            </li>
           </ul>
+        </div>
+
+        <!-- EMAIL -->
+        <div class="info-block">
+          <p class="info-label">
+            <i class="fas fa-envelope"></i> Email
+          </p>
+          <p class="info-value">
+            <a href="mailto:contact@estimation-immobilier-bordeaux.fr">
+              contact@estimation-immobilier-bordeaux.fr
+            </a>
+          </p>
+          <p class="info-desc">
+            Réponse garantie en moins de 24h
+          </p>
+        </div>
+
+        <!-- ADRESSE -->
+        <div class="info-block">
+          <p class="info-label">
+            <i class="fas fa-map-marker-alt"></i> Adresse
+          </p>
+          <p class="info-value">
+            12 Quai des Chartrons<br>
+            33000 Bordeaux<br>
+            France
+          </p>
+          <p class="info-desc">
+            Parking gratuit • Accès PMR
+          </p>
+        </div>
+
+        <!-- RÉSEAUX SOCIAUX -->
+        <div class="info-block">
+          <p class="info-label">
+            <i class="fas fa-share-alt"></i> Suivez-nous
+          </p>
+          <div style="display: flex; gap: 1rem; margin-top: 0.8rem;">
+            <a href="#facebook" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: rgba(139, 21, 56, 0.08); border-radius: 10px; color: var(--primary); text-decoration: none; transition: all 0.2s; border: 1px solid rgba(139, 21, 56, 0.15);" title="Facebook">
+              <i class="fab fa-facebook-f" style="font-size: 1.2rem;"></i>
+            </a>
+            <a href="#instagram" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: rgba(139, 21, 56, 0.08); border-radius: 10px; color: var(--primary); text-decoration: none; transition: all 0.2s; border: 1px solid rgba(139, 21, 56, 0.15);" title="Instagram">
+              <i class="fab fa-instagram" style="font-size: 1.2rem;"></i>
+            </a>
+            <a href="#linkedin" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: rgba(139, 21, 56, 0.08); border-radius: 10px; color: var(--primary); text-decoration: none; transition: all 0.2s; border: 1px solid rgba(139, 21, 56, 0.15);" title="LinkedIn">
+              <i class="fab fa-linkedin-in" style="font-size: 1.2rem;"></i>
+            </a>
+          </div>
         </div>
       </article>
 
-      <!-- FORMULAIRE CONTACT -->
+      <!-- DROITE: FORMULAIRE CONTACT -->
       <article class="card contact-form-card">
-        <h2><i class="fas fa-comment-dots"></i> Envoyez-nous un message</h2>
-        <p class="form-intro">Remplissez ce formulaire et nous vous recontacterons rapidement pour discuter de votre projet.</p>
+        <h2>
+          <i class="fas fa-comment-dots"></i> Envoyez-nous un message
+        </h2>
+        <p class="form-intro">
+          Remplissez ce formulaire et nous vous recontacterons rapidement. Merci de votre intérêt !
+        </p>
 
         <form class="form-grid form-contact" action="/contact" method="post">
-          <div class="form-row">
-            <label for="nom">
-              <span>Nom complet *</span>
-              <input type="text" id="nom" name="nom" placeholder="Jean Dupont" required>
-            </label>
-
-            <label for="email">
-              <span>Email *</span>
-              <input type="email" id="email" name="email" placeholder="jean@email.com" required>
-            </label>
-          </div>
-
-          <label for="telephone">
-            <span>Téléphone *</span>
-            <input type="tel" id="telephone" name="telephone" placeholder="06 12 34 56 78" required>
+          <!-- NOM -->
+          <label for="nom" class="full-width">
+            <span><i class="fas fa-user"></i> Nom complet *</span>
+            <input 
+              type="text" 
+              id="nom" 
+              name="nom" 
+              placeholder="Jean Dupont" 
+              required
+            >
           </label>
 
-          <label for="sujet">
-            <span>Sujet de votre demande *</span>
+          <!-- EMAIL -->
+          <label for="email" class="full-width">
+            <span><i class="fas fa-envelope"></i> Email *</span>
+            <input 
+              type="email" 
+              id="email" 
+              name="email" 
+              placeholder="jean@exemple.com" 
+              required
+            >
+          </label>
+
+          <!-- TÉLÉPHONE -->
+          <label for="telephone" class="full-width">
+            <span><i class="fas fa-phone"></i> Téléphone</span>
+            <input 
+              type="tel" 
+              id="telephone" 
+              name="telephone" 
+              placeholder="+33 5 56 00 00 00"
+            >
+          </label>
+
+          <!-- SUJET -->
+          <label for="sujet" class="full-width">
+            <span><i class="fas fa-list"></i> Sujet *</span>
             <select id="sujet" name="sujet" required>
-              <option value="">-- Sélectionner --</option>
-              <option value="estimation">Estimer mon bien</option>
-              <option value="vente">Conseil pour ma vente</option>
-              <option value="question">Question technique</option>
-              <option value="accompagnement">Accompagnement personnalisé</option>
-              <option value="autre">Autre demande</option>
+              <option value="">-- Sélectionner un sujet --</option>
+              <option value="estimation">Question sur une estimation</option>
+              <option value="accompagnement">Demander un accompagnement</option>
+              <option value="conseil">Conseil immobilier</option>
+              <option value="partenariat">Partenariat / Collaboration</option>
+              <option value="probleme">Signaler un problème</option>
+              <option value="autre">Autre question</option>
             </select>
           </label>
 
-          <label for="ville">
-            <span>Localisation du bien (si applicable)</span>
-            <input type="text" id="ville" name="ville" placeholder="Ex : Bordeaux, Talence, Pessac">
+          <!-- QUARTIER/VILLE -->
+          <label for="quartier" class="full-width">
+            <span><i class="fas fa-map-marker-alt"></i> Quartier / Ville concerné(e)</span>
+            <input 
+              type="text" 
+              id="quartier" 
+              name="quartier" 
+              placeholder="Ex: Chartrons, Talence, Floirac..."
+            >
           </label>
 
-          <label for="message">
-            <span>Votre message *</span>
-            <textarea id="message" name="message" placeholder="Décrivez votre situation ou vos questions..." rows="5" required></textarea>
+          <!-- MESSAGE -->
+          <label for="message" class="full-width">
+            <span><i class="fas fa-pen"></i> Votre message *</span>
+            <textarea 
+              id="message" 
+              name="message" 
+              placeholder="Décrivez votre situation, vos questions..." 
+              rows="6"
+              required
+            ></textarea>
           </label>
 
-          <div class="form-checkbox">
-            <input type="checkbox" id="consentement" name="consentement" required>
-            <label for="consentement">
-              J'accepte que mes données soient utilisées pour répondre à ma demande. <a href="/mentions-legales">Politique de confidentialité</a>
+          <!-- CHECKBOX RGPD -->
+          <div class="form-checkbox full-width">
+            <input 
+              type="checkbox" 
+              id="rgpd" 
+              name="rgpd" 
+              required
+            >
+            <label for="rgpd" style="margin: 0; font-weight: 500; font-size: 0.9rem; color: var(--text); cursor: pointer;">
+              J'accepte la 
+              <a href="/politique-confidentialite">politique de confidentialité</a> 
+              et je consens à recevoir des communications de la part d'Estimation Bordeaux *
             </label>
           </div>
 
-          <button type="submit" class="btn btn-primary btn-full">
-            <i class="fas fa-paper-plane"></i> Envoyer le message
+          <!-- SUBMIT -->
+          <button 
+            type="submit" 
+            class="btn btn-primary full-width" 
+            style="display: flex; justify-content: center; align-items: center; gap: 0.5rem; font-size: 1rem; padding: 1rem;"
+          >
+            <i class="fas fa-paper-plane"></i> Envoyer mon message
           </button>
 
-          <p class="form-footer">
-            <i class="fas fa-lock"></i> Vos données sont sécurisées et confidentielles.
+          <!-- LEGAL INFO -->
+          <p class="form-footer" style="text-align: center; margin-top: 1rem; font-size: 0.8rem; grid-column: 1 / -1;">
+            <i class="fas fa-lock"></i> Vos données sont sécurisées. 
+            <i class="fas fa-check-circle"></i> Nous vous répondrons rapidement.
           </p>
         </form>
       </article>
+
     </div>
   </div>
 </section>
 
-<!-- SERVICES -->
+<!-- ============================================ -->
+<!-- SERVICES / MOYENS DE CONTACT -->
+<!-- ============================================ -->
 <section class="section section-alt">
   <div class="container">
     <div class="section-heading">
-      <p class="eyebrow">Nos services</p>
-      <h2>Tout ce que nous pouvons faire pour vous</h2>
+      <p class="eyebrow">
+        <i class="fas fa-headset"></i> Autres moyens de nous contacter
+      </p>
+      <h2>Choisissez le canal qui vous convient</h2>
     </div>
 
-    <div class="services-grid">
-      <article class="card service-card">
-        <div class="service-icon">
-          <i class="fas fa-calculator"></i>
-        </div>
-        <h3>Estimation gratuite</h3>
-        <p>Obtenez une première évaluation de votre bien en moins d'une minute, 100% gratuit et sans engagement.</p>
-        <a href="/#simulateur" class="service-link">Estimer mon bien <i class="fas fa-arrow-right"></i></a>
+    <div class="service-grid">
+      <!-- MOYEN 1: TÉLÉPHONE -->
+      <article class="card service-additional">
+        <h3>
+          <i class="fas fa-phone"></i> Par téléphone
+        </h3>
+        <p>
+          Parlez directement à un expert. Réponses immédiates à vos questions. 
+          Disponible du lundi au samedi, 9h-19h.
+        </p>
+        <a href="tel:+33556000000" class="btn btn-small" style="margin-top: 1rem;">
+          <i class="fas fa-phone"></i> Appeler maintenant
+        </a>
       </article>
 
-      <article class="card service-card">
-        <div class="service-icon">
-          <i class="fas fa-user-tie"></i>
-        </div>
-        <h3>Accompagnement vendeur</h3>
-        <p>Un expert vous conseille pour optimiser votre stratégie de vente et maximiser le prix de votre propriété.</p>
-        <a href="#contact-form" class="service-link">Demander un conseil <i class="fas fa-arrow-right"></i></a>
+      <!-- MOYEN 2: EMAIL -->
+      <article class="card service-additional">
+        <h3>
+          <i class="fas fa-envelope"></i> Par email
+        </h3>
+        <p>
+          Envoyez-nous un email détaillé. Notre équipe vous répond en moins de 24h. 
+          Idéal pour les questions complexes.
+        </p>
+        <a href="mailto:contact@estimation-immobilier-bordeaux.fr" class="btn btn-small" style="margin-top: 1rem;">
+          <i class="fas fa-envelope"></i> Envoyer un email
+        </a>
       </article>
 
-      <article class="card service-card">
-        <div class="service-icon">
-          <i class="fas fa-chart-bar"></i>
-        </div>
-        <h3>Analyse de marché</h3>
-        <p>Recevez une analyse détaillée du marché immobilier de votre quartier et des tendances actuelles.</p>
-        <a href="#contact-form" class="service-link">Demander l'analyse <i class="fas fa-arrow-right"></i></a>
+      <!-- MOYEN 3: FORMULAIRE -->
+      <article class="card service-additional">
+        <h3>
+          <i class="fas fa-comment-dots"></i> Via le formulaire
+        </h3>
+        <p>
+          Remplissez le formulaire ci-dessus. Nous traiterons votre demande 
+          en priorité et vous recontacterons rapidement.
+        </p>
+        <a href="#form-contact" class="btn btn-small" style="margin-top: 1rem;">
+          <i class="fas fa-arrow-down"></i> Aller au formulaire
+        </a>
       </article>
 
-      <article class="card service-card">
-        <div class="service-icon">
-          <i class="fas fa-handshake"></i>
-        </div>
-        <h3>Suivi de projet</h3>
-        <p>Nous vous accompagnons jusqu'à la signature pour sécuriser votre transaction et atteindre vos objectifs.</p>
-        <a href="#contact-form" class="service-link">Activer le suivi <i class="fas fa-arrow-right"></i></a>
+      <!-- MOYEN 4: CHAT DIRECT -->
+      <article class="card service-additional">
+        <h3>
+          <i class="fas fa-comments"></i> Chat en direct
+        </h3>
+        <p>
+          Discussions instantanées avec nos experts (disponible du lundi 
+          au vendredi, 9h-18h). Support immédiat pour vos questions.
+        </p>
+        <button class="btn btn-small" style="margin-top: 1rem; cursor: pointer;">
+          <i class="fas fa-comments"></i> Ouvrir le chat
+        </button>
       </article>
 
-      <article class="card service-card">
-        <div class="service-icon">
-          <i class="fas fa-video"></i>
+      <!-- MOYEN 5: RÉSEAUX SOCIAUX -->
+      <article class="card service-additional">
+        <h3>
+          <i class="fas fa-share-alt"></i> Sur les réseaux sociaux
+        </h3>
+        <p>
+          Suivez-nous sur Facebook, Instagram et LinkedIn. Actualités, 
+          conseils immobiliers et réponses à vos questions.
+        </p>
+        <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+          <a href="#facebook" class="btn btn-small" style="flex: 1; justify-content: center;">
+            <i class="fab fa-facebook-f"></i>
+          </a>
+          <a href="#instagram" class="btn btn-small" style="flex: 1; justify-content: center;">
+            <i class="fab fa-instagram"></i>
+          </a>
+          <a href="#linkedin" class="btn btn-small" style="flex: 1; justify-content: center;">
+            <i class="fab fa-linkedin-in"></i>
+          </a>
         </div>
-        <h3>Consultation vidéo</h3>
-        <p>Préférez un appel vidéo ? Programmez une consultation avec un de nos experts à votre convenance.</p>
-        <a href="#contact-form" class="service-link">Programmer un appel <i class="fas fa-arrow-right"></i></a>
       </article>
 
-      <article class="card service-card">
-        <div class="service-icon">
-          <i class="fas fa-book"></i>
-        </div>
-        <h3>Guides & ressources</h3>
-        <p>Accédez à nos guides complets pour bien préparer votre vente immobilière à Bordeaux.</p>
-        <a href="/ressources" class="service-link">Voir les ressources <i class="fas fa-arrow-right"></i></a>
+      <!-- MOYEN 6: RENDEZ-VOUS -->
+      <article class="card service-additional">
+        <h3>
+          <i class="fas fa-calendar"></i> Prendre rendez-vous
+        </h3>
+        <p>
+          Préférez une consultation en personne ? Prenez rendez-vous 
+          avec nos experts au siège à Bordeaux.
+        </p>
+        <button class="btn btn-small" style="margin-top: 1rem; cursor: pointer;">
+          <i class="fas fa-calendar"></i> Prendre RDV
+        </button>
       </article>
     </div>
   </div>
 </section>
 
-<!-- RESPONSE TIME -->
+<!-- ============================================ -->
+<!-- FAQ CONTACT -->
+<!-- ============================================ -->
 <section class="section">
   <div class="container">
     <div class="section-heading">
-      <p class="eyebrow">Réactivité garantie</p>
-      <h2>Nous nous engageons à vous répondre rapidement</h2>
-    </div>
-
-    <div class="response-grid">
-      <div class="response-card card">
-        <div class="response-icon">
-          <i class="fas fa-envelope"></i>
-        </div>
-        <p class="response-time"><strong>Moins de 24h</strong></p>
-        <p class="response-label">Par email</p>
-        <p class="response-desc">Nous répondons à tous les emails en moins d'une journée ouvrable.</p>
-      </div>
-
-      <div class="response-card card">
-        <div class="response-icon">
-          <i class="fas fa-phone"></i>
-        </div>
-        <p class="response-time"><strong>Jour même</strong></p>
-        <p class="response-label">Par téléphone</p>
-        <p class="response-desc">Appelez-nous pendant les horaires d'ouverture pour une réponse immédiate.</p>
-      </div>
-
-      <div class="response-card card">
-        <div class="response-icon">
-          <i class="fas fa-mobile-alt"></i>
-        </div>
-        <p class="response-time"><strong>2-4h</strong></p>
-        <p class="response-label">Par SMS</p>
-        <p class="response-desc">Besoin d'une réponse rapide ? Envoyez-nous un SMS pour un contact immédiat.</p>
-      </div>
-
-      <div class="response-card card">
-        <div class="response-icon">
-          <i class="fas fa-comments"></i>
-        </div>
-        <p class="response-time"><strong>30 min</strong></p>
-        <p class="response-label">Instant messaging</p>
-        <p class="response-desc">Disponibilité 24/7 via WhatsApp ou Messenger pour les questions urgentes.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- FAQ CONTACT -->
-<section class="section section-alt">
-  <div class="container">
-    <div class="section-heading">
-      <p class="eyebrow">Questions fréquentes</p>
-      <h2>Tout ce que vous devez savoir</h2>
+      <p class="eyebrow">
+        <i class="fas fa-question-circle"></i> Questions fréquentes
+      </p>
+      <h2>Réponses rapides</h2>
     </div>
 
     <div class="faq-grid">
+      <!-- FAQ 1 -->
       <article class="card faq-card">
-        <h3><i class="fas fa-question-circle"></i> Quel est le meilleur moment pour me contacter ?</h3>
-        <p>Nous sommes disponibles du lundi au vendredi de 9h à 19h, et le samedi de 10h à 17h. Vous pouvez nous contacter à tout moment via email ou formulaire, nous répondons rapidement.</p>
+        <h3>
+          <i class="fas fa-question-circle"></i> Quel est le meilleur moyen pour me contacter?
+        </h3>
+        <p>
+          Cela dépend de votre besoin. Pour une question rapide, appelez-nous. 
+          Pour une demande détaillée, utilisez le formulaire ou l'email. Le chat est parfait pour les urgences.
+        </p>
       </article>
 
+      <!-- FAQ 2 -->
       <article class="card faq-card">
-        <h3><i class="fas fa-question-circle"></i> Faut-il un rendez-vous pour être conseillé ?</h3>
-        <p>Non, vous pouvez commencer par une estimation gratuite en ligne. Si vous avez besoin d'un conseil personnalisé, nous pouvons organiser un appel ou une visite selon votre préférence.</p>
+        <h3>
+          <i class="fas fa-question-circle"></i> Combien de temps pour obtenir une réponse?
+        </h3>
+        <p>
+          Par téléphone : immédiat. Par email/formulaire : moins de 24h. 
+          Par chat : réponse en quelques minutes (heures de bureau).
+        </p>
       </article>
 
+      <!-- FAQ 3 -->
       <article class="card faq-card">
-        <h3><i class="fas fa-question-circle"></i> Y a-t-il des frais pour une consultation ?</h3>
-        <p>L'estimation en ligne est 100% gratuite. Notre accompagnement personnalisé peut être proposé sous différentes formes selon vos besoins. Nous discutons toujours de la tarification avant d'engager un processus.</p>
+        <h3>
+          <i class="fas fa-question-circle"></i> Êtes-vous disponibles le week-end?
+        </h3>
+        <p>
+          Le samedi de 10h à 17h. Le dimanche fermé. Pour les urgences en dehors des heures, 
+          utilisez le formulaire et nous vous répondrons dès lundi.
+        </p>
       </article>
 
+      <!-- FAQ 4 -->
       <article class="card faq-card">
-        <h3><i class="fas fa-question-circle"></i> Pouvez-vous venir visiter mon bien ?</h3>
-        <p>Oui, nous pouvons organiser une visite si vous êtes intéressé par un accompagnement personnalisé. Contactez-nous pour programmer une visite adaptée à votre emploi du temps.</p>
+        <h3>
+          <i class="fas fa-question-circle"></i> Puis-je visiter vos bureaux?
+        </h3>
+        <p>
+          Oui ! Sur rendez-vous. 12 Quai des Chartrons, Bordeaux. 
+          Parking gratuit et accès PMR disponibles.
+        </p>
       </article>
 
+      <!-- FAQ 5 -->
       <article class="card faq-card">
-        <h3><i class="fas fa-question-circle"></i> Comment se passe une consultation vidéo ?</h3>
-        <p>Après validation de votre demande, nous vous envoyons un lien pour participer à une vidéoconférence sécurisée. Pas besoin de télécharger d'application, tout se fait via navigateur.</p>
+        <h3>
+          <i class="fas fa-question-circle"></i> Mes données sont-elles sécurisées?
+        </h3>
+        <p>
+          Absolument. Chiffrement SSL/TLS, RGPD conforme. Vos données ne sont jamais vendues. 
+          Nous respectons votre confidentialité.
+        </p>
       </article>
 
+      <!-- FAQ 6 -->
       <article class="card faq-card">
-        <h3><i class="fas fa-question-circle"></i> Que se passe-t-il après ma demande ?</h3>
-        <p>Nous vous contactons rapidement pour comprendre votre situation et vos besoins. Ensuite, nous vous proposons les solutions les plus adaptées : estimation, conseil, accompagnement, etc.</p>
+        <h3>
+          <i class="fas fa-question-circle"></i> Puis-je demander un rappel?
+        </h3>
+        <p>
+          Oui, indiquez-le dans le formulaire. Nous vous recontacterons au moment qui vous convient. 
+          Vous pouvez aussi nous appeler directement.
+        </p>
       </article>
     </div>
   </div>
 </section>
 
+<!-- ============================================ -->
 <!-- CTA FINAL -->
+<!-- ============================================ -->
 <section class="section">
   <div class="container">
-    <div class="cta-contact card" id="contact-form">
-      <p class="eyebrow"><i class="fas fa-lightbulb"></i> Pas encore décidé ?</p>
+    <div class="cta-final card">
+      <p class="eyebrow">
+        <i class="fas fa-hands-helping"></i> Pas encore estimé?
+      </p>
       <h2>Commencez par une estimation gratuite</h2>
-      <p class="lead">Aucun engagement, 100% confidentiel. Découvrez la valeur de votre bien en moins d'une minute.</p>
-      <a href="/#simulateur" class="btn btn-primary">Estimer mon bien gratuitement</a>
+      <p class="lead">
+        Avant de nous contacter, découvrez la fourchette de prix de votre bien. 
+        100% gratuit, résultat en 1 minute.
+      </p>
+      <a href="/#form-estimation" class="btn btn-primary">
+        <i class="fas fa-calculator"></i> Estimer mon bien
+      </a>
     </div>
   </div>
 </section>
 
-<?php include 'footer.php'; ?>
+<?php require 'app/views/layouts/footer.php'; ?>
