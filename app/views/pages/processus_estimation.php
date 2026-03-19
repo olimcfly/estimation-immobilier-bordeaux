@@ -75,7 +75,7 @@
       </article>
 
       <!-- ÉTAPE 2 -->
-      <article class="card" style="background: rgba(212, 175, 55, 0.03);">
+      <article class="card" style="background: rgba(var(--accent-rgb), 0.03);">
         <div style="display: grid; grid-template-columns: 120px 1fr; gap: 2rem; align-items: start;">
           <div style="text-align: center;">
             <div style="width: 100px; height: 100px; background: linear-gradient(135deg, var(--accent), #E8C547); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 2.5rem; font-weight: 700; margin: 0 auto;">2</div>
@@ -149,7 +149,7 @@
       </article>
 
       <!-- ÉTAPE 4 -->
-      <article class="card" style="background: rgba(139, 21, 56, 0.03);">
+      <article class="card" style="background: rgba(var(--primary-rgb), 0.03);">
         <div style="display: grid; grid-template-columns: 120px 1fr; gap: 2rem; align-items: start;">
           <div style="text-align: center;">
             <div style="width: 100px; height: 100px; background: linear-gradient(135deg, #3b82f6, #2563eb); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 2.5rem; font-weight: 700; margin: 0 auto;">4</div>

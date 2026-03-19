@@ -12,6 +12,7 @@ $router->get('/', [PageController::class, 'home']);
 $router->get('/estimation', [EstimationController::class, 'index']);
 $router->get('/leads', [EstimationController::class, 'leads']);
 $router->post('/estimation', [EstimationController::class, 'estimate']);
+$router->post('/api/estimation', [EstimationController::class, 'apiEstimate']);
 $router->post('/lead', [EstimationController::class, 'storeLead']);
 $router->get('/admin/leads', [EstimationController::class, 'leads']);
 
@@ -25,3 +26,15 @@ $router->get('/exemples-estimation', [PageController::class, 'exemplesEstimation
 $router->get('/guides', [PageController::class, 'guides']);
 $router->post('/contact', [PageController::class, 'contactSubmit']);
 $router->get('/sitemap.xml', [SeoController::class, 'sitemap']);
+
+$router->get('/blog', [BlogController::class, 'index']);
+$router->get('/blog/{slug}', [BlogController::class, 'show']);
+
+$router->get('/admin/blog', [AdminBlogController::class, 'index']);
+$router->get('/admin/blog/create', [AdminBlogController::class, 'create']);
+$router->post('/admin/blog/store', [AdminBlogController::class, 'store']);
+$router->post('/admin/blog/generate', [AdminBlogController::class, 'generate']);
+$router->get('/admin/blog/edit/{id}', [AdminBlogController::class, 'edit']);
+$router->post('/admin/blog/update/{id}', [AdminBlogController::class, 'update']);
+$router->post('/admin/blog/delete/{id}', [AdminBlogController::class, 'delete']);
+$router->post('/admin/blog/restore/{id}/{revisionId}', [AdminBlogController::class, 'restoreRevision']);

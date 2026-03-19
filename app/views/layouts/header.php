@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+<?php
+  $colors = $config['colors'] ?? [];
+  $rgbColors = $config['rgb_colors'] ?? [];
+?>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="<?= htmlspecialchars((string) ($meta_description ?? 'Estimation immobilière Bordeaux - Évaluez votre bien gratuitement et découvrez nos guides immobiliers.'), ENT_QUOTES, 'UTF-8') ?>">
@@ -18,15 +22,40 @@
 
   <!-- CSS Header Personnalisé -->
   <style>
+
+    :root {
+      --bg: <?= e((string) ($colors['bg'] ?? '#faf9f7')) ?>;
+      --surface: <?= e((string) ($colors['surface'] ?? '#ffffff')) ?>;
+      --text: <?= e((string) ($colors['text'] ?? '#1a1410')) ?>;
+      --muted: <?= e((string) ($colors['muted'] ?? '#6b6459')) ?>;
+      --primary: <?= e((string) ($colors['primary'] ?? '#8B1538')) ?>;
+      --primary-dark: <?= e((string) ($colors['primary_dark'] ?? '#6b0f2d')) ?>;
+      --accent: <?= e((string) ($colors['accent'] ?? '#D4AF37')) ?>;
+      --accent-light: <?= e((string) ($colors['accent_light'] ?? '#E8C547')) ?>;
+      --border: <?= e((string) ($colors['border'] ?? '#e8dfd7')) ?>;
+      --success: <?= e((string) ($colors['success'] ?? '#22c55e')) ?>;
+      --warning: <?= e((string) ($colors['warning'] ?? '#f97316')) ?>;
+      --danger: <?= e((string) ($colors['danger'] ?? '#e24b4a')) ?>;
+      --info: <?= e((string) ($colors['info'] ?? '#3b82f6')) ?>;
+      --neutral: <?= e((string) ($colors['neutral'] ?? '#000000')) ?>;
+      --bg-rgb: <?= e((string) ($rgbColors['bg'] ?? '250, 249, 247')) ?>;
+      --border-rgb: <?= e((string) ($rgbColors['border'] ?? '232, 223, 215')) ?>;
+      --primary-rgb: <?= e((string) ($rgbColors['primary'] ?? '139, 21, 56')) ?>;
+      --accent-rgb: <?= e((string) ($rgbColors['accent'] ?? '212, 175, 55')) ?>;
+      --success-rgb: <?= e((string) ($rgbColors['success'] ?? '34, 197, 94')) ?>;
+      --warning-rgb: <?= e((string) ($rgbColors['warning'] ?? '249, 115, 22')) ?>;
+      --neutral-rgb: <?= e((string) ($rgbColors['neutral'] ?? '0, 0, 0')) ?>;
+    }
+
     /* HEADER PREMIUM */
     .site-header {
       position: sticky;
       top: 0;
       z-index: 999;
       backdrop-filter: blur(12px);
-      background: rgba(250, 249, 247, 0.95);
-      border-bottom: 1px solid rgba(232, 223, 215, 0.6);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      background: rgba(var(--bg-rgb), 0.95);
+      border-bottom: 1px solid rgba(var(--border-rgb), 0.6);
+      box-shadow: 0 2px 8px rgba(var(--neutral-rgb), 0.04);
     }
 
     .header-container {
@@ -66,7 +95,7 @@
       border-radius: 10px;
       color: #fff;
       font-size: 1.2rem;
-      box-shadow: 0 4px 12px rgba(139, 21, 56, 0.2);
+      box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.2);
     }
 
     .brand span {
@@ -101,12 +130,12 @@
 
     .nav-link:hover {
       color: var(--primary);
-      background: rgba(139, 21, 56, 0.05);
+      background: rgba(var(--primary-rgb), 0.05);
     }
 
     .nav-link.active {
       color: var(--primary);
-      background: rgba(139, 21, 56, 0.08);
+      background: rgba(var(--primary-rgb), 0.08);
       font-weight: 600;
     }
 
@@ -142,7 +171,7 @@
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 12px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 10px 30px rgba(var(--neutral-rgb), 0.1);
       min-width: 220px;
       opacity: 0;
       visibility: hidden;
@@ -177,7 +206,7 @@
     }
 
     .dropdown-menu a:hover {
-      background: rgba(139, 21, 56, 0.05);
+      background: rgba(var(--primary-rgb), 0.05);
       border-left-color: var(--primary);
       color: var(--primary);
       padding-left: 1.8rem;
@@ -214,7 +243,7 @@
     .search-input:focus {
       outline: none;
       border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(139, 21, 56, 0.08);
+      box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.08);
     }
 
     .search-icon {
@@ -240,13 +269,13 @@
       font-size: 0.9rem;
       cursor: pointer;
       transition: all 0.3s ease;
-      box-shadow: 0 4px 12px rgba(139, 21, 56, 0.2);
+      box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.2);
       white-space: nowrap;
     }
 
     .btn-cta:hover {
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(139, 21, 56, 0.3);
+      box-shadow: 0 6px 20px rgba(var(--primary-rgb), 0.3);
       background: linear-gradient(135deg, var(--primary-dark), #a01833);
     }
 
@@ -334,7 +363,7 @@
         overflow: hidden;
         box-shadow: none;
         border: none;
-        background: rgba(139, 21, 56, 0.04);
+        background: rgba(var(--primary-rgb), 0.04);
         transform: none;
         transition: all 0.2s ease;
       }

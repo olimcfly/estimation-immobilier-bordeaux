@@ -91,13 +91,13 @@
             <i class="fas fa-share-alt"></i> Suivez-nous
           </p>
           <div style="display: flex; gap: 1rem; margin-top: 0.8rem;">
-            <a href="#facebook" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: rgba(139, 21, 56, 0.08); border-radius: 10px; color: var(--primary); text-decoration: none; transition: all 0.2s; border: 1px solid rgba(139, 21, 56, 0.15);" title="Facebook">
+            <a href="#facebook" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: rgba(var(--primary-rgb), 0.08); border-radius: 10px; color: var(--primary); text-decoration: none; transition: all 0.2s; border: 1px solid rgba(var(--primary-rgb), 0.15);" title="Facebook">
               <i class="fab fa-facebook-f" style="font-size: 1.2rem;"></i>
             </a>
-            <a href="#instagram" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: rgba(139, 21, 56, 0.08); border-radius: 10px; color: var(--primary); text-decoration: none; transition: all 0.2s; border: 1px solid rgba(139, 21, 56, 0.15);" title="Instagram">
+            <a href="#instagram" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: rgba(var(--primary-rgb), 0.08); border-radius: 10px; color: var(--primary); text-decoration: none; transition: all 0.2s; border: 1px solid rgba(var(--primary-rgb), 0.15);" title="Instagram">
               <i class="fab fa-instagram" style="font-size: 1.2rem;"></i>
             </a>
-            <a href="#linkedin" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: rgba(139, 21, 56, 0.08); border-radius: 10px; color: var(--primary); text-decoration: none; transition: all 0.2s; border: 1px solid rgba(139, 21, 56, 0.15);" title="LinkedIn">
+            <a href="#linkedin" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: rgba(var(--primary-rgb), 0.08); border-radius: 10px; color: var(--primary); text-decoration: none; transition: all 0.2s; border: 1px solid rgba(var(--primary-rgb), 0.15);" title="LinkedIn">
               <i class="fab fa-linkedin-in" style="font-size: 1.2rem;"></i>
             </a>
           </div>

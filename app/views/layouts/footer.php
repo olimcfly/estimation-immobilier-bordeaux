@@ -104,16 +104,16 @@
           Suivez-nous
         </h4>
         <div style="display: flex; gap: 1rem;">
-          <a href="#facebook" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: rgba(139, 21, 56, 0.08); border-radius: 8px; color: var(--primary); text-decoration: none; transition: all 0.2s;" title="Facebook">
+          <a href="#facebook" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: rgba(var(--primary-rgb), 0.08); border-radius: 8px; color: var(--primary); text-decoration: none; transition: all 0.2s;" title="Facebook">
             <i class="fab fa-facebook-f"></i>
           </a>
-          <a href="#instagram" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: rgba(139, 21, 56, 0.08); border-radius: 8px; color: var(--primary); text-decoration: none; transition: all 0.2s;" title="Instagram">
+          <a href="#instagram" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: rgba(var(--primary-rgb), 0.08); border-radius: 8px; color: var(--primary); text-decoration: none; transition: all 0.2s;" title="Instagram">
             <i class="fab fa-instagram"></i>
           </a>
-          <a href="#linkedin" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: rgba(139, 21, 56, 0.08); border-radius: 8px; color: var(--primary); text-decoration: none; transition: all 0.2s;" title="LinkedIn">
+          <a href="#linkedin" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: rgba(var(--primary-rgb), 0.08); border-radius: 8px; color: var(--primary); text-decoration: none; transition: all 0.2s;" title="LinkedIn">
             <i class="fab fa-linkedin-in"></i>
           </a>
-          <a href="#twitter" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: rgba(139, 21, 56, 0.08); border-radius: 8px; color: var(--primary); text-decoration: none; transition: all 0.2s;" title="Twitter">
+          <a href="#twitter" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: rgba(var(--primary-rgb), 0.08); border-radius: 8px; color: var(--primary); text-decoration: none; transition: all 0.2s;" title="Twitter">
             <i class="fab fa-twitter"></i>
           </a>
         </div>
