@@ -9,7 +9,6 @@ use App\Core\View;
 use App\Models\Lead;
 use App\Services\EstimationService;
 use App\Services\LeadScoringService;
-use App\Services\PerplexityService;
 
 final class EstimationController
 {
@@ -31,11 +30,12 @@ final class EstimationController
     {
         try {
             $city = Validator::string($_POST, 'ville', 2, 120);
-            $propertyType = Validator::string($_POST, 'type_bien', 2, 80);
+            $typeKey = array_key_exists('type', $_POST) ? 'type' : 'type_bien';
+            $propertyType = Validator::string($_POST, $typeKey, 2, 80);
             $surface = Validator::float($_POST, 'surface', 5, 10000);
             $rooms = Validator::int($_POST, 'pieces', 1, 50);
 
-            $service = new EstimationService(new PerplexityService());
+            $service = new EstimationService();
             $estimate = $service->estimate($city, $propertyType, $surface, $rooms);
 
             View::render('estimation/result', [
@@ -55,7 +55,6 @@ final class EstimationController
             $nom = Validator::string($_POST, 'nom', 2, 120);
             $email = Validator::email($_POST, 'email');
             $telephone = Validator::string($_POST, 'telephone', 6, 30);
-            Validator::string($_POST, 'adresse', 5, 255);
             $ville = Validator::string($_POST, 'ville', 2, 120);
             $estimation = Validator::float($_POST, 'estimation', 10000, 100000000);
             $urgence = Validator::string($_POST, 'urgence', 3, 40);

@@ -6,19 +6,17 @@ namespace App\Core;
 
 use PDO;
 use PDOException;
+use RuntimeException;
 
 final class Database
 {
-    private static ?PDO $connection = null;
+    private static ?self $instance = null;
+    private PDO $connection;
 
-    public static function connection(): PDO
+    private function __construct()
     {
-        if (self::$connection !== null) {
-            return self::$connection;
-        }
-
         $host = (string) Config::get('db.host');
-        $port = (int) Config::get('db.port');
+        $port = (int) Config::get('db.port', 3306);
         $name = (string) Config::get('db.name');
         $user = (string) Config::get('db.user');
         $pass = (string) Config::get('db.pass');
@@ -27,15 +25,39 @@ final class Database
         $dsn = sprintf('mysql:host=%s;port=%d;dbname=%s;charset=%s', $host, $port, $name, $charset);
 
         try {
-            self::$connection = new PDO($dsn, $user, $pass, [
+            $this->connection = new PDO($dsn, $user, $pass, [
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                 PDO::ATTR_EMULATE_PREPARES => false,
+                PDO::ATTR_TIMEOUT => 5,
+                PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES {$charset} COLLATE {$charset}_unicode_ci",
             ]);
         } catch (PDOException $exception) {
-            throw new \RuntimeException('Database connection failed: ' . $exception->getMessage());
+            error_log('Database connection failed: ' . $exception->getMessage());
+            throw new RuntimeException('Impossible de se connecter à la base de données.');
+        }
+    }
+
+    public static function getInstance(): self
+    {
+        if (self::$instance === null) {
+            self::$instance = new self();
         }
 
-        return self::$connection;
+        return self::$instance;
+    }
+
+    public static function connection(): PDO
+    {
+        return self::getInstance()->connection;
+    }
+
+    private function __clone()
+    {
+    }
+
+    public function __wakeup(): void
+    {
+        throw new RuntimeException('Cannot unserialize singleton.');
     }
 }
