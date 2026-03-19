@@ -19,5 +19,6 @@ $router->get('/about', [PageController::class, 'about']);
 $router->get('/a-propos', [PageController::class, 'aPropos']);
 $router->get('/processus-estimation', [PageController::class, 'processusEstimation']);
 $router->get('/contact', [PageController::class, 'contact']);
+$router->get('/faq', [PageController::class, 'faq']);
 $router->get('/exemples-estimation', [PageController::class, 'exemplesEstimation']);
 $router->post('/contact', [PageController::class, 'contactSubmit']);

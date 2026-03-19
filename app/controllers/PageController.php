@@ -57,6 +57,13 @@ final class PageController
         ]);
     }
 
+    public function faq(): void
+    {
+        View::render('pages/faq', [
+            'page_title' => 'FAQ - Estimation Immobilier Bordeaux',
+        ]);
+    }
+
     public function contactSubmit(): void
     {
         View::render('pages/contact', [
