@@ -166,117 +166,33 @@ final class PageController
         ]);
     }
 
-    private function generateNewsletterToken(string $email): string
+
+    public function mentionsLegales(): void
     {
-        $payload = json_encode([
-            'email' => $email,
-            'exp' => time() + (60 * 60 * 24),
-            'nonce' => bin2hex(random_bytes(8)),
-        ], JSON_THROW_ON_ERROR);
-
-        $encodedPayload = $this->base64UrlEncode($payload);
-        $signature = hash_hmac('sha256', $encodedPayload, $this->newsletterSecret(), true);
-
-        return $encodedPayload . '.' . $this->base64UrlEncode($signature);
+        View::render('legal/mentions', [
+            'page_title' => 'Mentions légales - Estimation Immobilier Bordeaux',
+        ]);
     }
 
-    private function validateNewsletterToken(string $token): ?string
+    public function politiqueConfidentialite(): void
     {
-        $parts = explode('.', $token, 2);
-        if (count($parts) !== 2 || $parts[0] === '' || $parts[1] === '') {
-            return null;
-        }
-
-        [$encodedPayload, $encodedSignature] = $parts;
-        $expectedSignature = hash_hmac('sha256', $encodedPayload, $this->newsletterSecret(), true);
-        $providedSignature = $this->base64UrlDecode($encodedSignature);
-
-        if ($providedSignature === '' || !hash_equals($expectedSignature, $providedSignature)) {
-            return null;
-        }
-
-        $payloadJson = $this->base64UrlDecode($encodedPayload);
-        if ($payloadJson === '') {
-            return null;
-        }
-
-        $payload = json_decode($payloadJson, true);
-        if (!is_array($payload)) {
-            return null;
-        }
-
-        $email = isset($payload['email']) ? (string) $payload['email'] : '';
-        $exp = isset($payload['exp']) ? (int) $payload['exp'] : 0;
-
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL) || $exp < time()) {
-            return null;
-        }
-
-        return mb_strtolower($email);
+        View::render('legal/confidentialite', [
+            'page_title' => 'Politique de confidentialité - Estimation Immobilier Bordeaux',
+        ]);
     }
 
-    private function buildNewsletterConfirmLink(string $token): string
+    public function conditionsUtilisation(): void
     {
-        $configuredBaseUrl = trim((string) Config::get('base_url', ''));
-        $origin = $configuredBaseUrl !== ''
-            ? rtrim($configuredBaseUrl, '/')
-            : $this->requestOrigin();
-
-        return $origin . '/newsletter/confirm?token=' . rawurlencode($token);
+        View::render('legal/cgu', [
+            'page_title' => 'Conditions d\'utilisation - Estimation Immobilier Bordeaux',
+        ]);
     }
 
-    private function sendNewsletterConfirmationEmail(string $email, string $confirmLink): bool
+    public function rgpd(): void
     {
-        $subject = 'Confirmez votre inscription à la newsletter';
-        $message = "Bonjour,\n\n";
-        $message .= "Merci pour votre inscription. Confirmez votre email via ce lien :\n";
-        $message .= $confirmLink . "\n\n";
-        $message .= "Ce lien expire dans 24 heures.\n\n";
-        $message .= "Si vous n\'êtes pas à l\'origine de cette demande, ignorez ce message.";
-
-        $fromAddress = (string) Config::get('mail.from', 'no-reply@localhost');
-        $headers = [
-            'From: ' . $fromAddress,
-            'Content-Type: text/plain; charset=UTF-8',
-        ];
-
-        return mail($email, $subject, $message, implode("\r\n", $headers));
+        View::render('legal/rgpd', [
+            'page_title' => 'RGPD - Estimation Immobilier Bordeaux',
+        ]);
     }
 
-    private function newsletterSecret(): string
-    {
-        $configuredSecret = trim((string) Config::get('app_key', ''));
-        if ($configuredSecret !== '') {
-            return $configuredSecret;
-        }
-
-        return hash('sha256', (string) Config::get('app_name', 'estimateur-immobilier'));
-    }
-
-    private function requestOrigin(): string
-    {
-        $isHttps = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
-        $scheme = $isHttps ? 'https' : 'http';
-        $host = (string) ($_SERVER['HTTP_HOST'] ?? 'localhost');
-
-        return $scheme . '://' . $host;
-    }
-
-    private function base64UrlEncode(string $value): string
-    {
-        return rtrim(strtr(base64_encode($value), '+/', '-_'), '=');
-    }
-
-    private function base64UrlDecode(string $value): string
-    {
-        $normalized = strtr($value, '-_', '+/');
-        $padding = strlen($normalized) % 4;
-        if ($padding > 0) {
-            $normalized .= str_repeat('=', 4 - $padding);
-        }
-
-        $decoded = base64_decode($normalized, true);
-
-        return $decoded === false ? '' : $decoded;
-    }
 }
