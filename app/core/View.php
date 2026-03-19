@@ -16,6 +16,8 @@ final class View
             return;
         }
 
+        $data['config'] = $data['config'] ?? getSiteConfig();
+
         extract($data, EXTR_SKIP);
         include __DIR__ . '/../views/layouts/header.php';
         include $templatePath;
