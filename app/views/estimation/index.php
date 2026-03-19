@@ -4,7 +4,7 @@
 <!-- ============================================ -->
 <!-- HERO SECTION -->
 <!-- ============================================ -->
-<section class="section page-hero">
+<section class="section page-hero page-block-hero">
   <div class="container">
     <div class="page-hero-inner card">
       <p class="eyebrow">
@@ -23,11 +23,11 @@
 <!-- ============================================ -->
 <section class="section" id="form-estimation">
   <div class="container">
-    <div class="estimation-form-wrapper">
+    <div class="estimation-form-wrapper estimation-layout">
       
       <!-- GAUCHE: INFOS BIEN -->
       <article class="card estimation-form">
-        <h2>
+        <h2 class="estimation-form-title">
           <i class="fas fa-home"></i> Parlez-nous de votre bien
         </h2>
         <p class="form-intro">
@@ -173,19 +173,19 @@
           <label for="etat" class="full-width">
             <span><i class="fas fa-check-circle"></i> État général du bien *</span>
             <div class="radio-group">
-              <label style="display: flex; align-items: center; gap: 0.8rem; margin: 0.8rem 0; cursor: pointer;">
+              <label class="radio-option">
                 <input type="radio" name="etat" value="excellent" required>
                 <span><strong>Excellent</strong> - Rénové récemment, très bon état</span>
               </label>
-              <label style="display: flex; align-items: center; gap: 0.8rem; margin: 0.8rem 0; cursor: pointer;">
+              <label class="radio-option">
                 <input type="radio" name="etat" value="bon" required>
                 <span><strong>Bon</strong> - Bon état, quelques travaux possibles</span>
               </label>
-              <label style="display: flex; align-items: center; gap: 0.8rem; margin: 0.8rem 0; cursor: pointer;">
+              <label class="radio-option">
                 <input type="radio" name="etat" value="moyen" required>
                 <span><strong>Moyen</strong> - État correct, travaux à prévoir</span>
               </label>
-              <label style="display: flex; align-items: center; gap: 0.8rem; margin: 0.8rem 0; cursor: pointer;">
+              <label class="radio-option">
                 <input type="radio" name="etat" value="mauvais" required>
                 <span><strong>Mauvais</strong> - Nécessite travaux importants</span>
               </label>
@@ -193,7 +193,7 @@
           </label>
 
           <!-- INFORMATIONS PERSONNELLES -->
-          <h3 style="grid-column: 1 / -1; margin: 1rem 0 0; padding-top: 1rem; border-top: 1px solid var(--border); font-size: 1rem;">
+          <h3 class="form-section-title">
             <i class="fas fa-user"></i> Vos informations (optionnel)
           </h3>
 
@@ -224,7 +224,7 @@
               id="rgpd-estimation" 
               name="rgpd"
             >
-            <label for="rgpd-estimation" style="margin: 0; font-weight: 500; font-size: 0.9rem; color: var(--text); cursor: pointer;">
+            <label for="rgpd-estimation" class="form-checkbox-label">
               J'accepte la 
               <a href="/politique-confidentialite">politique de confidentialité</a>
             </label>
@@ -233,14 +233,13 @@
           <!-- SUBMIT -->
           <button 
             type="submit" 
-            class="btn btn-primary full-width" 
-            style="display: flex; justify-content: center; align-items: center; gap: 0.5rem; font-size: 1rem; padding: 1rem; grid-column: 1 / -1;"
+            class="btn btn-primary full-width estimation-submit"
           >
             <i class="fas fa-bolt"></i> Voir mon estimation
           </button>
 
           <!-- FOOTER INFO -->
-          <p class="form-footer" style="text-align: center; margin: 1rem 0 0; font-size: 0.8rem; grid-column: 1 / -1;">
+          <p class="form-footer form-footer-inline">
             <i class="fas fa-clock"></i> Résultat en 60 secondes • 
             <i class="fas fa-lock"></i> 100% sécurisé • 
             <i class="fas fa-ban"></i> Sans engagement
@@ -253,28 +252,28 @@
         
         <!-- BLOC 1: AVANTAGES -->
         <article class="card">
-          <h3 style="margin: 0 0 1rem; display: flex; align-items: center; gap: 0.8rem;">
+          <h3 class="sidebar-title">
             <i class="fas fa-star" style="color: var(--accent);"></i> Avantages
           </h3>
-          <ul style="list-style: none; padding: 0; margin: 0;">
-            <li style="padding: 0.7rem 0; border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; gap: 0.8rem;">
-              <i class="fas fa-check-circle" style="color: #22c55e; flex-shrink: 0; margin-top: 0.2rem;"></i>
+          <ul class="benefits-list">
+            <li class="benefits-item">
+              <i class="fas fa-check-circle benefits-icon"></i>
               <span style="font-size: 0.9rem;"><strong>100% gratuit</strong> - Aucun frais caché</span>
             </li>
-            <li style="padding: 0.7rem 0; border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; gap: 0.8rem;">
-              <i class="fas fa-check-circle" style="color: #22c55e; flex-shrink: 0; margin-top: 0.2rem;"></i>
+            <li class="benefits-item">
+              <i class="fas fa-check-circle benefits-icon"></i>
               <span style="font-size: 0.9rem;"><strong>Rapide</strong> - Résultat en 1 minute</span>
             </li>
-            <li style="padding: 0.7rem 0; border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; gap: 0.8rem;">
-              <i class="fas fa-check-circle" style="color: #22c55e; flex-shrink: 0; margin-top: 0.2rem;"></i>
+            <li class="benefits-item">
+              <i class="fas fa-check-circle benefits-icon"></i>
               <span style="font-size: 0.9rem;"><strong>Précis</strong> - ±3% vs prix réel</span>
             </li>
-            <li style="padding: 0.7rem 0; border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; gap: 0.8rem;">
-              <i class="fas fa-check-circle" style="color: #22c55e; flex-shrink: 0; margin-top: 0.2rem;"></i>
+            <li class="benefits-item">
+              <i class="fas fa-check-circle benefits-icon"></i>
               <span style="font-size: 0.9rem;"><strong>Données temps réel</strong> - 5000+ transactions</span>
             </li>
-            <li style="padding: 0.7rem 0; display: flex; align-items: flex-start; gap: 0.8rem;">
-              <i class="fas fa-check-circle" style="color: #22c55e; flex-shrink: 0; margin-top: 0.2rem;"></i>
+            <li class="benefits-item">
+              <i class="fas fa-check-circle benefits-icon"></i>
               <span style="font-size: 0.9rem;"><strong>Sans engagement</strong> - Aucune obligation</span>
             </li>
           </ul>
@@ -282,29 +281,29 @@
 
         <!-- BLOC 2: ÉTAPES -->
         <article class="card">
-          <h3 style="margin: 0 0 1rem; display: flex; align-items: center; gap: 0.8rem;">
+          <h3 class="sidebar-title">
             <i class="fas fa-list-ol" style="color: var(--primary);"></i> Étapes
           </h3>
-          <div style="display: flex; flex-direction: column; gap: 1rem;">
-            <div style="display: flex; gap: 1rem;">
-              <div style="width: 40px; height: 40px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">1</div>
-              <div style="flex: 1;">
-                <p style="margin: 0 0 0.3rem; font-weight: 600; font-size: 0.9rem;">Remplir le formulaire</p>
-                <p style="margin: 0; font-size: 0.85rem; color: var(--muted);">Infos sur votre bien</p>
+          <div class="steps-list">
+            <div class="step-item">
+              <div class="step-badge">1</div>
+              <div>
+                <h4>Remplir le formulaire</h4>
+                <p>Infos sur votre bien</p>
               </div>
             </div>
-            <div style="display: flex; gap: 1rem;">
-              <div style="width: 40px; height: 40px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">2</div>
-              <div style="flex: 1;">
-                <p style="margin: 0 0 0.3rem; font-weight: 600; font-size: 0.9rem;">Analyser les données</p>
-                <p style="margin: 0; font-size: 0.85rem; color: var(--muted);">Notre moteur calcule</p>
+            <div class="step-item">
+              <div class="step-badge">2</div>
+              <div>
+                <h4>Analyser les données</h4>
+                <p>Notre moteur calcule</p>
               </div>
             </div>
-            <div style="display: flex; gap: 1rem;">
-              <div style="width: 40px; height: 40px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">3</div>
-              <div style="flex: 1;">
-                <p style="margin: 0 0 0.3rem; font-weight: 600; font-size: 0.9rem;">Recevoir l'estimation</p>
-                <p style="margin: 0; font-size: 0.85rem; color: var(--muted);">Fourchette de prix détaillée</p>
+            <div class="step-item">
+              <div class="step-badge">3</div>
+              <div>
+                <h4>Recevoir l'estimation</h4>
+                <p>Fourchette de prix détaillée</p>
               </div>
             </div>
           </div>
@@ -312,25 +311,25 @@
 
         <!-- BLOC 3: STATISTIQUES -->
         <article class="card">
-          <h3 style="margin: 0 0 1rem; display: flex; align-items: center; gap: 0.8rem;">
+          <h3 class="sidebar-title">
             <i class="fas fa-chart-bar" style="color: var(--accent);"></i> Nos chiffres
           </h3>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; text-align: center;">
+          <div class="stats-grid">
             <div>
-              <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: var(--primary);">3 847</p>
-              <p style="margin: 0.3rem 0 0; font-size: 0.85rem; color: var(--muted);">Estimations</p>
+              <p class="stat-value">3 847</p>
+              <p class="stat-label">Estimations</p>
             </div>
             <div>
-              <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: var(--primary);">4.8/5</p>
-              <p style="margin: 0.3rem 0 0; font-size: 0.85rem; color: var(--muted);">Satisfaction</p>
+              <p class="stat-value">4.8/5</p>
+              <p class="stat-label">Satisfaction</p>
             </div>
             <div>
-              <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: var(--primary);">97%</p>
-              <p style="margin: 0.3rem 0 0; font-size: 0.85rem; color: var(--muted);">Précision</p>
+              <p class="stat-value">97%</p>
+              <p class="stat-label">Précision</p>
             </div>
             <div>
-              <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: var(--primary);">60 sec</p>
-              <p style="margin: 0.3rem 0 0; font-size: 0.85rem; color: var(--muted);">Résultat</p>
+              <p class="stat-value">60 sec</p>
+              <p class="stat-label">Résultat</p>
             </div>
           </div>
         </article>
