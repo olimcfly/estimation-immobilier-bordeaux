@@ -38,7 +38,7 @@
       </ul>
 
       <!-- SOCIAL PROOF -->
-      <div style="margin-top: 2rem; padding: 1.2rem; background: rgba(139, 21, 56, 0.04); border-radius: 12px; border-left: 3px solid var(--primary);">
+      <div style="margin-top: 2rem; padding: 1.2rem; background: rgba(var(--primary-rgb), 0.04); border-radius: 12px; border-left: 3px solid var(--primary);">
         <p style="margin: 0 0 0.5rem 0; font-size: 0.85rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">
           <i class="fas fa-quote-left"></i> Témoignage client
         </p>
@@ -484,7 +484,7 @@
 <!-- ============================================ -->
 <section class="section">
   <div class="container">
-    <div class="card" style="padding: 3rem; background: linear-gradient(135deg, rgba(139, 21, 56, 0.05), rgba(212, 175, 55, 0.03)); border: 2px solid var(--accent); text-align: center;">
+    <div class="card" style="padding: 3rem; background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.05), rgba(var(--accent-rgb), 0.03)); border: 2px solid var(--accent); text-align: center;">
       <p class="eyebrow" style="margin-bottom: 1rem;">
         <i class="fas fa-rocket"></i> Plus attendre pour connaître la valeur
       </p>

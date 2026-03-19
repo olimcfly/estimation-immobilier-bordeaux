@@ -1,10 +1,24 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+  <?php
+    $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
+    $canonicalPath = (string) parse_url($requestUri, PHP_URL_PATH);
+    $canonicalPath = $canonicalPath !== '' ? $canonicalPath : '/';
+    if ($canonicalPath !== '/') {
+        $canonicalPath = rtrim($canonicalPath, '/');
+    }
+
+    $isHttps = !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
+    $scheme = $isHttps ? 'https' : 'http';
+    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+    $canonicalUrl = $scheme . '://' . $host . $canonicalPath;
+  ?>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Estimation immobilière Bordeaux - Évaluez votre bien gratuitement et découvrez nos guides immobiliers.">
+  <meta name="description" content="<?= htmlspecialchars((string) ($meta_description ?? 'Estimation immobilière Bordeaux - Évaluez votre bien gratuitement et découvrez nos guides immobiliers.'), ENT_QUOTES, 'UTF-8') ?>">
   <meta name="theme-color" content="#8B1538">
+  <link rel="canonical" href="<?= e($canonicalUrl) ?>">
   <title><?= isset($page_title) ? $page_title : 'Estimation Immobilière Bordeaux' ?></title>
 
   <!-- Google Fonts -->
@@ -18,15 +32,40 @@
 
   <!-- CSS Header Personnalisé -->
   <style>
+
+    :root {
+      --bg: <?= e((string) ($colors['bg'] ?? '#faf9f7')) ?>;
+      --surface: <?= e((string) ($colors['surface'] ?? '#ffffff')) ?>;
+      --text: <?= e((string) ($colors['text'] ?? '#1a1410')) ?>;
+      --muted: <?= e((string) ($colors['muted'] ?? '#6b6459')) ?>;
+      --primary: <?= e((string) ($colors['primary'] ?? '#8B1538')) ?>;
+      --primary-dark: <?= e((string) ($colors['primary_dark'] ?? '#6b0f2d')) ?>;
+      --accent: <?= e((string) ($colors['accent'] ?? '#D4AF37')) ?>;
+      --accent-light: <?= e((string) ($colors['accent_light'] ?? '#E8C547')) ?>;
+      --border: <?= e((string) ($colors['border'] ?? '#e8dfd7')) ?>;
+      --success: <?= e((string) ($colors['success'] ?? '#22c55e')) ?>;
+      --warning: <?= e((string) ($colors['warning'] ?? '#f97316')) ?>;
+      --danger: <?= e((string) ($colors['danger'] ?? '#e24b4a')) ?>;
+      --info: <?= e((string) ($colors['info'] ?? '#3b82f6')) ?>;
+      --neutral: <?= e((string) ($colors['neutral'] ?? '#000000')) ?>;
+      --bg-rgb: <?= e((string) ($rgbColors['bg'] ?? '250, 249, 247')) ?>;
+      --border-rgb: <?= e((string) ($rgbColors['border'] ?? '232, 223, 215')) ?>;
+      --primary-rgb: <?= e((string) ($rgbColors['primary'] ?? '139, 21, 56')) ?>;
+      --accent-rgb: <?= e((string) ($rgbColors['accent'] ?? '212, 175, 55')) ?>;
+      --success-rgb: <?= e((string) ($rgbColors['success'] ?? '34, 197, 94')) ?>;
+      --warning-rgb: <?= e((string) ($rgbColors['warning'] ?? '249, 115, 22')) ?>;
+      --neutral-rgb: <?= e((string) ($rgbColors['neutral'] ?? '0, 0, 0')) ?>;
+    }
+
     /* HEADER PREMIUM */
     .site-header {
       position: sticky;
       top: 0;
       z-index: 999;
       backdrop-filter: blur(12px);
-      background: rgba(250, 249, 247, 0.95);
-      border-bottom: 1px solid rgba(232, 223, 215, 0.6);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      background: rgba(var(--bg-rgb), 0.95);
+      border-bottom: 1px solid rgba(var(--border-rgb), 0.6);
+      box-shadow: 0 2px 8px rgba(var(--neutral-rgb), 0.04);
     }
 
     .header-container {
@@ -66,7 +105,7 @@
       border-radius: 10px;
       color: #fff;
       font-size: 1.2rem;
-      box-shadow: 0 4px 12px rgba(139, 21, 56, 0.2);
+      box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.2);
     }
 
     .brand span {
@@ -101,12 +140,12 @@
 
     .nav-link:hover {
       color: var(--primary);
-      background: rgba(139, 21, 56, 0.05);
+      background: rgba(var(--primary-rgb), 0.05);
     }
 
     .nav-link.active {
       color: var(--primary);
-      background: rgba(139, 21, 56, 0.08);
+      background: rgba(var(--primary-rgb), 0.08);
       font-weight: 600;
     }
 
@@ -142,7 +181,7 @@
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 12px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 10px 30px rgba(var(--neutral-rgb), 0.1);
       min-width: 220px;
       opacity: 0;
       visibility: hidden;
@@ -177,7 +216,7 @@
     }
 
     .dropdown-menu a:hover {
-      background: rgba(139, 21, 56, 0.05);
+      background: rgba(var(--primary-rgb), 0.05);
       border-left-color: var(--primary);
       color: var(--primary);
       padding-left: 1.8rem;
@@ -214,7 +253,7 @@
     .search-input:focus {
       outline: none;
       border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(139, 21, 56, 0.08);
+      box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.08);
     }
 
     .search-icon {
@@ -240,13 +279,13 @@
       font-size: 0.9rem;
       cursor: pointer;
       transition: all 0.3s ease;
-      box-shadow: 0 4px 12px rgba(139, 21, 56, 0.2);
+      box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.2);
       white-space: nowrap;
     }
 
     .btn-cta:hover {
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(139, 21, 56, 0.3);
+      box-shadow: 0 6px 20px rgba(var(--primary-rgb), 0.3);
       background: linear-gradient(135deg, var(--primary-dark), #a01833);
     }
 
@@ -334,7 +373,7 @@
         overflow: hidden;
         box-shadow: none;
         border: none;
-        background: rgba(139, 21, 56, 0.04);
+        background: rgba(var(--primary-rgb), 0.04);
         transform: none;
         transition: all 0.2s ease;
       }
@@ -409,153 +448,58 @@
 <!-- HEADER PREMIUM -->
 <!-- ============================= -->
 <header class="site-header">
-  <div class="header-container">
-    <div class="header-wrapper">
-      <!-- LOGO -->
-      <a href="/" class="brand">
-        <div class="brand-icon">
-          <i class="fas fa-home"></i>
-        </div>
-        <span>Estim</span>ation
-      </a>
+  <div class="container nav-wrapper">
+    <a href="/" class="brand">Bordeaux<span>Estimate</span></a>
 
-      <!-- NAVIGATION PRINCIPALE -->
-      <nav class="nav-main" id="navMain">
-        <!-- ESTIMATION -->
-        <div class="nav-item nav-dropdown">
-          <a href="/" class="nav-link dropdown-toggle">
-            <i class="fas fa-calculator"></i> Estimation
-          </a>
-          <ul class="dropdown-menu">
-            <li><a href="/#form-estimation"><i class="fas fa-zap"></i> Estimer mon bien</a></li>
-            <li><a href="/#example-result"><i class="fas fa-chart-bar"></i> Voir un exemple</a></li>
-            <li><a href="/#how-it-works"><i class="fas fa-cogs"></i> Comment ça marche</a></li>
-            <li><a href="/faq"><i class="fas fa-question-circle"></i> FAQ Estimation</a></li>
-          </ul>
-        </div>
-
-        <!-- BLOG -->
-        <div class="nav-item nav-dropdown">
-          <a href="/blog" class="nav-link dropdown-toggle">
-            <i class="fas fa-book-open"></i> Blog
-          </a>
-          <ul class="dropdown-menu">
-            <li><a href="/blog"><i class="fas fa-newspaper"></i> Tous les articles</a></li>
-            <li><a href="/blog?cat=vendre"><i class="fas fa-door-open"></i> Vendre son bien</a></li>
-            <li><a href="/blog?cat=marche"><i class="fas fa-chart-line"></i> Marché immobilier</a></li>
-            <li><a href="/blog?cat=conseil"><i class="fas fa-lightbulb"></i> Conseils & astuces</a></li>
-            <li><a href="/blog?cat=legal"><i class="fas fa-gavel"></i> Aspect juridique</a></li>
-          </ul>
-        </div>
-
-        <!-- SERVICES -->
-        <div class="nav-item nav-dropdown">
-          <a href="/services" class="nav-link dropdown-toggle">
-            <i class="fas fa-briefcase"></i> Services
-          </a>
-          <ul class="dropdown-menu">
-            <li><a href="/services#estimation"><i class="fas fa-calculator"></i> Estimation détaillée</a></li>
-            <li><a href="/services#accompagnement"><i class="fas fa-handshake"></i> Accompagnement</a></li>
-            <li><a href="/services#conseil"><i class="fas fa-user-tie"></i> Conseil immobilier</a></li>
-            <li><a href="/services#marketing"><i class="fas fa-bullhorn"></i> Marketing immobilier</a></li>
-          </ul>
-        </div>
-
-        <!-- À PROPOS -->
-        <div class="nav-item">
-          <a href="/about" class="nav-link">
-            <i class="fas fa-info-circle"></i> À propos
-          </a>
-        </div>
-
-        <!-- CONTACT -->
-        <div class="nav-item">
-          <a href="/contact" class="nav-link">
-            <i class="fas fa-envelope"></i> Contact
-          </a>
-        </div>
-
-        <!-- RESSOURCES -->
-        <div class="nav-item nav-dropdown">
-          <a href="#" class="nav-link dropdown-toggle">
-            <i class="fas fa-graduation-cap"></i> Ressources
-          </a>
-          <ul class="dropdown-menu">
-            <li><a href="/guides"><i class="fas fa-map"></i> Guides complets</a></li>
-            <li><a href="/tools/calculatrice"><i class="fas fa-calculator"></i> Calculatrice prix</a></li>
-            <li><a href="/quartiers"><i class="fas fa-map-marker-alt"></i> Quartiers Bordeaux</a></li>
-            <li><a href="/podcast"><i class="fas fa-podcast"></i> Podcast immobilier</a></li>
-            <li><a href="/newsletter"><i class="fas fa-envelope-open"></i> Newsletter</a></li>
-          </ul>
-        </div>
-      </nav>
-
-      <!-- ACTIONS DROITE -->
-      <div class="header-actions">
-        <!-- SEARCH (optionnel) -->
-        <!-- <div class="search-wrapper">
-          <i class="fas fa-search search-icon"></i>
-          <input type="text" class="search-input" placeholder="Chercher...">
-        </div> -->
-
-        <!-- CTA PRINCIPAL -->
-        <a href="/#form-estimation" class="btn-cta">
-          <i class="fas fa-bolt"></i>
-          <span>Estimer</span>
-        </a>
-
-        <!-- MENU TOGGLE MOBILE -->
-        <button class="menu-toggle" id="menuToggle" aria-label="Menu">
-          <span></span>
-          <span></span>
-          <span></span>
-        </button>
+    <nav class="top-nav" aria-label="Navigation principale">
+      <div class="nav-item has-dropdown">
+        <a href="/estimation" class="nav-link">Estimation</a>
+        <ul class="dropdown-menu" aria-label="Sous-menu estimation">
+          <li><a href="/estimation#form-estimation">Estimer mon bien</a></li>
+          <li><a href="/estimation#example-result">Voir un exemple</a></li>
+          <li><a href="/estimation#how-it-works">Comment ça marche</a></li>
+          <li><a href="/estimation#faq">FAQ Estimation</a></li>
+        </ul>
       </div>
-    </div>
+
+      <div class="nav-item has-dropdown">
+        <a href="/blog" class="nav-link">Blog</a>
+        <ul class="dropdown-menu" aria-label="Sous-menu blog">
+          <li><a href="/blog">Tous les articles</a></li>
+          <li><a href="/blog?cat=vendre">Vendre son bien</a></li>
+          <li><a href="/blog?cat=marche">Marché immobilier</a></li>
+          <li><a href="/blog?cat=conseil">Conseils &amp; astuces</a></li>
+          <li><a href="/blog?cat=legal">Aspect juridique</a></li>
+        </ul>
+      </div>
+
+      <div class="nav-item has-dropdown">
+        <a href="/services" class="nav-link">Services</a>
+        <ul class="dropdown-menu" aria-label="Sous-menu services">
+          <li><a href="/services#estimation-detaillee">Estimation détaillée</a></li>
+          <li><a href="/services#accompagnement">Accompagnement</a></li>
+          <li><a href="/services#conseil-immobilier">Conseil immobilier</a></li>
+          <li><a href="/services#marketing-immobilier">Marketing immobilier</a></li>
+        </ul>
+      </div>
+
+      <a href="/about" class="nav-link">À propos</a>
+      <a href="/contact" class="nav-link">Contact</a>
+
+      <div class="nav-item has-dropdown">
+        <a href="/guides" class="nav-link">Ressources</a>
+        <ul class="dropdown-menu" aria-label="Sous-menu ressources">
+          <li><a href="/guides">Guides complets</a></li>
+          <li><a href="/tools/calculatrice">Calculatrice prix</a></li>
+          <li><a href="/quartiers">Quartiers Bordeaux</a></li>
+          <li><a href="/podcast">Podcast immobilier</a></li>
+          <li><a href="/newsletter">Newsletter</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <a href="/estimation#form-estimation" class="btn btn-small">Estimer mon bien</a>
   </div>
 </header>
 
 <main>
-
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const menuToggle = document.getElementById('menuToggle');
-    const navMain = document.getElementById('navMain');
-    const navDropdowns = document.querySelectorAll('.nav-dropdown');
-
-    // Toggle menu mobile
-    menuToggle.addEventListener('click', function() {
-      navMain.classList.toggle('active');
-    });
-
-    // Fermer menu au clic sur un lien
-    const navLinks = document.querySelectorAll('.nav-link');
-    navLinks.forEach(link => {
-      link.addEventListener('click', function(e) {
-        // Ne pas fermer si c'est un dropdown
-        if (!this.parentElement.classList.contains('nav-dropdown')) {
-          navMain.classList.remove('active');
-        }
-      });
-    });
-
-    // Gestion des dropdowns en mobile
-    navDropdowns.forEach(dropdown => {
-      const toggle = dropdown.querySelector('.nav-link');
-      toggle.addEventListener('click', function(e) {
-        if (window.innerWidth <= 768) {
-          e.preventDefault();
-          dropdown.classList.toggle('active');
-          e.stopPropagation();
-        }
-      });
-    });
-
-    // Fermer les dropdowns au clic extérieur
-    document.addEventListener('click', function(e) {
-      if (!e.target.closest('.nav-dropdown')) {
-        navDropdowns.forEach(d => d.classList.remove('active'));
-      }
-    });
-  });
-</script>

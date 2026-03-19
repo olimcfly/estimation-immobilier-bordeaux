@@ -14,11 +14,7 @@ final class BlogController
         $articleModel = new Article();
         $articles = $articleModel->findPublished();
 
-        View::render('blog/index', [
-            'articles' => $articles,
-            'metaTitle' => 'Blog immobilier Bordeaux | Conseils vendeurs',
-            'metaDescription' => 'Guides pratiques pour vendre votre appartement ou maison à Bordeaux dans les meilleures conditions.',
-        ]);
+        View::render('blog/index', ['articles' => $articles]);
     }
 
     public function show(string $slug): void
@@ -32,10 +28,6 @@ final class BlogController
             return;
         }
 
-        View::render('blog/show', [
-            'article' => $article,
-            'metaTitle' => (string) $article['meta_title'],
-            'metaDescription' => (string) $article['meta_description'],
-        ]);
+        View::render('blog/show', ['article' => $article]);
     }
 }

@@ -12,6 +12,7 @@ $router->get('/', [PageController::class, 'home']);
 $router->get('/estimation', [EstimationController::class, 'index']);
 $router->get('/leads', [EstimationController::class, 'leads']);
 $router->post('/estimation', [EstimationController::class, 'estimate']);
+$router->post('/api/estimation', [EstimationController::class, 'apiEstimate']);
 $router->post('/lead', [EstimationController::class, 'storeLead']);
 $router->get('/admin/leads', [EstimationController::class, 'leads']);
 
@@ -19,8 +20,13 @@ $router->get('/services', [PageController::class, 'services']);
 $router->get('/about', [PageController::class, 'about']);
 $router->get('/a-propos', [PageController::class, 'aPropos']);
 $router->get('/processus-estimation', [PageController::class, 'processusEstimation']);
+$router->get('/quartiers', [PageController::class, 'quartiers']);
 $router->get('/contact', [PageController::class, 'contact']);
+$router->get('/newsletter', [PageController::class, 'newsletter']);
+$router->post('/newsletter', [PageController::class, 'newsletterSubscribe']);
+$router->get('/newsletter/confirm', [PageController::class, 'newsletterConfirm']);
 $router->get('/exemples-estimation', [PageController::class, 'exemplesEstimation']);
+$router->get('/guides', [PageController::class, 'guides']);
 $router->post('/contact', [PageController::class, 'contactSubmit']);
 
 $router->get('/tools/calculatrice', [ToolController::class, 'calculatrice']);
