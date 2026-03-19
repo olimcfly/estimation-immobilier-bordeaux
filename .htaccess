@@ -3,6 +3,9 @@ ServerSignature Off
 <IfModule mod_rewrite.c>
   RewriteEngine On
 
+  # Keep admin API reachable before any hardening deny rules (e.g. ^modules/ - [F]).
+  RewriteRule ^admin/api/ - [L]
+
   # Serve static assets from /public/assets when DocumentRoot is the project root.
   RewriteRule ^assets/(.*)$ public/assets/$1 [L]
 
