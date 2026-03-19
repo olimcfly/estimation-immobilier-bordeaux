@@ -26,4 +26,9 @@ spl_autoload_register(static function (string $class): void {
     }
 });
 
+
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
+
 Config::load(base_path('config/config.php'));

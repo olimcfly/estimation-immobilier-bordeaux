@@ -31,8 +31,8 @@
     </div>
 
     <div class="cards-stack">
-      <!-- SERVICE 1: ESTIMATION -->
-      <article class="card service-card">
+      <!-- SERVICE 1 -->
+      <article class="card service-card service-card-1" id="estimation-detaillee">
         <div class="service-header">
           <div class="service-icon-large">
             <i class="fas fa-calculator"></i>
@@ -76,16 +76,15 @@
           </div>
         </div>
 
-        <div class="service-cta">
-          <a href="/#form-estimation" class="btn btn-primary">
-            <i class="fas fa-bolt"></i> Estimer mon bien
-          </a>
-          <p class="service-tag">✓ 100% gratuit • ⚡ Résultat en 1 min</p>
+          <div class="service-cta">
+            <a href="/estimation#form-estimation" class="btn btn-small">Estimer mon bien</a>
+            <p class="service-tag">100% gratuit • Sans engagement</p>
+          </div>
         </div>
       </article>
 
-      <!-- SERVICE 2: ACCOMPAGNEMENT -->
-      <article class="card service-card">
+      <!-- SERVICE 2 -->
+      <article class="card service-card service-card-2" id="conseil-immobilier">
         <div class="service-header">
           <div class="service-icon-large">
             <i class="fas fa-handshake"></i>
@@ -134,8 +133,8 @@
         </div>
       </article>
 
-      <!-- SERVICE 3: CONSEIL IMMOBILIER -->
-      <article class="card service-card">
+      <!-- SERVICE 3 -->
+      <article class="card service-card service-card-3" id="accompagnement">
         <div class="service-header">
           <div class="service-icon-large">
             <i class="fas fa-user-tie"></i>
@@ -199,71 +198,38 @@
       <h2>Pour aller plus loin</h2>
     </div>
 
-    <div class="service-grid">
-      <!-- COMPLÉMENT 1 -->
-      <article class="card service-additional">
-        <h3>
-          <i class="fas fa-home"></i> Estimation Maison/Villa
-        </h3>
-        <p>
-          Spécialité maisons individuelles. Surface terrain, jardin, garage : nous intégrons tous les paramètres 
-          pour une évaluation précise.
-        </p>
-      </article>
+    <div class="additional-services">
+      <div class="service-grid">
+        <article class="card service-additional">
+          <h3><i class="fas fa-camera"></i> Photographie professionnelle</h3>
+          <p>Photos et vidéos HD de votre bien pour des annonces captivantes qui attirent les visiteurs qualifiés.</p>
+        </article>
 
-      <!-- COMPLÉMENT 2 -->
-      <article class="card service-additional">
-        <h3>
-          <i class="fas fa-building"></i> Estimation Appartement
-        </h3>
-        <p>
-          Nous connaissons les spécificités de chaque immeuble bordelais. Étage, exposition, copropriété : 
-          autant de facteurs que nous prenons en compte.
-        </p>
-      </article>
+        <article class="card service-additional">
+          <h3><i class="fas fa-file-pdf"></i> Dossier vendeur</h3>
+          <p>Préparation d'un dossier complet avec diagnostics, documents légaux et caractéristiques du bien.</p>
+        </article>
 
-      <!-- COMPLÉMENT 3 -->
-      <article class="card service-additional">
-        <h3>
-          <i class="fas fa-chart-line"></i> Suivi Marché
-        </h3>
-        <p>
-          Recevez des mises à jour mensuelles sur les tendances du marché bordelais. 
-          Articles d'expertise, quartiers en hausse, prix moyens.
-        </p>
-      </article>
+        <article class="card service-additional" id="marketing-immobilier">
+          <h3><i class="fas fa-bullhorn"></i> Marketing immobilier</h3>
+          <p>Publication optimisée sur les portails, réseaux sociaux et emails ciblés auprès d'acquéreurs potentiels.</p>
+        </article>
 
-      <!-- COMPLÉMENT 4 -->
-      <article class="card service-additional">
-        <h3>
-          <i class="fas fa-map-marker-alt"></i> Guide Quartier
-        </h3>
-        <p>
-          Découvrez tous les quartiers de Bordeaux. Caractéristiques, dynamique, prix au m², avis résidents, 
-          points d'intérêt.
-        </p>
-      </article>
+        <article class="card service-additional">
+          <h3><i class="fas fa-list-check"></i> Coaching de vente</h3>
+          <p>Sessions de préparation pour bien accueillir les visiteurs et optimiser votre communication en négociation.</p>
+        </article>
 
-      <!-- COMPLÉMENT 5 -->
-      <article class="card service-additional">
-        <h3>
-          <i class="fas fa-calculator"></i> Calculatrice Fiscale
-        </h3>
-        <p>
-          Estimez les frais de vente, taxes, plus-value immobilière. Comprendre les coûts avant de vendre.
-        </p>
-      </article>
+        <article class="card service-additional">
+          <h3><i class="fas fa-chart-pie"></i> Analyse de marché</h3>
+          <p>Rapport détaillé sur les tendances du quartier, prix moyens et profil type d'acquéreurs.</p>
+        </article>
 
-      <!-- COMPLÉMENT 6 -->
-      <article class="card service-additional">
-        <h3>
-          <i class="fas fa-file-alt"></i> Documents Guide
-        </h3>
-        <p>
-          Téléchargez nos guides gratuits : checklist avant vente, diagnostics obligatoires, contrats, 
-          conseils légaux.
-        </p>
-      </article>
+        <article class="card service-additional">
+          <h3><i class="fas fa-video"></i> Visite virtuelle 3D</h3>
+          <p>Tour complet en 3D de votre propriété, accessible 24/7 pour pré-filtrer les visiteurs sérieux.</p>
+        </article>
+      </div>
     </div>
   </div>
 </section>
@@ -465,17 +431,15 @@
         </a>
       </div>
 
-      <!-- PLAN 2: ACCOMPAGNEMENT -->
-      <div class="card pricing-card pricing-featured">
-        <span class="pricing-badge primary">POPULAIRE</span>
-        <h3>Accompagnement Expert</h3>
-        <div class="pricing-price">
-          <span class="price-value">À partir de</span>
-          <span class="price-monthly">€ 0</span>
-        </div>
-        <p class="pricing-description">
-          L'option idéale pour maximiser votre vente
-        </p>
+        <a href="/estimation#form-estimation" class="btn btn-ghost btn-full">Commencer</a>
+      </article>
+
+      <article class="pricing-card card pricing-featured">
+        <div class="pricing-badge primary">Recommandé</div>
+        <h3>Accompagnement vendeur</h3>
+        <p class="pricing-price"><span class="price-value">À partir de</span> <span class="price-monthly">99€/mois</span></p>
+        <p class="pricing-description">Pour vendre rapidement</p>
+
         <ul class="pricing-features">
           <li><i class="fas fa-check"></i> Estimation complète</li>
           <li><i class="fas fa-check"></i> Accompagnement expert</li>
@@ -605,12 +569,8 @@
         Choisissez le service qui vous convient et lancez votre projet de vente en toute confiance.
       </p>
       <div class="cta-buttons">
-        <a href="/#form-estimation" class="btn btn-primary">
-          <i class="fas fa-calculator"></i> Estimer gratuitement
-        </a>
-        <a href="/contact" class="btn btn-ghost">
-          <i class="fas fa-phone-alt"></i> Me contacter
-        </a>
+        <a href="/estimation#form-estimation" class="btn btn-primary">Estimer gratuitement</a>
+        <a href="/contact" class="btn btn-ghost">Demander un conseil</a>
       </div>
     </div>
   </div>

@@ -3,249 +3,47 @@
 
 <!-- ============================================ -->
 <!-- HERO SECTION -->
-<!-- ============================================ -->
-<section class="section page-hero">
-  <div class="container">
-    <div class="page-hero-inner card">
-      <p class="eyebrow">
-        <i class="fas fa-calculator"></i> Estimation gratuite
-      </p>
-      <h1>Découvrez la vraie valeur de votre bien</h1>
-      <p class="lead">
-        Formulaire simple, résultat instantané. Aucune visite obligatoire. 100% gratuit et sans engagement.
-      </p>
+<section class="hero">
+  <div class="container hero-grid">
+    <div>
+      <p class="eyebrow">✓ Estimation immobilière à Bordeaux</p>
+      <h1>Vendez au meilleur prix avec une évaluation fiable et professionnelle</h1>
+      <p class="lead">Notre moteur analyse les données locales, les tendances du marché et les caractéristiques de votre bien pour fournir une fourchette de valeur précise en quelques secondes.</p>
+      
+      <ul class="trust-list">
+        <li><i class="fas fa-check-circle"></i> +2 000 estimations réalisées</li>
+        <li><i class="fas fa-check-circle"></i> Méthodologie marché local</li>
+        <li><i class="fas fa-check-circle"></i> Accompagnement personnalisé</li>
+      </ul>
+
+      <div class="hero-actions">
+        <a class="btn" href="#form-estimation">Lancer mon estimation</a>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- ============================================ -->
-<!-- FORMULAIRE ESTIMATION -->
-<!-- ============================================ -->
-<section class="section" id="form-estimation">
+<section class="section" id="avantages">
   <div class="container">
-    <div class="estimation-form-wrapper">
-      
-      <!-- GAUCHE: INFOS BIEN -->
-      <article class="card estimation-form">
-        <h2>
-          <i class="fas fa-home"></i> Parlez-nous de votre bien
-        </h2>
-        <p class="form-intro">
-          Remplissez les informations ci-dessous. Votre estimation sera calculée en temps réel.
-        </p>
-
-        <form class="form-grid form-estimation" action="/estimation" method="post" id="estimation-form">
-          
-          <!-- LOCALISATION -->
-          <label for="localisation" class="full-width">
-            <span><i class="fas fa-map-marker-alt"></i> Localisation *</span>
-            <select id="localisation" name="localisation" required onchange="updateQuartiers(this.value)">
-              <option value="">-- Sélectionner une zone --</option>
-              <optgroup label="Bordeaux Centre">
-                <option value="chartrons">Chartrons</option>
-                <option value="vieux-bordeaux">Vieux Bordeaux</option>
-                <option value="pey-berland">Pey Berland</option>
-                <option value="st-michel">Saint-Michel</option>
-              </optgroup>
-              <optgroup label="Rive Gauche">
-                <option value="sainte-croix">Sainte-Croix</option>
-                <option value="bacalan">Bacalan</option>
-                <option value="la-bastide">La Bastide</option>
-              </optgroup>
-              <optgroup label="Banlieue">
-                <option value="talence">Talence</option>
-                <option value="floirac">Floirac</option>
-                <option value="villenave">Villenave d'Ornon</option>
-                <option value="bruges">Bruges</option>
-              </optgroup>
-              <optgroup label="Autre">
-                <option value="autre">Autre quartier</option>
-              </optgroup>
-            </select>
-          </label>
-
-          <!-- CODE POSTAL -->
-          <label for="code-postal" class="half-width">
-            <span><i class="fas fa-envelope"></i> Code postal *</span>
-            <input 
-              type="text" 
-              id="code-postal" 
-              name="code_postal" 
-              placeholder="33000" 
-              pattern="[0-9]{5}"
-              required
-            >
-          </label>
-
-          <!-- TYPE DE BIEN -->
-          <label for="type-bien" class="half-width">
-            <span><i class="fas fa-home"></i> Type de bien *</span>
-            <select id="type-bien" name="type_bien" required onchange="updateChamps(this.value)">
-              <option value="">-- Sélectionner --</option>
-              <option value="appartement">Appartement</option>
-              <option value="maison">Maison / Villa</option>
-              <option value="terrain">Terrain</option>
-              <option value="local">Local commercial</option>
-            </select>
-          </label>
-
-          <!-- SURFACE -->
-          <label for="surface" class="half-width">
-            <span><i class="fas fa-ruler"></i> Surface (m²) *</span>
-            <input 
-              type="number" 
-              id="surface" 
-              name="surface" 
-              placeholder="85" 
-              min="20"
-              max="500"
-              required
-            >
-          </label>
-
-          <!-- NOMBRE DE PIÈCES -->
-          <label for="pieces" class="half-width">
-            <span><i class="fas fa-door-open"></i> Nombre de pièces *</span>
-            <select id="pieces" name="pieces" required>
-              <option value="">-- Sélectionner --</option>
-              <option value="1">1 pièce</option>
-              <option value="2">2 pièces</option>
-              <option value="3">3 pièces</option>
-              <option value="4">4 pièces</option>
-              <option value="5">5 pièces</option>
-              <option value="6+">6+ pièces</option>
-            </select>
-          </label>
-
-          <!-- NOMBRE DE CHAMBRES -->
-          <label for="chambres" class="half-width">
-            <span><i class="fas fa-bed"></i> Chambres</span>
-            <select id="chambres" name="chambres">
-              <option value="0">0</option>
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="5+">5+</option>
-            </select>
-          </label>
-
-          <!-- SALLES DE BAIN -->
-          <label for="sdb" class="half-width">
-            <span><i class="fas fa-bath"></i> Salles de bain</span>
-            <select id="sdb" name="sdb">
-              <option value="0">0</option>
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4+">4+</option>
-            </select>
-          </label>
-
-          <!-- ANNÉE CONSTRUCTION -->
-          <label for="annee" class="half-width">
-            <span><i class="fas fa-calendar"></i> Année de construction *</span>
-            <input 
-              type="number" 
-              id="annee" 
-              name="annee" 
-              placeholder="2005" 
-              min="1800"
-              max="2024"
-              required
-            >
-          </label>
-
-          <!-- ÉTAGE -->
-          <label for="etage" class="half-width">
-            <span><i class="fas fa-layer-group"></i> Étage</span>
-            <select id="etage" name="etage">
-              <option value="">Pas applicable</option>
-              <option value="rdc">Rez-de-chaussée</option>
-              <option value="1">1er étage</option>
-              <option value="2">2ème étage</option>
-              <option value="3">3ème étage</option>
-              <option value="4+">4+ étages</option>
-            </select>
-          </label>
-
-          <!-- ÉTAT GÉNÉRAL -->
-          <label for="etat" class="full-width">
-            <span><i class="fas fa-check-circle"></i> État général du bien *</span>
-            <div class="radio-group">
-              <label style="display: flex; align-items: center; gap: 0.8rem; margin: 0.8rem 0; cursor: pointer;">
-                <input type="radio" name="etat" value="excellent" required>
-                <span><strong>Excellent</strong> - Rénové récemment, très bon état</span>
-              </label>
-              <label style="display: flex; align-items: center; gap: 0.8rem; margin: 0.8rem 0; cursor: pointer;">
-                <input type="radio" name="etat" value="bon" required>
-                <span><strong>Bon</strong> - Bon état, quelques travaux possibles</span>
-              </label>
-              <label style="display: flex; align-items: center; gap: 0.8rem; margin: 0.8rem 0; cursor: pointer;">
-                <input type="radio" name="etat" value="moyen" required>
-                <span><strong>Moyen</strong> - État correct, travaux à prévoir</span>
-              </label>
-              <label style="display: flex; align-items: center; gap: 0.8rem; margin: 0.8rem 0; cursor: pointer;">
-                <input type="radio" name="etat" value="mauvais" required>
-                <span><strong>Mauvais</strong> - Nécessite travaux importants</span>
-              </label>
-            </div>
-          </label>
-
-          <!-- INFORMATIONS PERSONNELLES -->
-          <h3 style="grid-column: 1 / -1; margin: 1rem 0 0; padding-top: 1rem; border-top: 1px solid var(--border); font-size: 1rem;">
-            <i class="fas fa-user"></i> Vos informations (optionnel)
-          </h3>
-
-          <label for="nom" class="half-width">
-            <span>Nom complet</span>
-            <input 
-              type="text" 
-              id="nom" 
-              name="nom" 
-              placeholder="Jean Dupont"
-            >
-          </label>
-
-          <label for="email" class="half-width">
-            <span>Email</span>
-            <input 
-              type="email" 
-              id="email" 
-              name="email" 
-              placeholder="jean@exemple.com"
-            >
-          </label>
-
-          <!-- CHECKBOX RGPD -->
-          <div class="form-checkbox full-width">
-            <input 
-              type="checkbox" 
-              id="rgpd-estimation" 
-              name="rgpd"
-            >
-            <label for="rgpd-estimation" style="margin: 0; font-weight: 500; font-size: 0.9rem; color: var(--text); cursor: pointer;">
-              J'accepte la 
-              <a href="/politique-confidentialite">politique de confidentialité</a>
-            </label>
-          </div>
-
-          <!-- SUBMIT -->
-          <button 
-            type="submit" 
-            class="btn btn-primary full-width" 
-            style="display: flex; justify-content: center; align-items: center; gap: 0.5rem; font-size: 1rem; padding: 1rem; grid-column: 1 / -1;"
-          >
-            <i class="fas fa-bolt"></i> Voir mon estimation
-          </button>
-
-          <!-- FOOTER INFO -->
-          <p class="form-footer" style="text-align: center; margin: 1rem 0 0; font-size: 0.8rem; grid-column: 1 / -1;">
-            <i class="fas fa-clock"></i> Résultat en 60 secondes • 
-            <i class="fas fa-lock"></i> 100% sécurisé • 
-            <i class="fas fa-ban"></i> Sans engagement
-          </p>
-        </form>
+    <div class="section-heading">
+      <p class="eyebrow">Pourquoi nous choisir</p>
+      <h2>Une home page premium mérite un service premium.</h2>
+    </div>
+    <div class="features-grid">
+      <article class="card feature-card">
+        <h3>Données locales fines</h3>
+        <p>Nous nous appuyons sur des références de transactions en Gironde pour une évaluation réaliste de votre bien.</p>
+        <a class="btn btn-small" href="#simulateur">Estimer mon bien</a>
+      </article>
+      <article class="card feature-card">
+        <h3>Résultat immédiat</h3>
+        <p>En moins d'une minute, obtenez une fourchette de prix basse, moyenne et haute avec prix au m².</p>
+        <a class="btn btn-small" href="#simulateur">Estimer mon bien</a>
+      </article>
+      <article class="card feature-card">
+        <h3>Passage à l'action</h3>
+        <p>Recevez ensuite un accompagnement sur-mesure pour vendre rapidement et sécuriser votre projet.</p>
+        <a class="btn btn-small" href="#simulateur">Estimer mon bien</a>
       </article>
 
       <!-- DROITE: AVANTAGES + ÉTAPES -->
@@ -253,28 +51,28 @@
         
         <!-- BLOC 1: AVANTAGES -->
         <article class="card">
-          <h3 style="margin: 0 0 1rem; display: flex; align-items: center; gap: 0.8rem;">
+          <h3 class="sidebar-title">
             <i class="fas fa-star" style="color: var(--accent);"></i> Avantages
           </h3>
-          <ul style="list-style: none; padding: 0; margin: 0;">
-            <li style="padding: 0.7rem 0; border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; gap: 0.8rem;">
-              <i class="fas fa-check-circle" style="color: #22c55e; flex-shrink: 0; margin-top: 0.2rem;"></i>
+          <ul class="benefits-list">
+            <li class="benefits-item">
+              <i class="fas fa-check-circle benefits-icon"></i>
               <span style="font-size: 0.9rem;"><strong>100% gratuit</strong> - Aucun frais caché</span>
             </li>
-            <li style="padding: 0.7rem 0; border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; gap: 0.8rem;">
-              <i class="fas fa-check-circle" style="color: #22c55e; flex-shrink: 0; margin-top: 0.2rem;"></i>
+            <li class="benefits-item">
+              <i class="fas fa-check-circle benefits-icon"></i>
               <span style="font-size: 0.9rem;"><strong>Rapide</strong> - Résultat en 1 minute</span>
             </li>
-            <li style="padding: 0.7rem 0; border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; gap: 0.8rem;">
-              <i class="fas fa-check-circle" style="color: #22c55e; flex-shrink: 0; margin-top: 0.2rem;"></i>
+            <li class="benefits-item">
+              <i class="fas fa-check-circle benefits-icon"></i>
               <span style="font-size: 0.9rem;"><strong>Précis</strong> - ±3% vs prix réel</span>
             </li>
-            <li style="padding: 0.7rem 0; border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; gap: 0.8rem;">
-              <i class="fas fa-check-circle" style="color: #22c55e; flex-shrink: 0; margin-top: 0.2rem;"></i>
+            <li class="benefits-item">
+              <i class="fas fa-check-circle benefits-icon"></i>
               <span style="font-size: 0.9rem;"><strong>Données temps réel</strong> - 5000+ transactions</span>
             </li>
-            <li style="padding: 0.7rem 0; display: flex; align-items: flex-start; gap: 0.8rem;">
-              <i class="fas fa-check-circle" style="color: #22c55e; flex-shrink: 0; margin-top: 0.2rem;"></i>
+            <li class="benefits-item">
+              <i class="fas fa-check-circle benefits-icon"></i>
               <span style="font-size: 0.9rem;"><strong>Sans engagement</strong> - Aucune obligation</span>
             </li>
           </ul>
@@ -282,29 +80,29 @@
 
         <!-- BLOC 2: ÉTAPES -->
         <article class="card">
-          <h3 style="margin: 0 0 1rem; display: flex; align-items: center; gap: 0.8rem;">
+          <h3 class="sidebar-title">
             <i class="fas fa-list-ol" style="color: var(--primary);"></i> Étapes
           </h3>
-          <div style="display: flex; flex-direction: column; gap: 1rem;">
-            <div style="display: flex; gap: 1rem;">
-              <div style="width: 40px; height: 40px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">1</div>
-              <div style="flex: 1;">
-                <p style="margin: 0 0 0.3rem; font-weight: 600; font-size: 0.9rem;">Remplir le formulaire</p>
-                <p style="margin: 0; font-size: 0.85rem; color: var(--muted);">Infos sur votre bien</p>
+          <div class="steps-list">
+            <div class="step-item">
+              <div class="step-badge">1</div>
+              <div>
+                <h4>Remplir le formulaire</h4>
+                <p>Infos sur votre bien</p>
               </div>
             </div>
-            <div style="display: flex; gap: 1rem;">
-              <div style="width: 40px; height: 40px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">2</div>
-              <div style="flex: 1;">
-                <p style="margin: 0 0 0.3rem; font-weight: 600; font-size: 0.9rem;">Analyser les données</p>
-                <p style="margin: 0; font-size: 0.85rem; color: var(--muted);">Notre moteur calcule</p>
+            <div class="step-item">
+              <div class="step-badge">2</div>
+              <div>
+                <h4>Analyser les données</h4>
+                <p>Notre moteur calcule</p>
               </div>
             </div>
-            <div style="display: flex; gap: 1rem;">
-              <div style="width: 40px; height: 40px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">3</div>
-              <div style="flex: 1;">
-                <p style="margin: 0 0 0.3rem; font-weight: 600; font-size: 0.9rem;">Recevoir l'estimation</p>
-                <p style="margin: 0; font-size: 0.85rem; color: var(--muted);">Fourchette de prix détaillée</p>
+            <div class="step-item">
+              <div class="step-badge">3</div>
+              <div>
+                <h4>Recevoir l'estimation</h4>
+                <p>Fourchette de prix détaillée</p>
               </div>
             </div>
           </div>
@@ -312,25 +110,25 @@
 
         <!-- BLOC 3: STATISTIQUES -->
         <article class="card">
-          <h3 style="margin: 0 0 1rem; display: flex; align-items: center; gap: 0.8rem;">
+          <h3 class="sidebar-title">
             <i class="fas fa-chart-bar" style="color: var(--accent);"></i> Nos chiffres
           </h3>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; text-align: center;">
+          <div class="stats-grid">
             <div>
-              <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: var(--primary);">3 847</p>
-              <p style="margin: 0.3rem 0 0; font-size: 0.85rem; color: var(--muted);">Estimations</p>
+              <p class="stat-value">3 847</p>
+              <p class="stat-label">Estimations</p>
             </div>
             <div>
-              <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: var(--primary);">4.8/5</p>
-              <p style="margin: 0.3rem 0 0; font-size: 0.85rem; color: var(--muted);">Satisfaction</p>
+              <p class="stat-value">4.8/5</p>
+              <p class="stat-label">Satisfaction</p>
             </div>
             <div>
-              <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: var(--primary);">97%</p>
-              <p style="margin: 0.3rem 0 0; font-size: 0.85rem; color: var(--muted);">Précision</p>
+              <p class="stat-value">97%</p>
+              <p class="stat-label">Précision</p>
             </div>
             <div>
-              <p style="margin: 0; font-size: 1.5rem; font-weight: 700; color: var(--primary);">60 sec</p>
-              <p style="margin: 0.3rem 0 0; font-size: 0.85rem; color: var(--muted);">Résultat</p>
+              <p class="stat-value">60 sec</p>
+              <p class="stat-label">Résultat</p>
             </div>
           </div>
         </article>
@@ -341,9 +139,7 @@
   </div>
 </section>
 
-<!-- ============================================ -->
-<!-- RÉSULTAT ESTIMATION (EXEMPLE) -->
-<!-- ============================================ -->
+<!-- EXEMPLE RÉSULTAT -->
 <section class="section section-alt" id="example-result">
   <div class="container">
     <div class="section-heading">
@@ -378,7 +174,7 @@
         <!-- DROITE: RÉSULTAT ESTIMATION -->
         <div>
           <h3 style="margin: 0 0 1.5rem; font-size: 1.1rem;">Résultat de l'estimation</h3>
-          <div style="background: linear-gradient(135deg, rgba(139, 21, 56, 0.05), rgba(212, 175, 55, 0.03)); border: 2px solid var(--accent); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem;">
+          <div style="background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.05), rgba(var(--accent-rgb), 0.03)); border: 2px solid var(--accent); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem;">
             
             <!-- FOURCHETTE PRIX -->
             <div style="margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border);">
@@ -409,7 +205,7 @@
             </div>
 
             <!-- ANALYSE -->
-            <div style="background: rgba(139, 21, 56, 0.05); border-radius: 8px; padding: 1rem; font-size: 0.9rem;">
+            <div style="background: rgba(var(--primary-rgb), 0.05); border-radius: 8px; padding: 1rem; font-size: 0.9rem;">
               <p style="margin: 0 0 0.5rem; font-weight: 600; color: var(--primary);">✓ Analyse positive</p>
               <p style="margin: 0; color: var(--muted); font-size: 0.85rem;">Quartier Chartrons dynamique, prix au m² 12% au-dessus de la moyenne bordelaise, bon potentiel de vente.</p>
             </div>
@@ -419,16 +215,33 @@
 
       </div>
 
-      <!-- BOUTONS -->
-      <div style="display: flex; gap: 1rem; margin-top: 2rem; justify-content: center;">
-        <a href="/estimation/exemple" class="btn btn-primary">
-          <i class="fas fa-eye"></i> Voir plus d'exemples
-        </a>
-        <a href="#form-estimation" class="btn btn-ghost">
-          <i class="fas fa-arrow-up"></i> Estimer mon bien
-        </a>
-      </div>
-    </article>
+<!-- PROCESSUS -->
+<section class="section" id="how-it-works">
+  <div class="container">
+    <div class="section-heading">
+      <p class="eyebrow">Notre méthode</p>
+      <h2>3 étapes simples pour démarrer</h2>
+    </div>
+    <div class="steps-grid">
+      <article class="card step-card">
+        <div class="step-number">01</div>
+        <h3>Renseignez votre bien</h3>
+        <p>Ville, type, surface et nombre de pièces suffisent pour lancer la simulation.</p>
+        <a class="btn btn-small" href="#simulateur">Estimer mon bien</a>
+      </article>
+      <article class="card step-card">
+        <div class="step-number">02</div>
+        <h3>Recevez l'estimation</h3>
+        <p>Une fourchette de prix cohérente avec la dynamique actuelle du marché bordelais.</p>
+        <a class="btn btn-small" href="#simulateur">Estimer mon bien</a>
+      </article>
+      <article class="card step-card">
+        <div class="step-number">03</div>
+        <h3>Activez l'accompagnement</h3>
+        <p>Laissez vos coordonnées et avancez avec des conseils d'expert pour concrétiser votre vente.</p>
+        <a class="btn btn-small" href="#simulateur">Estimer mon bien</a>
+      </article>
+    </div>
   </div>
 </section>
 
@@ -445,19 +258,20 @@
     </div>
 
     <div class="faq-grid">
-      <article class="card faq-card">
-        <h3><i class="fas fa-question-circle"></i> Quelle est la précision de l'estimation?</h3>
-        <p>Précision moyenne ±3% vs prix de vente final. Basée sur 5000+ transactions réelles à Bordeaux.</p>
+      <article class="card">
+        <h3>L'estimation est-elle gratuite ?</h3>
+        <p>Oui, la simulation en ligne est gratuite et sans engagement.</p>
+        <a class="btn btn-small" href="#simulateur">Estimer mon bien</a>
       </article>
-
-      <article class="card faq-card">
-        <h3><i class="fas fa-question-circle"></i> Faut-il une visite pour estimer?</h3>
-        <p>Non. Notre estimation est basée sur les données que vous fournissez. Une visite peut améliorer la précision si vous le souhaitez.</p>
+      <article class="card">
+        <h3>En combien de temps j'obtiens mon résultat ?</h3>
+        <p>Le résultat est généré immédiatement après validation du formulaire.</p>
+        <a class="btn btn-small" href="#simulateur">Estimer mon bien</a>
       </article>
-
-      <article class="card faq-card">
-        <h3><i class="fas fa-question-circle"></i> Puis-je modifier mon estimation?</h3>
-        <p>Oui, autant de fois que vous le souhaitez. Vous pouvez ajuster les paramètres et voir les résultats en temps réel.</p>
+      <article class="card">
+        <h3>Puis-je être recontacté ensuite ?</h3>
+        <p>Oui, si vous le souhaitez, vous pouvez laisser vos coordonnées pour être accompagné.</p>
+        <a class="btn btn-small" href="#simulateur">Estimer mon bien</a>
       </article>
 
       <article class="card faq-card">

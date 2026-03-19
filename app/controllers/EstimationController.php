@@ -6,12 +6,17 @@ namespace App\Controllers;
 
 use App\Core\Validator;
 use App\Core\View;
+use App\Models\DesignTemplate;
 use App\Models\Lead;
 use App\Services\EstimationService;
 use App\Services\LeadScoringService;
+use App\Services\PerplexityService;
 
 final class EstimationController
 {
+    private const LEAD_FORM_TTL_SECONDS = 1800;
+    private const LEAD_SUBMIT_COOLDOWN_SECONDS = 60;
+
     private EstimationService $estimationService;
 
     public function __construct(?EstimationService $estimationService = null)
@@ -36,6 +41,12 @@ final class EstimationController
             $rooms = Validator::int($_POST, 'pieces', 1, 50);
 
             $estimate = $this->estimationService->estimate($city, $propertyType, $surface, $rooms);
+            $now = time();
+            $_SESSION['lead_form_context'] = [
+                'ip' => $this->getClientIp(),
+                'issued_at' => $now,
+                'expires_at' => $now + self::LEAD_FORM_TTL_SECONDS,
+            ];
 
             View::render('estimation/result', [
                 'estimate' => $estimate,
@@ -48,9 +59,43 @@ final class EstimationController
         }
     }
 
+    public function apiEstimate(): void
+    {
+        header('Content-Type: application/json; charset=utf-8');
+
+        try {
+            $input = $this->readApiInput();
+            $sanitized = $this->sanitizeEstimationPayload($input);
+
+            $cityKey = $sanitized['ville'] !== '' ? 'ville' : 'localisation';
+            $typeKey = $sanitized['type'] !== '' ? 'type' : 'type_bien';
+
+            $city = Validator::string($sanitized, $cityKey, 2, 120);
+            $propertyType = Validator::string($sanitized, $typeKey, 2, 80);
+            $surface = Validator::float($sanitized, 'surface', 5, 10000);
+            $rooms = Validator::int($sanitized, 'pieces', 1, 50);
+
+            $estimate = $this->estimationService->estimate($city, $propertyType, $surface, $rooms);
+
+            http_response_code(200);
+            echo json_encode([
+                'success' => true,
+                'data' => $estimate,
+            ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
+        } catch (\Throwable $throwable) {
+            http_response_code(422);
+            echo json_encode([
+                'success' => false,
+                'error' => $throwable->getMessage(),
+            ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
+        }
+    }
+
     public function storeLead(): void
     {
         try {
+            $this->assertLeadRequestAllowed();
+
             $nom = Validator::string($_POST, 'nom', 2, 120);
             $email = Validator::email($_POST, 'email');
             $telephone = Validator::string($_POST, 'telephone', 6, 30);
@@ -62,9 +107,19 @@ final class EstimationController
             $motivation = Validator::string($_POST, 'motivation', 3, 80);
             $notesRaw = trim((string) ($_POST['notes'] ?? ($_POST['message'] ?? '')));
             $contactPrefere = trim((string) ($_POST['contact_prefere'] ?? ''));
+            $layout = trim((string) ($_POST['layout'] ?? ''));
             $notes = $notesRaw;
             if ($contactPrefere !== '') {
                 $notes = $notes !== '' ? "Contact préféré: {$contactPrefere}\n{$notes}" : "Contact préféré: {$contactPrefere}";
+            }
+            if ($layout !== '') {
+                $template = (new DesignTemplate())->findBySlug($layout);
+                if ($template === null) {
+                    throw new \InvalidArgumentException("Template layout inconnu: {$layout}");
+                }
+
+                $layoutNote = 'Template layout: ' . (string) $template['slug'];
+                $notes = $notes !== '' ? "{$layoutNote}\n{$notes}" : $layoutNote;
             }
             if (mb_strlen($notes) > 1500) {
                 throw new \InvalidArgumentException('Les notes ne doivent pas dépasser 1500 caractères.');
@@ -88,6 +143,11 @@ final class EstimationController
                 'statut' => 'nouveau',
             ]);
 
+            $_SESSION['lead_last_submit'] = [
+                'ip' => $this->getClientIp(),
+                'submitted_at' => time(),
+            ];
+
             View::render('estimation/lead_saved', [
                 'leadId' => $leadId,
                 'temperature' => $temperature,
@@ -110,4 +170,58 @@ final class EstimationController
             ]);
         }
     }
+
+
+    private function assertLeadRequestAllowed(): void
+    {
+        $context = $_SESSION['lead_form_context'] ?? null;
+
+        if (!is_array($context)) {
+            throw new \RuntimeException('Session expirée. Merci de relancer une estimation avant de soumettre vos coordonnées.');
+        }
+
+        $ip = $this->getClientIp();
+        $issuedAt = (int) ($context['issued_at'] ?? 0);
+        $expiresAt = (int) ($context['expires_at'] ?? 0);
+
+        if (($context['ip'] ?? '') !== $ip) {
+            unset($_SESSION['lead_form_context']);
+            throw new \RuntimeException('Vérification de sécurité invalide. Merci de refaire une estimation.');
+        }
+
+        $now = time();
+        if ($issuedAt <= 0 || $now > $expiresAt) {
+            unset($_SESSION['lead_form_context']);
+            throw new \RuntimeException('Le formulaire a expiré. Merci de relancer une estimation.');
+        }
+
+        $lastSubmit = $_SESSION['lead_last_submit'] ?? null;
+        if (is_array($lastSubmit) && ($lastSubmit['ip'] ?? '') === $ip) {
+            $lastSubmittedAt = (int) ($lastSubmit['submitted_at'] ?? 0);
+            $secondsSinceLastSubmit = $now - $lastSubmittedAt;
+
+            if ($lastSubmittedAt > 0 && $secondsSinceLastSubmit < self::LEAD_SUBMIT_COOLDOWN_SECONDS) {
+                throw new \RuntimeException('Merci de patienter une minute avant d\'envoyer une nouvelle demande.');
+            }
+        }
+    }
+
+    private function getClientIp(): string
+    {
+        $forwardedFor = trim((string) ($_SERVER['HTTP_X_FORWARDED_FOR'] ?? ''));
+        if ($forwardedFor !== '') {
+            $forwardedIp = trim(explode(',', $forwardedFor)[0]);
+            if ($forwardedIp !== '') {
+                return $forwardedIp;
+            }
+        }
+
+        $realIp = trim((string) ($_SERVER['HTTP_X_REAL_IP'] ?? ''));
+        if ($realIp !== '') {
+            return $realIp;
+        }
+
+        return trim((string) ($_SERVER['REMOTE_ADDR'] ?? 'unknown'));
+    }
+
 }

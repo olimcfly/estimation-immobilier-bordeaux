@@ -60,7 +60,10 @@ final class AdminBlogController
 
         View::render('admin/blog/form', [
             'article' => $article,
+            'revisions' => $articleModel->findRevisionsByArticleId((int) $id),
             'errors' => [],
+            'message' => (string) ($_GET['message'] ?? ''),
+            'error' => (string) ($_GET['error'] ?? ''),
             'action' => '/admin/blog/update/' . (int) $id,
             'submitLabel' => 'Mettre à jour',
         ]);
@@ -79,10 +82,23 @@ final class AdminBlogController
 
             View::render('admin/blog/form', [
                 'article' => $article,
+                'revisions' => $articleModel->findRevisionsByArticleId((int) $id),
                 'errors' => [$throwable->getMessage()],
                 'action' => '/admin/blog/update/' . (int) $id,
                 'submitLabel' => 'Mettre à jour',
             ]);
+        }
+    }
+
+    public function restoreRevision(string $id, string $revisionId): void
+    {
+        $articleModel = new Article();
+
+        try {
+            $articleModel->restoreRevision((int) $id, (int) $revisionId);
+            $this->redirect('/admin/blog/edit/' . (int) $id . '?message=' . urlencode('Révision restaurée avec succès.'));
+        } catch (\Throwable $throwable) {
+            $this->redirect('/admin/blog/edit/' . (int) $id . '?error=' . urlencode($throwable->getMessage()));
         }
     }
 
