@@ -423,7 +423,7 @@
           </a>
           <ul class="dropdown-menu">
             <li><a href="/#form-estimation"><i class="fas fa-zap"></i> Estimer mon bien</a></li>
-            <li><a href="/#example-result"><i class="fas fa-chart-bar"></i> Voir un exemple</a></li>
+            <li><a href="/exemples-estimation"><i class="fas fa-chart-bar"></i> Voir des cas réels</a></li>
             <li><a href="/#how-it-works"><i class="fas fa-cogs"></i> Comment ça marche</a></li>
             <li><a href="/faq"><i class="fas fa-question-circle"></i> FAQ Estimation</a></li>
           </ul>
