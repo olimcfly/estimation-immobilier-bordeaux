@@ -7,8 +7,8 @@
 ?>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Estimation immobilière Bordeaux - Évaluez votre bien gratuitement et découvrez nos guides immobiliers.">
-  <meta name="theme-color" content="<?= e((string) ($colors['primary'] ?? '#8B1538')) ?>">
+  <meta name="description" content="<?= htmlspecialchars((string) ($meta_description ?? 'Estimation immobilière Bordeaux - Évaluez votre bien gratuitement et découvrez nos guides immobiliers.'), ENT_QUOTES, 'UTF-8') ?>">
+  <meta name="theme-color" content="#8B1538">
   <title><?= isset($page_title) ? $page_title : 'Estimation Immobilière Bordeaux' ?></title>
 
   <!-- Google Fonts -->
