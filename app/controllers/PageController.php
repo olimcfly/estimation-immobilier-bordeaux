@@ -57,10 +57,10 @@ final class PageController
         ]);
     }
 
-    public function faq(): void
+    public function guides(): void
     {
-        View::render('pages/faq', [
-            'page_title' => 'FAQ - Estimation Immobilier Bordeaux',
+        View::render('pages/guides', [
+            'page_title' => 'Guides - Estimation Immobilier Bordeaux',
         ]);
     }
 

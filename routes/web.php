@@ -21,4 +21,5 @@ $router->get('/processus-estimation', [PageController::class, 'processusEstimati
 $router->get('/contact', [PageController::class, 'contact']);
 $router->get('/faq', [PageController::class, 'faq']);
 $router->get('/exemples-estimation', [PageController::class, 'exemplesEstimation']);
+$router->get('/guides', [PageController::class, 'guides']);
 $router->post('/contact', [PageController::class, 'contactSubmit']);
