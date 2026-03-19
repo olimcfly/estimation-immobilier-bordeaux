@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="<?= e((string) ($metaDescription ?? 'Estimation immobilière Bordeaux - Évaluez votre bien gratuitement et découvrez nos guides immobiliers.')) ?>">
+  <meta name="description" content="Estimation immobilière Bordeaux - Évaluez votre bien gratuitement et découvrez nos guides immobiliers.">
   <meta name="theme-color" content="#8B1538">
-  <title><?= e((string) ($page_title ?? $metaTitle ?? 'Estimation Immobilière Bordeaux')) ?></title>
+  <title><?= isset($page_title) ? $page_title : 'Estimation Immobilière Bordeaux' ?></title>
 
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -14,7 +14,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <!-- CSS Principal -->
-  <link rel="stylesheet" href="/assets/css/app.css">
+  <link rel="stylesheet" href="/public/assets/css/app.css">
 
   <!-- CSS Header Personnalisé -->
   <style>
@@ -405,10 +405,13 @@
 </head>
 <body>
 
+<!-- ============================= -->
 <!-- HEADER PREMIUM -->
+<!-- ============================= -->
 <header class="site-header">
   <div class="header-container">
     <div class="header-wrapper">
+      <!-- LOGO -->
       <a href="/" class="brand">
         <div class="brand-icon">
           <i class="fas fa-home"></i>
@@ -416,7 +419,9 @@
         <span>Estim</span>ation
       </a>
 
+      <!-- NAVIGATION PRINCIPALE -->
       <nav class="nav-main" id="navMain">
+        <!-- ESTIMATION -->
         <div class="nav-item nav-dropdown">
           <a href="/" class="nav-link dropdown-toggle">
             <i class="fas fa-calculator"></i> Estimation
@@ -424,11 +429,12 @@
           <ul class="dropdown-menu">
             <li><a href="/#form-estimation"><i class="fas fa-zap"></i> Estimer mon bien</a></li>
             <li><a href="/#example-result"><i class="fas fa-chart-bar"></i> Voir un exemple</a></li>
-            <li><a href="/processus-estimation"><i class="fas fa-cogs"></i> Comment ça marche</a></li>
+            <li><a href="/#how-it-works"><i class="fas fa-cogs"></i> Comment ça marche</a></li>
             <li><a href="/faq"><i class="fas fa-question-circle"></i> FAQ Estimation</a></li>
           </ul>
         </div>
 
+        <!-- BLOG -->
         <div class="nav-item nav-dropdown">
           <a href="/blog" class="nav-link dropdown-toggle">
             <i class="fas fa-book-open"></i> Blog
@@ -442,6 +448,7 @@
           </ul>
         </div>
 
+        <!-- SERVICES -->
         <div class="nav-item nav-dropdown">
           <a href="/services" class="nav-link dropdown-toggle">
             <i class="fas fa-briefcase"></i> Services
@@ -454,18 +461,21 @@
           </ul>
         </div>
 
+        <!-- À PROPOS -->
         <div class="nav-item">
           <a href="/about" class="nav-link">
             <i class="fas fa-info-circle"></i> À propos
           </a>
         </div>
 
+        <!-- CONTACT -->
         <div class="nav-item">
           <a href="/contact" class="nav-link">
             <i class="fas fa-envelope"></i> Contact
           </a>
         </div>
 
+        <!-- RESSOURCES -->
         <div class="nav-item nav-dropdown">
           <a href="#" class="nav-link dropdown-toggle">
             <i class="fas fa-graduation-cap"></i> Ressources
@@ -480,12 +490,21 @@
         </div>
       </nav>
 
+      <!-- ACTIONS DROITE -->
       <div class="header-actions">
+        <!-- SEARCH (optionnel) -->
+        <!-- <div class="search-wrapper">
+          <i class="fas fa-search search-icon"></i>
+          <input type="text" class="search-input" placeholder="Chercher...">
+        </div> -->
+
+        <!-- CTA PRINCIPAL -->
         <a href="/#form-estimation" class="btn-cta">
           <i class="fas fa-bolt"></i>
           <span>Estimer</span>
         </a>
 
+        <!-- MENU TOGGLE MOBILE -->
         <button class="menu-toggle" id="menuToggle" aria-label="Menu">
           <span></span>
           <span></span>
@@ -504,27 +523,25 @@
     const navMain = document.getElementById('navMain');
     const navDropdowns = document.querySelectorAll('.nav-dropdown');
 
-    if (menuToggle && navMain) {
-      menuToggle.addEventListener('click', function() {
-        navMain.classList.toggle('active');
-      });
-    }
+    // Toggle menu mobile
+    menuToggle.addEventListener('click', function() {
+      navMain.classList.toggle('active');
+    });
 
+    // Fermer menu au clic sur un lien
     const navLinks = document.querySelectorAll('.nav-link');
     navLinks.forEach(link => {
-      link.addEventListener('click', function() {
-        if (navMain && !this.parentElement.classList.contains('nav-dropdown')) {
+      link.addEventListener('click', function(e) {
+        // Ne pas fermer si c'est un dropdown
+        if (!this.parentElement.classList.contains('nav-dropdown')) {
           navMain.classList.remove('active');
         }
       });
     });
 
+    // Gestion des dropdowns en mobile
     navDropdowns.forEach(dropdown => {
       const toggle = dropdown.querySelector('.nav-link');
-      if (!toggle) {
-        return;
-      }
-
       toggle.addEventListener('click', function(e) {
         if (window.innerWidth <= 768) {
           e.preventDefault();
@@ -534,6 +551,7 @@
       });
     });
 
+    // Fermer les dropdowns au clic extérieur
     document.addEventListener('click', function(e) {
       if (!e.target.closest('.nav-dropdown')) {
         navDropdowns.forEach(d => d.classList.remove('active'));
