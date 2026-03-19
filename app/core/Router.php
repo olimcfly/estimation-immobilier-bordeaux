@@ -24,6 +24,7 @@ final class Router
     public function dispatch(string $method, string $uri): void
     {
         $path = parse_url($uri, PHP_URL_PATH) ?: '/';
+        parse_str((string) parse_url($uri, PHP_URL_QUERY), $queryParams);
 
         if ($path === '/public' || $path === '/public/') {
             $path = '/';
@@ -37,11 +38,18 @@ final class Router
             $path = substr($path, strlen('/index.php'));
         }
 
+        if ($path === '/front/page.php') {
+            $legacyPage = $this->sanitizeLegacyPage($queryParams['page'] ?? null);
+            if ($legacyPage !== null) {
+                $path = '/' . $legacyPage;
+            }
+        }
+
         [$action, $params] = $this->resolveRoute($method, $path);
 
         if ($action === null) {
-            http_response_code(404);
-            echo '404 - Route introuvable';
+            $this->logNotFoundRoute($method, $uri, $path, $queryParams);
+            $this->fallbackToHomeOr404($method);
             return;
         }
 
@@ -60,6 +68,40 @@ final class Router
         }
 
         return [null, []];
+    }
+
+    private function sanitizeLegacyPage(mixed $value): ?string
+    {
+        if (!is_string($value) || $value === '') {
+            return null;
+        }
+
+        $page = strtolower(trim($value));
+        if ($page === '') {
+            return null;
+        }
+
+        return preg_replace('/[^a-z0-9\-]/', '', $page) ?: null;
+    }
+
+    private function logNotFoundRoute(string $method, string $uri, string $path, array $queryParams): void
+    {
+        $queryString = empty($queryParams) ? '' : ('?' . http_build_query($queryParams));
+        error_log(sprintf('[router][404] method=%s uri=%s resolved_path=%s query=%s', $method, $uri, $path, $queryString));
+    }
+
+    private function fallbackToHomeOr404(string $method): void
+    {
+        [$homeAction] = $this->resolveRoute($method, '/');
+        if ($homeAction !== null) {
+            http_response_code(302);
+            header('Location: /', true, 302);
+            return;
+        }
+
+        http_response_code(404);
+        header('Content-Type: text/plain; charset=utf-8');
+        echo '404 - Route introuvable. Retournez à l’accueil : /';
     }
 
     private function match(string $routePath, string $currentPath): ?array
