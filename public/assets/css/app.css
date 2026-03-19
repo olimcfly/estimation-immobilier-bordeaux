@@ -783,7 +783,7 @@ textarea:focus {
 }
 
 .lead-section {
-  padding: 4rem 0;
+  padding: 4rem 0 0;
 }
 
 .form-header {
@@ -838,6 +838,20 @@ textarea:focus {
 .form-section h4 i {
   color: var(--primary);
   font-size: 1.1rem;
+}
+
+.form-row {
+  gap: 1.2rem;
+}
+
+textarea {
+  transition: all 0.2s ease;
+}
+
+textarea:focus {
+  outline: none;
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 3px rgba(139, 21, 56, 0.08) !important;
 }
 
 .form-actions {
