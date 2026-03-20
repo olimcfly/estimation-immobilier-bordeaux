@@ -539,7 +539,6 @@
           <li><a href="/guides">Guides complets</a></li>
           <li><a href="/tools/calculatrice">Calculatrice prix</a></li>
           <li><a href="/quartiers">Quartiers Bordeaux</a></li>
-          <li><a href="/podcast">Podcast immobilier</a></li>
           <li><a href="/newsletter">Newsletter</a></li>
         </ul>
       </div>
