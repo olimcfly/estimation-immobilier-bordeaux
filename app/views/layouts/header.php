@@ -345,6 +345,7 @@
       border: none;
       cursor: pointer;
       padding: 0.5rem;
+      z-index: 999;
     }
 
     .menu-toggle span {
@@ -353,6 +354,18 @@
       background: var(--text);
       border-radius: 2px;
       transition: all 0.3s ease;
+    }
+
+    .menu-toggle.active span:nth-child(1) {
+      transform: rotate(45deg) translate(4px, 4px);
+    }
+
+    .menu-toggle.active span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .menu-toggle.active span:nth-child(3) {
+      transform: rotate(-45deg) translate(4px, -4px);
     }
 
     /* RESPONSIVE */
@@ -382,20 +395,22 @@
 
       .top-nav {
         position: fixed;
-        top: 60px;
+        top: 0;
         left: 0;
         right: 0;
+        bottom: 0;
         background: var(--surface);
         flex-direction: column;
         gap: 0;
-        max-height: 0;
-        overflow: hidden;
-        transition: max-height 0.3s ease;
-        border-bottom: 1px solid var(--border);
+        padding-top: 70px;
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+        overflow-y: auto;
+        z-index: 998;
       }
 
       .top-nav.active {
-        max-height: 500px;
+        transform: translateX(0);
       }
 
       .nav-item {
@@ -483,6 +498,27 @@
         display: none;
       }
     }
+
+    /* Header CTA button */
+    .btn-header-cta {
+      padding: 0.9rem 2rem;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 768px) {
+      .btn-header-cta {
+        padding: 0.7rem 1.2rem;
+        font-size: 0.85rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .btn-header-cta {
+        padding: 0.6rem 1rem;
+        font-size: 0.78rem;
+      }
+    }
   </style>
 </head>
 <body>
@@ -544,7 +580,7 @@
       </div>
     </nav>
 
-    <a href="/estimation#form-estimation" class="btn btn-small">Estimer mon bien</a>
+    <a href="/estimation#form-estimation" class="btn btn-header-cta">Estimer mon bien</a>
   </div>
 </header>
 

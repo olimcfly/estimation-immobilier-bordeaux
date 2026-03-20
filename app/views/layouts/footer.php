@@ -154,7 +154,9 @@
 
     toggle.addEventListener('click', function() {
       nav.classList.toggle('active');
+      toggle.classList.toggle('active');
       toggle.setAttribute('aria-expanded', nav.classList.contains('active'));
+      document.body.style.overflow = nav.classList.contains('active') ? 'hidden' : '';
     });
 
     // Mobile dropdown toggles (touch-friendly)
@@ -175,10 +177,21 @@
     window.addEventListener('resize', function() {
       if (window.innerWidth > 768) {
         nav.classList.remove('active');
+        toggle.classList.remove('active');
+        document.body.style.overflow = '';
         document.querySelectorAll('.has-dropdown').forEach(function(d) {
           d.classList.remove('active');
         });
       }
+    });
+
+    // Close menu when clicking a nav link (mobile)
+    nav.querySelectorAll('a:not(.has-dropdown > .nav-link)').forEach(function(link) {
+      link.addEventListener('click', function() {
+        nav.classList.remove('active');
+        toggle.classList.remove('active');
+        document.body.style.overflow = '';
+      });
     });
   })();
 </script>
