@@ -6,7 +6,7 @@
  * Usage: php database/setup-admin.php
  *
  * Environment variables (or edit values below):
- *   ADMIN_EMAIL - Admin email (default: contact@estimation-immobilier-bordeaux.fr)
+ *   ADMIN_EMAIL - Admin email (default: admin@estimation-immobilier-bordeaux.fr)
  */
 
 declare(strict_types=1);
@@ -15,7 +15,7 @@ require_once __DIR__ . '/../app/core/bootstrap.php';
 
 use App\Models\AdminUser;
 
-$email = $_ENV['ADMIN_EMAIL'] ?? 'contact@estimation-immobilier-bordeaux.fr';
+$email = $_ENV['ADMIN_EMAIL'] ?? 'admin@estimation-immobilier-bordeaux.fr';
 
 echo "Creating admin_users table...\n";
 AdminUser::createTable();
