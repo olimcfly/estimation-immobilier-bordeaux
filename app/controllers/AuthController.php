@@ -37,15 +37,25 @@ final class AuthController
             return;
         }
 
-        if ($action === 'send_code') {
-            $this->handleSendCode();
-        } elseif ($action === 'verify_code') {
-            $this->handleVerifyCode();
-        } else {
+        try {
+            if ($action === 'send_code') {
+                $this->handleSendCode();
+            } elseif ($action === 'verify_code') {
+                $this->handleVerifyCode();
+            } else {
+                View::renderBare('admin/login', [
+                    'page_title' => 'Connexion Admin - Estimation Immobilier Bordeaux',
+                    'step' => 'email',
+                    'error_message' => 'Requête invalide.',
+                ]);
+            }
+        } catch (\RuntimeException $e) {
+            error_log('Auth error: ' . $e->getMessage());
+            http_response_code(500);
             View::renderBare('admin/login', [
                 'page_title' => 'Connexion Admin - Estimation Immobilier Bordeaux',
                 'step' => 'email',
-                'error_message' => 'Requête invalide.',
+                'error_message' => 'Erreur serveur : impossible de se connecter à la base de données. Vérifiez la configuration.',
             ]);
         }
     }
