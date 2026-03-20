@@ -43,3 +43,5 @@ $router->get('/mentions-legales', [PageController::class, 'mentionsLegales']);
 $router->get('/politique-confidentialite', [PageController::class, 'politiqueConfidentialite']);
 $router->get('/conditions-utilisation', [PageController::class, 'conditionsUtilisation']);
 $router->get('/rgpd', [PageController::class, 'rgpd']);
+
+$router->get('/tools/calculatrice', [ToolController::class, 'calculatrice']);

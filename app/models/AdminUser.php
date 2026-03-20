@@ -9,6 +9,8 @@ use PDO;
 
 final class AdminUser
 {
+    private const CODE_TTL_MINUTES = 10;
+
     public static function findByEmail(string $email): ?array
     {
         $stmt = Database::connection()->prepare(
@@ -20,9 +22,52 @@ final class AdminUser
         return $row !== false ? $row : null;
     }
 
-    public static function verifyPassword(string $password, string $hash): bool
+    public static function storeLoginCode(string $email, string $code): void
     {
-        return password_verify($password, $hash);
+        $expiresAt = date('Y-m-d H:i:s', time() + self::CODE_TTL_MINUTES * 60);
+
+        $stmt = Database::connection()->prepare(
+            'UPDATE admin_users SET login_code = :code, login_code_expires_at = :expires WHERE email = :email'
+        );
+        $stmt->execute([
+            'code' => password_hash($code, PASSWORD_BCRYPT, ['cost' => 10]),
+            'expires' => $expiresAt,
+            'email' => $email,
+        ]);
+    }
+
+    public static function verifyLoginCode(string $email, string $code): bool
+    {
+        $user = self::findByEmail($email);
+        if ($user === null) {
+            return false;
+        }
+
+        $hash = (string) ($user['login_code'] ?? '');
+        $expiresAt = (string) ($user['login_code_expires_at'] ?? '');
+
+        if ($hash === '' || $expiresAt === '') {
+            return false;
+        }
+
+        if (strtotime($expiresAt) < time()) {
+            return false;
+        }
+
+        return password_verify($code, $hash);
+    }
+
+    public static function clearLoginCode(string $email): void
+    {
+        $stmt = Database::connection()->prepare(
+            'UPDATE admin_users SET login_code = NULL, login_code_expires_at = NULL WHERE email = :email'
+        );
+        $stmt->execute(['email' => $email]);
+    }
+
+    public static function generateCode(): string
+    {
+        return str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
     }
 
     public static function createTable(): void
@@ -31,8 +76,9 @@ final class AdminUser
             CREATE TABLE IF NOT EXISTS admin_users (
                 id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
                 email VARCHAR(180) NOT NULL UNIQUE,
-                password_hash VARCHAR(255) NOT NULL,
                 name VARCHAR(120) NOT NULL DEFAULT '',
+                login_code VARCHAR(255) DEFAULT NULL,
+                login_code_expires_at DATETIME DEFAULT NULL,
                 created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                 INDEX idx_admin_email (email)
@@ -40,20 +86,18 @@ final class AdminUser
         ");
     }
 
-    public static function seedDefaultAdmin(string $email, string $password): void
+    public static function seedDefaultAdmin(string $email): void
     {
         $existing = self::findByEmail($email);
         if ($existing !== null) {
             return;
         }
 
-        $hash = password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]);
         $stmt = Database::connection()->prepare(
-            'INSERT INTO admin_users (email, password_hash, name, created_at) VALUES (:email, :hash, :name, NOW())'
+            'INSERT INTO admin_users (email, name, created_at) VALUES (:email, :name, NOW())'
         );
         $stmt->execute([
             'email' => $email,
-            'hash' => $hash,
             'name' => 'Administrateur',
         ]);
     }

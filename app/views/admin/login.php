@@ -1,6 +1,7 @@
 <?php
 use App\Controllers\AuthController;
 $csrfToken = AuthController::generateCsrfToken();
+$step = $step ?? 'email';
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -22,8 +23,10 @@ $csrfToken = AuthController::generateCsrfToken();
       --primary-dark: #6b0f2d;
       --border: #e8dfd7;
       --danger: #e24b4a;
+      --success: #22c55e;
       --primary-rgb: 139, 21, 56;
       --neutral-rgb: 0, 0, 0;
+      --success-rgb: 34, 197, 94;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -78,10 +81,7 @@ $csrfToken = AuthController::generateCsrfToken();
       margin: 0;
     }
 
-    .error-message {
-      background: rgba(226, 75, 74, 0.08);
-      border: 1px solid var(--danger);
-      color: var(--danger);
+    .alert {
       padding: 1rem 1.25rem;
       border-radius: 10px;
       margin-bottom: 1.5rem;
@@ -89,6 +89,18 @@ $csrfToken = AuthController::generateCsrfToken();
       display: flex;
       align-items: center;
       gap: 0.75rem;
+    }
+
+    .alert-error {
+      background: rgba(226, 75, 74, 0.08);
+      border: 1px solid var(--danger);
+      color: var(--danger);
+    }
+
+    .alert-success {
+      background: rgba(34, 197, 94, 0.08);
+      border: 1px solid var(--success);
+      color: #15803d;
     }
 
     .login-form {
@@ -133,24 +145,12 @@ $csrfToken = AuthController::generateCsrfToken();
       box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.08);
     }
 
-    .password-wrapper {
-      position: relative;
-    }
-
-    .password-wrapper input {
-      padding-right: 3rem;
-    }
-
-    .password-toggle {
-      position: absolute;
-      right: 0.8rem;
-      top: 50%;
-      transform: translateY(-50%);
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: var(--muted);
-      padding: 0.4rem;
+    .code-input {
+      text-align: center;
+      font-size: 1.8rem !important;
+      letter-spacing: 0.6rem;
+      font-weight: 700;
+      padding: 1rem !important;
     }
 
     .btn-submit {
@@ -183,6 +183,32 @@ $csrfToken = AuthController::generateCsrfToken();
     .login-footer i {
       margin-right: 0.3rem;
     }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      margin-top: 1.5rem;
+      transition: color 0.2s;
+    }
+
+    .back-link:hover {
+      color: var(--primary);
+    }
+
+    .email-display {
+      background: rgba(var(--primary-rgb), 0.06);
+      border-radius: 8px;
+      padding: 0.6rem 1rem;
+      font-size: 0.9rem;
+      color: var(--text);
+      font-weight: 500;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -191,82 +217,103 @@ $csrfToken = AuthController::generateCsrfToken();
 
     <div class="login-header">
       <div class="login-icon">
-        <i class="fas fa-lock"></i>
+        <i class="fas fa-<?= $step === 'code' ? 'envelope-open-text' : 'lock' ?>"></i>
       </div>
       <h1>Espace Administrateur</h1>
-      <p>Connectez-vous pour accéder au tableau de bord</p>
+      <?php if ($step === 'email'): ?>
+        <p>Entrez votre adresse email pour recevoir un code de connexion</p>
+      <?php else: ?>
+        <p>Saisissez le code reçu par email</p>
+      <?php endif; ?>
     </div>
 
     <?php if (!empty($error_message)): ?>
-    <div class="error-message">
+    <div class="alert alert-error">
       <i class="fas fa-exclamation-circle"></i>
       <span><?= e($error_message) ?></span>
     </div>
     <?php endif; ?>
 
-    <form method="POST" action="/admin/login" class="login-form">
-      <input type="hidden" name="csrf_token" value="<?= e($csrfToken) ?>">
+    <?php if (!empty($success_message)): ?>
+    <div class="alert alert-success">
+      <i class="fas fa-check-circle"></i>
+      <span><?= e($success_message) ?></span>
+    </div>
+    <?php endif; ?>
 
-      <div class="form-group">
-        <label for="email">
-          <i class="fas fa-envelope"></i>Adresse email
-        </label>
-        <input
-          type="email"
-          id="email"
-          name="email"
-          value="<?= e((string) ($old_email ?? '')) ?>"
-          placeholder="contact@estimation-immobilier-bordeaux.fr"
-          required
-          autocomplete="email"
-        >
-      </div>
+    <?php if ($step === 'email'): ?>
 
-      <div class="form-group">
-        <label for="password">
-          <i class="fas fa-key"></i>Mot de passe
-        </label>
-        <div class="password-wrapper">
+      <form method="POST" action="/admin/login" class="login-form">
+        <input type="hidden" name="csrf_token" value="<?= e($csrfToken) ?>">
+        <input type="hidden" name="action" value="send_code">
+
+        <div class="form-group">
+          <label for="email">
+            <i class="fas fa-envelope"></i>Adresse email
+          </label>
           <input
-            type="password"
-            id="password"
-            name="password"
-            placeholder="Votre mot de passe"
+            type="email"
+            id="email"
+            name="email"
             required
-            autocomplete="current-password"
+            autocomplete="email"
+            autofocus
           >
-          <button type="button" onclick="togglePassword()" class="password-toggle" aria-label="Afficher le mot de passe">
-            <i id="toggle-icon" class="fas fa-eye"></i>
-          </button>
         </div>
+
+        <button type="submit" class="btn-submit">
+          <i class="fas fa-paper-plane" style="margin-right: 0.5rem;"></i>Recevoir mon code
+        </button>
+      </form>
+
+    <?php else: ?>
+
+      <div class="email-display">
+        <i class="fas fa-envelope" style="margin-right: 0.4rem; color: var(--primary);"></i>
+        <?= e($login_email ?? '') ?>
       </div>
 
-      <button type="submit" class="btn-submit">
-        <i class="fas fa-sign-in-alt" style="margin-right: 0.5rem;"></i>Se connecter
-      </button>
-    </form>
+      <form method="POST" action="/admin/login" class="login-form">
+        <input type="hidden" name="csrf_token" value="<?= e($csrfToken) ?>">
+        <input type="hidden" name="action" value="verify_code">
+        <input type="hidden" name="email" value="<?= e($login_email ?? '') ?>">
+
+        <div class="form-group">
+          <label for="code">
+            <i class="fas fa-key"></i>Code de connexion
+          </label>
+          <input
+            type="text"
+            id="code"
+            name="code"
+            class="code-input"
+            maxlength="6"
+            pattern="[0-9]{6}"
+            inputmode="numeric"
+            autocomplete="one-time-code"
+            required
+            autofocus
+          >
+        </div>
+
+        <button type="submit" class="btn-submit">
+          <i class="fas fa-sign-in-alt" style="margin-right: 0.5rem;"></i>Se connecter
+        </button>
+      </form>
+
+      <div style="text-align: center;">
+        <a href="/admin/login" class="back-link">
+          <i class="fas fa-arrow-left"></i>Utiliser une autre adresse
+        </a>
+      </div>
+
+    <?php endif; ?>
 
     <p class="login-footer">
       <i class="fas fa-shield-alt"></i>Connexion sécurisée SSL
     </p>
 
   </div>
-
-  <script>
-  function togglePassword() {
-    const input = document.getElementById('password');
-    const icon = document.getElementById('toggle-icon');
-    if (input.type === 'password') {
-      input.type = 'text';
-      icon.classList.remove('fa-eye');
-      icon.classList.add('fa-eye-slash');
-    } else {
-      input.type = 'password';
-      icon.classList.remove('fa-eye-slash');
-      icon.classList.add('fa-eye');
-    }
-  }
-  </script>
 
 </body>
 </html>

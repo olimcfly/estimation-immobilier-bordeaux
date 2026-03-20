@@ -55,7 +55,15 @@ final class Router
 
         [$controllerClass, $controllerMethod] = $action;
         $controller = new $controllerClass();
-        $controller->{$controllerMethod}(...$params);
+
+        try {
+            $controller->{$controllerMethod}(...$params);
+        } catch (\RuntimeException $e) {
+            error_log(sprintf('[router][error] %s::%s - %s', $controllerClass, $controllerMethod, $e->getMessage()));
+            http_response_code(500);
+            header('Content-Type: text/html; charset=utf-8');
+            echo '<h1>Erreur 500</h1><p>Une erreur interne est survenue. Veuillez réessayer plus tard.</p>';
+        }
     }
 
     private function resolveRoute(string $method, string $path): array

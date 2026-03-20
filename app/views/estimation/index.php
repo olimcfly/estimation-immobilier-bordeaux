@@ -1,7 +1,6 @@
 <?php $page_title = 'Estimation Immobilière Bordeaux - Avis de Valeur Indicatif Gratuit'; ?>
 
 <!-- ============================================ -->
-<!-- HERO + FORMULAIRE SIMPLE -->
 <!-- HERO + FORMULAIRE -->
 <!-- ============================================ -->
 <section class="hero">
@@ -35,83 +34,6 @@
           <?php endforeach; ?>
         </div>
       <?php endif; ?>
-
-      <form action="/estimation" method="post" class="form-grid">
-        <!-- TYPE DE BIEN -->
-        <label for="property_type">
-          <span><i class="fas fa-home"></i> Type de bien</span>
-          <select id="property_type" name="type_bien" required>
-            <option value="">-- Sélectionner --</option>
-            <option value="appartement">Appartement</option>
-            <option value="maison">Maison / Villa</option>
-            <option value="studio">Studio</option>
-            <option value="loft">Loft</option>
-            <option value="maison de ville">Maison de ville</option>
-          </select>
-        </label>
-
-        <!-- SUPERFICIE -->
-        <label for="surface">
-          <span><i class="fas fa-ruler-combined"></i> Superficie (m²)</span>
-          <input type="number" id="surface" name="surface" min="10" max="500" step="1" placeholder="Ex: 75" required>
-        </label>
-
-        <!-- LOCALITÉ -->
-        <label for="ville">
-          <span><i class="fas fa-map-marker-alt"></i> Localité</span>
-          <input type="text" id="ville" name="ville" placeholder="Bordeaux, Talence, Mérignac..." required autocomplete="off">
-        </label>
-
-        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; font-size: 1rem; padding: 1rem;">
-          <i class="fas fa-bolt"></i> Obtenir mon estimation gratuite
-        </button>
-
-        <p class="form-footer" style="text-align: center; margin: 0.8rem 0 0; font-size: 0.8rem; color: var(--muted);">
-          <i class="fas fa-lock"></i> Aucune donnée personnelle requise
-        </p>
-      </form>
-    </aside>
-  </div>
-</section>
-
-<!-- ============================================ -->
-<!-- COMPRENDRE: ESTIMATION vs AVIS DE VALEUR -->
-<!-- ============================================ -->
-<section class="section section-alt" id="comprendre">
-  <div class="container">
-    <div class="section-heading">
-      <p class="eyebrow"><i class="fas fa-gavel"></i> Ce qu'il faut savoir</p>
-      <h2>Estimation en ligne vs. Avis de Valeur</h2>
-    </div>
-
-    <div class="card" style="margin-top: 1.5rem; padding: 1.5rem 2rem; background: rgba(var(--primary-rgb), 0.04); border-left: 4px solid var(--primary);">
-      <p style="margin: 0; font-size: 0.95rem; line-height: 1.7;">
-        <i class="fas fa-exclamation-triangle" style="color: var(--primary);"></i>
-        <strong>Important :</strong> Les outils en ligne (y compris le nôtre) fournissent des <strong>estimations statistiques</strong> basées sur les données du marché.
-        Seul un <strong>Avis de Valeur</strong> réalisé par un <strong>expert d'estimation agréé</strong> (un métier réglementé avec agrément) constitue une évaluation fiable et reconnue.
-        Notre outil vous donne une première indication, mais pour vendre ou acheter sereinement, faites appel à un expert.
-      </p>
-      <p class="eyebrow"><i class="fas fa-calculator"></i> Estimation immobilière à Bordeaux</p>
-      <h1>Estimez la valeur de votre bien immobilier à Bordeaux</h1>
-      <p class="lead">Remplissez le formulaire ci-contre pour obtenir une fourchette de prix basée sur les données réelles du marché bordelais. Résultat immédiat, 100% gratuit.</p>
-
-      <?php if (!empty($errors)): ?>
-        <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 1rem; margin-top: 1rem;">
-          <?php foreach ($errors as $error): ?>
-            <p style="margin: 0; color: #dc2626; font-size: 0.9rem;">
-              <i class="fas fa-exclamation-circle"></i> <?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8') ?>
-            </p>
-          <?php endforeach; ?>
-        </div>
-      <?php endif; ?>
-    </div>
-
-    <!-- FORMULAIRE D'ESTIMATION -->
-    <aside class="hero-panel card" id="form-estimation">
-      <div class="panel-header">
-        <h2><i class="fas fa-home"></i> Votre bien</h2>
-        <p class="muted">Remplissez les caractéristiques pour lancer l'estimation.</p>
-      </div>
 
       <form action="/estimation" method="post" class="form-grid">
         <!-- VILLE -->
@@ -190,30 +112,33 @@
 </section>
 
 <!-- ============================================ -->
+<!-- COMPRENDRE: ESTIMATION vs AVIS DE VALEUR -->
+<!-- ============================================ -->
+<section class="section section-alt" id="comprendre">
+  <div class="container">
+    <div class="section-heading">
+      <p class="eyebrow"><i class="fas fa-gavel"></i> Ce qu'il faut savoir</p>
+      <h2>Estimation en ligne vs. Avis de valeur réalisé par un conseiller immobilier</h2>
+    </div>
+
+    <div class="card" style="margin-top: 1.5rem; padding: 1.5rem 2rem; background: rgba(var(--primary-rgb), 0.04); border-left: 4px solid var(--primary);">
+      <p style="margin: 0; font-size: 0.95rem; line-height: 1.7;">
+        <i class="fas fa-exclamation-triangle" style="color: var(--primary);"></i>
+        <strong>Important :</strong> Les outils en ligne (y compris le nôtre) fournissent des <strong>estimations statistiques</strong> à partir de données de marché.
+        Pour affiner le prix de vente de votre bien, l'idéal est de compléter cette première estimation par un <strong>avis de valeur</strong> réalisé par un conseiller immobilier
+        qui se déplace chez vous et analyse votre bien dans le détail.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================ -->
 <!-- PROCESSUS -->
 <!-- ============================================ -->
 <section class="section" id="how-it-works">
   <div class="container">
     <div class="section-heading">
-      <p class="eyebrow"><i class="fas fa-bolt"></i> Simple et rapide</p>
-      <h2>3 étapes pour votre estimation</h2>
-    </div>
-    <div class="steps-grid">
-      <article class="card step-card">
-        <div class="step-number">1</div>
-        <h3>Remplissez 3 champs</h3>
-        <p>Type de bien, superficie et localité. C'est tout.</p>
-      </article>
-      <article class="card step-card">
-        <div class="step-number">2</div>
-        <h3>Recevez votre fourchette</h3>
-        <p>Estimation basse, moyenne et haute basée sur les données du marché.</p>
-      </article>
-      <article class="card step-card">
-        <div class="step-number">3</div>
-        <h3>Demandez un Avis de Valeur</h3>
-        <p>Pour une évaluation précise par un expert agréé.</p>
-      <p class="eyebrow">Notre méthode</p>
+      <p class="eyebrow"><i class="fas fa-bolt"></i> Notre méthode</p>
       <h2>3 étapes simples pour estimer votre bien</h2>
     </div>
     <div class="steps-grid">
@@ -242,10 +167,6 @@
 <section class="section section-alt" id="faq">
   <div class="container">
     <div class="section-heading">
-      <p class="eyebrow"><i class="fas fa-comments"></i> Questions fréquentes</p>
-<section class="section section-alt">
-  <div class="container">
-    <div class="section-heading">
       <p class="eyebrow"><i class="fas fa-question-circle"></i> Questions fréquentes</p>
       <h2>FAQ Estimation</h2>
     </div>
@@ -256,12 +177,12 @@
         <p>Oui, 100% gratuite et sans engagement. Aucune inscription nécessaire.</p>
       </article>
       <article class="card faq-card">
-        <h3><i class="fas fa-question-circle"></i> Qu'est-ce qu'un Avis de Valeur ?</h3>
-        <p>C'est une évaluation réalisée par un expert d'estimation agréé, un professionnel dont c'est le métier avec un agrément officiel. C'est le seul document reconnu officiellement.</p>
+        <h3><i class="fas fa-question-circle"></i> Qu'est-ce qu'un avis de valeur ?</h3>
+        <p>C'est un document rédigé par un <strong>professionnel de l'immobilier</strong> (conseiller ou agent immobilier) après visite du bien. Il s'appuie sur l'analyse du marché local et sur les caractéristiques réelles de votre logement pour proposer un prix de mise en vente cohérent.</p>
       </article>
       <article class="card faq-card">
         <h3><i class="fas fa-question-circle"></i> Pourquoi les outils en ligne ne suffisent-ils pas ?</h3>
-        <p>Ils utilisent des statistiques générales et ne voient pas l'état réel du bien, les travaux, la luminosité, le voisinage, etc. Seul un expert peut évaluer ces critères sur place.</p>
+        <p>Les outils en ligne utilisent des <strong>statistiques générales</strong> (prix au m², tendances, historique des ventes). Ils ne voient pas l'état réel du bien, les travaux, la luminosité, la vue ou le voisinage. Seul un professionnel qui se rend sur place peut intégrer ces critères dans un avis de valeur.</p>
       </article>
     </div>
   </div>
@@ -279,17 +200,6 @@
       <a href="#form-estimation" class="btn btn-primary" style="display: inline-flex; gap: 0.5rem;">
         <i class="fas fa-bolt"></i> Estimer mon bien gratuitement
       </a>
-    </div>
-        <p>Oui, 100% gratuite et sans engagement. Aucun frais caché.</p>
-      </article>
-      <article class="card faq-card">
-        <h3><i class="fas fa-question-circle"></i> En combien de temps j'obtiens mon résultat ?</h3>
-        <p>Le résultat est immédiat après validation du formulaire, en moins de 60 secondes.</p>
-      </article>
-      <article class="card faq-card">
-        <h3><i class="fas fa-question-circle"></i> Puis-je être accompagné ensuite ?</h3>
-        <p>Oui. Après l'estimation, vous pouvez laisser vos coordonnées pour un accompagnement personnalisé gratuit.</p>
-      </article>
     </div>
   </div>
 </section>

@@ -6,6 +6,7 @@ namespace App\Controllers;
 
 use App\Core\View;
 use App\Models\AdminUser;
+use App\Services\Mailer;
 
 final class AuthController
 {
@@ -18,43 +19,124 @@ final class AuthController
 
         View::renderBare('admin/login', [
             'page_title' => 'Connexion Admin - Estimation Immobilier Bordeaux',
+            'step' => 'email',
         ]);
     }
 
     public function login(): void
     {
-        $email = trim((string) ($_POST['email'] ?? ''));
-        $password = (string) ($_POST['password'] ?? '');
+        $action = (string) ($_POST['action'] ?? '');
         $csrfToken = (string) ($_POST['csrf_token'] ?? '');
 
         if (!$this->verifyCsrfToken($csrfToken)) {
             View::renderBare('admin/login', [
                 'page_title' => 'Connexion Admin - Estimation Immobilier Bordeaux',
+                'step' => 'email',
                 'error_message' => 'Session expirée. Veuillez réessayer.',
-                'old_email' => $email,
             ]);
             return;
         }
 
-        if ($email === '' || $password === '') {
+        try {
+            if ($action === 'send_code') {
+                $this->handleSendCode();
+            } elseif ($action === 'verify_code') {
+                $this->handleVerifyCode();
+            } else {
+                View::renderBare('admin/login', [
+                    'page_title' => 'Connexion Admin - Estimation Immobilier Bordeaux',
+                    'step' => 'email',
+                    'error_message' => 'Requête invalide.',
+                ]);
+            }
+        } catch (\RuntimeException $e) {
+            error_log('Auth error: ' . $e->getMessage());
+            http_response_code(500);
             View::renderBare('admin/login', [
                 'page_title' => 'Connexion Admin - Estimation Immobilier Bordeaux',
-                'error_message' => 'Veuillez remplir tous les champs.',
-                'old_email' => $email,
+                'step' => 'email',
+                'error_message' => 'Erreur serveur : impossible de se connecter à la base de données. Vérifiez la configuration.',
+            ]);
+        }
+    }
+
+    private function handleSendCode(): void
+    {
+        $email = trim((string) ($_POST['email'] ?? ''));
+
+        if ($email === '') {
+            View::renderBare('admin/login', [
+                'page_title' => 'Connexion Admin - Estimation Immobilier Bordeaux',
+                'step' => 'email',
+                'error_message' => 'Veuillez saisir votre adresse email.',
             ]);
             return;
         }
 
         $user = AdminUser::findByEmail($email);
 
-        if ($user === null || !AdminUser::verifyPassword($password, (string) $user['password_hash'])) {
+        if ($user === null) {
             View::renderBare('admin/login', [
                 'page_title' => 'Connexion Admin - Estimation Immobilier Bordeaux',
-                'error_message' => 'Email ou mot de passe incorrect.',
-                'old_email' => $email,
+                'step' => 'email',
+                'error_message' => 'Aucun compte administrateur associé à cet email.',
             ]);
             return;
         }
+
+        $code = AdminUser::generateCode();
+        AdminUser::storeLoginCode($email, $code);
+
+        $sent = Mailer::send(
+            $email,
+            'Votre code de connexion - Estimation Immobilier Bordeaux',
+            $this->buildCodeEmail($code, (string) ($user['name'] ?? 'Administrateur'))
+        );
+
+        if (!$sent) {
+            View::renderBare('admin/login', [
+                'page_title' => 'Connexion Admin - Estimation Immobilier Bordeaux',
+                'step' => 'email',
+                'error_message' => 'Impossible d\'envoyer l\'email. Vérifiez la configuration SMTP.',
+            ]);
+            return;
+        }
+
+        View::renderBare('admin/login', [
+            'page_title' => 'Connexion Admin - Estimation Immobilier Bordeaux',
+            'step' => 'code',
+            'login_email' => $email,
+            'success_message' => 'Un code de connexion a été envoyé à votre adresse email.',
+        ]);
+    }
+
+    private function handleVerifyCode(): void
+    {
+        $email = trim((string) ($_POST['email'] ?? ''));
+        $code = trim((string) ($_POST['code'] ?? ''));
+
+        if ($email === '' || $code === '') {
+            View::renderBare('admin/login', [
+                'page_title' => 'Connexion Admin - Estimation Immobilier Bordeaux',
+                'step' => 'email',
+                'error_message' => 'Veuillez remplir tous les champs.',
+            ]);
+            return;
+        }
+
+        if (!AdminUser::verifyLoginCode($email, $code)) {
+            View::renderBare('admin/login', [
+                'page_title' => 'Connexion Admin - Estimation Immobilier Bordeaux',
+                'step' => 'code',
+                'login_email' => $email,
+                'error_message' => 'Code invalide ou expiré. Veuillez réessayer.',
+            ]);
+            return;
+        }
+
+        AdminUser::clearLoginCode($email);
+
+        $user = AdminUser::findByEmail($email);
 
         session_regenerate_id(true);
         $_SESSION['admin_user_id'] = (int) $user['id'];
@@ -64,6 +146,25 @@ final class AuthController
 
         header('Location: /admin/leads');
         exit;
+    }
+
+    private function buildCodeEmail(string $code, string $name): string
+    {
+        return <<<HTML
+        <div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 500px; margin: 0 auto; padding: 2rem;">
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <div style="display: inline-block; width: 50px; height: 50px; background: linear-gradient(135deg, #8B1538, #C41E3A); border-radius: 12px; line-height: 50px; color: #fff; font-size: 1.4rem;">&#128274;</div>
+            </div>
+            <h2 style="text-align: center; color: #1a1410; margin-bottom: 0.5rem;">Votre code de connexion</h2>
+            <p style="text-align: center; color: #6b6459; margin-bottom: 2rem;">Bonjour {$name}, voici votre code pour accéder à l'espace administrateur :</p>
+            <div style="background: #f8f5f2; border: 2px solid #e8dfd7; border-radius: 12px; padding: 1.5rem; text-align: center; margin-bottom: 2rem;">
+                <span style="font-size: 2.2rem; font-weight: 700; letter-spacing: 0.5rem; color: #8B1538;">{$code}</span>
+            </div>
+            <p style="text-align: center; color: #6b6459; font-size: 0.85rem;">Ce code est valable <strong>10 minutes</strong>.<br>Si vous n'avez pas demandé ce code, ignorez cet email.</p>
+            <hr style="border: none; border-top: 1px solid #e8dfd7; margin: 2rem 0;">
+            <p style="text-align: center; color: #999; font-size: 0.8rem;">Estimation Immobilier Bordeaux</p>
+        </div>
+        HTML;
     }
 
     public function logout(): void

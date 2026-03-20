@@ -530,7 +530,7 @@
         </ul>
       </div>
 
-      <a href="/about" class="nav-link">À propos</a>
+      <a href="/a-propos" class="nav-link">À propos</a>
       <a href="/contact" class="nav-link">Contact</a>
 
       <div class="nav-item has-dropdown">
@@ -539,7 +539,6 @@
           <li><a href="/guides">Guides complets</a></li>
           <li><a href="/tools/calculatrice">Calculatrice prix</a></li>
           <li><a href="/quartiers">Quartiers Bordeaux</a></li>
-          <li><a href="/podcast">Podcast immobilier</a></li>
           <li><a href="/newsletter">Newsletter</a></li>
         </ul>
       </div>
