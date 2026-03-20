@@ -1,4 +1,47 @@
-<?php $page_title = 'Estimation Immobilière Bordeaux | Évaluez Votre Bien en 1 Minute'; ?>
+<?php $page_title = 'Estimation Immobilier Bordeaux | Avis de Valeur Gratuit en 1 Minute'; ?>
+<?php $meta_description = 'Avis de valeur immobilier gratuit à Bordeaux. Obtenez votre estimation en 60 secondes basée sur les données réelles du marché bordelais. 100% gratuit, sans engagement.'; ?>
+
+<!-- FAQ Schema.org -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "L'avis de valeur immobilier à Bordeaux est-il gratuit ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Oui, 100% gratuit et sans engagement. Utilisez-la autant que vous le souhaitez pour explorer différents scénarios."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Combien de temps faut-il pour obtenir un avis de valeur ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Estimation immédiate après validation. Vous avez votre fourchette de prix en moins de 60 secondes."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "À quelle précision m'attendre pour l'estimation immobilière à Bordeaux ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Précision moyenne ±5% basée sur les données réelles de transactions. Peut varier selon l'état du bien et la localisation exacte."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Mes données sont-elles sécurisées ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Oui. Chiffrement SSL/TLS, stockage sécurisé, et conformité RGPD. Vos données ne sont jamais vendues à des tiers."
+      }
+    }
+  ]
+}
+</script>
 
 <!-- ============================================ -->
 <!-- HERO ULTRA-PREMIUM -->
@@ -9,15 +52,15 @@
     <div>
       <!-- BADGE -->
       <p class="eyebrow">
-        <i class="fas fa-certificate"></i> Estimation certifiée • Données 2024
+        <i class="fas fa-certificate"></i> Avis de valeur certifié • Données 2026
       </p>
 
       <!-- HEADLINE H1 -->
-      <h1>Découvrez la vraie valeur de votre bien immobilier à Bordeaux</h1>
+      <h1>Avis de Valeur Immobilier à Bordeaux — Estimation Gratuite en Ligne</h1>
 
       <!-- SUBHEADLINE -->
       <p class="lead">
-        En 60 secondes, obtenez une fourchette de prix précise basée sur les données réelles du marché bordelais. Aucun engagement, 100% gratuit.
+        Obtenez votre avis de valeur immobilier à Bordeaux en 60 secondes. Fourchette de prix précise basée sur les données réelles du marché bordelais. Aucun engagement, 100% gratuit.
       </p>
 
       <!-- TRUST INDICATORS -->
@@ -42,7 +85,7 @@
           <i class="fas fa-quote-left"></i> Témoignage client
         </p>
         <p style="margin: 0; font-style: italic; color: var(--text); line-height: 1.6;">
-          "L'estimation était très proche de l'offre reçue. Recommandé pour avoir un avis fiable avant de vendre !"
+          "L'avis de valeur était très proche de l'offre reçue. Recommandé pour avoir une estimation fiable avant de vendre à Bordeaux !"
         </p>
         <p style="margin: 0.8rem 0 0; font-size: 0.85rem; color: var(--muted); font-weight: 600;">
           — Marie D. • Bordeaux Chartrons
@@ -236,7 +279,7 @@
       <p class="eyebrow">
         <i class="fas fa-bolt"></i> Processus simple & rapide
       </p>
-      <h2>Comment fonctionne notre estimation ?</h2>
+      <h2>Comment fonctionne notre avis de valeur immobilier ?</h2>
     </div>
 
     <div class="steps-grid">
@@ -282,7 +325,7 @@
       <p class="eyebrow">
         <i class="fas fa-crown"></i> Pourquoi nous choisir
       </p>
-      <h2>L'estimation immobilière fiable</h2>
+      <h2>L'avis de valeur immobilier fiable à Bordeaux</h2>
     </div>
 
     <div class="features-grid">
@@ -352,7 +395,7 @@
       <p class="eyebrow">
         <i class="fas fa-eye"></i> Voici ce que vous recevrez
       </p>
-      <h2>Exemple d'estimation détaillée</h2>
+      <h2>Exemple d'avis de valeur détaillé à Bordeaux</h2>
     </div>
 
     <div class="result-layout">
@@ -485,13 +528,13 @@
   <div class="container">
     <div class="card" style="padding: 3rem; background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.05), rgba(var(--accent-rgb), 0.03)); border: 2px solid var(--accent); text-align: center;">
       <p class="eyebrow" style="margin-bottom: 1rem;">
-        <i class="fas fa-rocket"></i> Plus attendre pour connaître la valeur
+        <i class="fas fa-rocket"></i> Obtenez votre avis de valeur maintenant
       </p>
       <h2 style="margin-bottom: 1rem; font-size: 2rem;">
-        Estimez votre bien en 60 secondes
+        Votre avis de valeur immobilier à Bordeaux en 60 secondes
       </h2>
       <p class="lead" style="max-width: 600px; margin: 0 auto 2rem;">
-        Obtenez une fourchette de prix précise basée sur les données réelles du marché bordelais. 100% gratuit, sans engagement, confidentiel.
+        Obtenez une fourchette de prix précise basée sur les données réelles du marché bordelais. Avis de valeur 100% gratuit, sans engagement, confidentiel.
       </p>
       <a href="#form-estimation" class="btn btn-primary" style="display: inline-flex; font-size: 1.1rem; padding: 1.2rem 2rem;">
         <i class="fas fa-calculator"></i> Lancer mon estimation gratuite

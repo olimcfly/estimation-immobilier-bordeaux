@@ -177,16 +177,49 @@
 </footer>
 
 <script>
+  // Property image alt text
   document.querySelectorAll('img[data-address][data-bedrooms]').forEach((propertyImage) => {
     const address = (propertyImage.dataset.address || '').trim();
     const bedrooms = (propertyImage.dataset.bedrooms || '').trim();
-
-    if (!address || !bedrooms) {
-      return;
-    }
-
+    if (!address || !bedrooms) return;
     propertyImage.alt = `${address} - ${bedrooms} pièces`;
   });
+
+  // Mobile menu toggle
+  (function() {
+    const toggle = document.querySelector('.menu-toggle');
+    const nav = document.querySelector('.top-nav');
+    if (!toggle || !nav) return;
+
+    toggle.addEventListener('click', function() {
+      nav.classList.toggle('active');
+      toggle.setAttribute('aria-expanded', nav.classList.contains('active'));
+    });
+
+    // Mobile dropdown toggles (touch-friendly)
+    document.querySelectorAll('.has-dropdown > .nav-link').forEach(function(link) {
+      link.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768) {
+          e.preventDefault();
+          const parent = this.parentElement;
+          document.querySelectorAll('.has-dropdown').forEach(function(d) {
+            if (d !== parent) d.classList.remove('active');
+          });
+          parent.classList.toggle('active');
+        }
+      });
+    });
+
+    // Close menu on resize to desktop
+    window.addEventListener('resize', function() {
+      if (window.innerWidth > 768) {
+        nav.classList.remove('active');
+        document.querySelectorAll('.has-dropdown').forEach(function(d) {
+          d.classList.remove('active');
+        });
+      }
+    });
+  })();
 </script>
 
 </body>

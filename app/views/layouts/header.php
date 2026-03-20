@@ -16,10 +16,48 @@
   ?>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="<?= htmlspecialchars((string) ($meta_description ?? 'Estimation immobilière Bordeaux - Évaluez votre bien gratuitement et découvrez nos guides immobiliers.'), ENT_QUOTES, 'UTF-8') ?>">
+  <meta name="description" content="<?= htmlspecialchars((string) ($meta_description ?? 'Estimation immobilier Bordeaux - Obtenez votre avis de valeur immobilier gratuit. Données réelles du marché bordelais, résultat en 60 secondes.'), ENT_QUOTES, 'UTF-8') ?>">
   <meta name="theme-color" content="#8B1538">
   <link rel="canonical" href="<?= e($canonicalUrl) ?>">
-  <title><?= isset($page_title) ? $page_title : 'Estimation Immobilière Bordeaux' ?></title>
+  <title><?= isset($page_title) ? $page_title : 'Estimation Immobilier Bordeaux' ?></title>
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="<?= isset($page_title) ? htmlspecialchars($page_title, ENT_QUOTES, 'UTF-8') : 'Estimation Immobilier Bordeaux' ?>">
+  <meta property="og:description" content="<?= htmlspecialchars((string) ($meta_description ?? 'Obtenez votre avis de valeur immobilier gratuit à Bordeaux. Résultat en 60 secondes.'), ENT_QUOTES, 'UTF-8') ?>">
+  <meta property="og:url" content="<?= e($canonicalUrl) ?>">
+  <meta property="og:locale" content="fr_FR">
+  <meta property="og:site_name" content="Estimation Immobilier Bordeaux">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="<?= isset($page_title) ? htmlspecialchars($page_title, ENT_QUOTES, 'UTF-8') : 'Estimation Immobilier Bordeaux' ?>">
+  <meta name="twitter:description" content="<?= htmlspecialchars((string) ($meta_description ?? 'Avis de valeur immobilier gratuit à Bordeaux. Résultat en 60 secondes.'), ENT_QUOTES, 'UTF-8') ?>">
+
+  <!-- Schema.org JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "RealEstateAgent",
+    "name": "Estimation Immobilier Bordeaux",
+    "description": "Avis de valeur et estimation immobilière gratuite à Bordeaux et en Gironde.",
+    "url": "https://estimation-immobilier-bordeaux.fr",
+    "telephone": "+33556000000",
+    "email": "contact@estimation-immobilier-bordeaux.fr",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Bordeaux",
+      "addressRegion": "Nouvelle-Aquitaine",
+      "postalCode": "33000",
+      "addressCountry": "FR"
+    },
+    "areaServed": {
+      "@type": "City",
+      "name": "Bordeaux"
+    },
+    "priceRange": "Gratuit"
+  }
+  </script>
 
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -113,7 +151,7 @@
     }
 
     /* NAVIGATION PRINCIPALE */
-    .nav-main {
+    .top-nav {
       display: flex;
       align-items: center;
       gap: 0.5rem;
@@ -154,7 +192,7 @@
     }
 
     /* DROPDOWN MENU */
-    .nav-dropdown {
+    .has-dropdown {
       position: relative;
     }
 
@@ -170,7 +208,7 @@
       transition: transform 0.2s ease;
     }
 
-    .nav-dropdown:hover .dropdown-toggle::after {
+    .has-dropdown:hover .dropdown-toggle::after {
       transform: rotate(-135deg);
     }
 
@@ -193,7 +231,7 @@
       z-index: 1000;
     }
 
-    .nav-dropdown:hover .dropdown-menu {
+    .has-dropdown:hover .dropdown-menu {
       opacity: 1;
       visibility: visible;
       transform: translateY(0);
@@ -314,7 +352,7 @@
 
     /* RESPONSIVE */
     @media (max-width: 1024px) {
-      .nav-main {
+      .top-nav {
         gap: 0;
       }
 
@@ -337,7 +375,7 @@
         display: flex;
       }
 
-      .nav-main {
+      .top-nav {
         position: fixed;
         top: 60px;
         left: 0;
@@ -351,7 +389,7 @@
         border-bottom: 1px solid var(--border);
       }
 
-      .nav-main.active {
+      .top-nav.active {
         max-height: 500px;
       }
 
@@ -378,7 +416,7 @@
         transition: all 0.2s ease;
       }
 
-      .nav-dropdown.active .dropdown-menu {
+      .has-dropdown.active .dropdown-menu {
         opacity: 1;
         visibility: visible;
         max-height: 400px;
@@ -402,7 +440,7 @@
       }
 
       .brand {
-        font-size: 1.2rem;
+        font-size: 1rem;
       }
 
       .brand-icon {
@@ -422,8 +460,8 @@
       }
 
       .brand {
-        font-size: 1.1rem;
-        gap: 0.5rem;
+        font-size: 0.85rem;
+        gap: 0.4rem;
       }
 
       .brand-icon {
@@ -449,7 +487,11 @@
 <!-- ============================= -->
 <header class="site-header">
   <div class="container nav-wrapper">
-    <a href="/" class="brand">Bordeaux<span>Estimate</span></a>
+    <a href="/" class="brand">Estimation Immobilier <span>Bordeaux</span></a>
+
+    <button class="menu-toggle" aria-label="Ouvrir le menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
 
     <nav class="top-nav" aria-label="Navigation principale">
       <div class="nav-item has-dropdown">
