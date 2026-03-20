@@ -25,6 +25,23 @@ final class View
         include __DIR__ . '/../views/layouts/footer.php';
     }
 
+    /**
+     * Render a template without the site header and footer (bare layout).
+     */
+    public static function renderBare(string $template, array $data = []): void
+    {
+        $templatePath = __DIR__ . '/../views/' . $template . '.php';
+
+        if (!is_file($templatePath)) {
+            http_response_code(500);
+            echo 'Template not found.';
+            return;
+        }
+
+        extract($data, EXTR_SKIP);
+        include $templatePath;
+    }
+
     private static function renderTemplate(string $templatePath, array $data): string
     {
         ob_start();

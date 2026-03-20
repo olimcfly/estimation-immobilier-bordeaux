@@ -16,7 +16,7 @@ final class AuthController
             exit;
         }
 
-        View::render('admin/login', [
+        View::renderBare('admin/login', [
             'page_title' => 'Connexion Admin - Estimation Immobilier Bordeaux',
         ]);
     }
@@ -28,7 +28,7 @@ final class AuthController
         $csrfToken = (string) ($_POST['csrf_token'] ?? '');
 
         if (!$this->verifyCsrfToken($csrfToken)) {
-            View::render('admin/login', [
+            View::renderBare('admin/login', [
                 'page_title' => 'Connexion Admin - Estimation Immobilier Bordeaux',
                 'error_message' => 'Session expirée. Veuillez réessayer.',
                 'old_email' => $email,
@@ -37,7 +37,7 @@ final class AuthController
         }
 
         if ($email === '' || $password === '') {
-            View::render('admin/login', [
+            View::renderBare('admin/login', [
                 'page_title' => 'Connexion Admin - Estimation Immobilier Bordeaux',
                 'error_message' => 'Veuillez remplir tous les champs.',
                 'old_email' => $email,
@@ -48,7 +48,7 @@ final class AuthController
         $user = AdminUser::findByEmail($email);
 
         if ($user === null || !AdminUser::verifyPassword($password, (string) $user['password_hash'])) {
-            View::render('admin/login', [
+            View::renderBare('admin/login', [
                 'page_title' => 'Connexion Admin - Estimation Immobilier Bordeaux',
                 'error_message' => 'Email ou mot de passe incorrect.',
                 'old_email' => $email,
