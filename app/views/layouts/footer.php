@@ -60,7 +60,6 @@
         <ul class="footer-links">
           <li><a href="/blog">Blog & actualités</a></li>
           <li><a href="/guides">Guides immobiliers</a></li>
-          <li><a href="/podcast">Podcast</a></li>
           <li><a href="/#faq">FAQ</a></li>
           <li><a href="/newsletter">Newsletter</a></li>
         </ul>
