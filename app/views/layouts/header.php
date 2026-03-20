@@ -530,7 +530,7 @@
         </ul>
       </div>
 
-      <a href="/about" class="nav-link">À propos</a>
+      <a href="/a-propos" class="nav-link">À propos</a>
       <a href="/contact" class="nav-link">Contact</a>
 
       <div class="nav-item has-dropdown">
