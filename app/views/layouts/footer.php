@@ -3,7 +3,7 @@
 <!-- ================================================ -->
 <!-- FOOTER PREMIUM -->
 <!-- ================================================ -->
-<footer class="site-footer">
+<footer class="site-footer" id="footer">
   <div class="footer-container">
 
     <!-- FOOTER MAIN CONTENT -->
@@ -92,7 +92,7 @@
             <li><a href="/quartiers">Nos quartiers</a></li>
           </ul>
 
-          <h4 class="footer-section-title" style="margin-top: var(--space-6);">
+          <h4 class="footer-section-title" style="margin-top: 1.8rem;">
             <i class="fas fa-book-open"></i> Ressources
           </h4>
           <ul class="footer-links">
@@ -116,7 +116,7 @@
             <li><a href="/a-propos">Notre équipe</a></li>
           </ul>
 
-          <h4 class="footer-section-title" style="margin-top: var(--space-6);">
+          <h4 class="footer-section-title" style="margin-top: 1.8rem;">
             <i class="fas fa-headset"></i> Support
           </h4>
           <ul class="footer-links">
@@ -140,7 +140,7 @@
             <li><a href="/rgpd">Conformité RGPD</a></li>
           </ul>
 
-          <h4 class="footer-section-title" style="margin-top: var(--space-6);">
+          <h4 class="footer-section-title" style="margin-top: 1.8rem;">
             <i class="fas fa-certificate"></i> Certifications
           </h4>
           <div class="footer-badges">
