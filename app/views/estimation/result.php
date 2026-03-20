@@ -64,18 +64,18 @@
         <p class="eyebrow" style="margin-bottom: 1rem;">
           <i class="fas fa-user-tie"></i> Aller plus loin
         </p>
-        <h2 style="margin-bottom: 1rem;">Obtenez un vrai Avis de Valeur</h2>
+        <h2 style="margin-bottom: 1rem;">Complétez avec un avis de valeur</h2>
         <p style="color: var(--muted); line-height: 1.7; margin-bottom: 1.5rem;">
-          L'estimation que vous venez de recevoir est basée sur des <strong>statistiques</strong> — comme tous les outils en ligne et moteurs de recherche.
-          C'est une bonne première indication, mais pour connaître la <strong>vraie valeur</strong> de votre bien, vous avez besoin d'un <strong>Avis de Valeur</strong>.
+          L'estimation que vous venez de recevoir est basée sur des <strong>statistiques</strong> — comme tous les outils en ligne.
+          C'est une bonne première indication, mais pour fixer un <strong>prix de mise en vente réaliste</strong>, l'idéal est de la compléter par un <strong>avis de valeur</strong> réalisé par un conseiller immobilier.
         </p>
 
         <div style="margin-bottom: 1.5rem;">
-          <h3 style="font-size: 1rem; margin-bottom: 0.8rem;">Pourquoi un Avis de Valeur est différent :</h3>
+          <h3 style="font-size: 1rem; margin-bottom: 0.8rem;">Ce qu'apporte un avis de valeur :</h3>
           <ul style="list-style: none; padding: 0; margin: 0;">
             <li style="padding: 0.5rem 0; display: flex; gap: 0.5rem;">
               <i class="fas fa-certificate" style="color: var(--primary); margin-top: 0.2rem;"></i>
-              <span>Réalisé par un <strong>expert agréé</strong> — c'est un métier avec un agrément officiel</span>
+              <span>Réalisé par un <strong>conseiller immobilier</strong> connaissant votre quartier</span>
             </li>
             <li style="padding: 0.5rem 0; display: flex; gap: 0.5rem;">
               <i class="fas fa-eye" style="color: var(--primary); margin-top: 0.2rem;"></i>
@@ -83,11 +83,11 @@
             </li>
             <li style="padding: 0.5rem 0; display: flex; gap: 0.5rem;">
               <i class="fas fa-file-alt" style="color: var(--primary); margin-top: 0.2rem;"></i>
-              <span><strong>Document officiel</strong> reconnu par les banques, notaires et tribunaux</span>
+              <span>Prend en compte l'état, les travaux, la situation, l'environnement et la <strong>demande sur le secteur</strong></span>
             </li>
             <li style="padding: 0.5rem 0; display: flex; gap: 0.5rem;">
               <i class="fas fa-bullseye" style="color: var(--primary); margin-top: 0.2rem;"></i>
-              <span><strong>Précision réelle</strong> — pas une statistique, une expertise terrain</span>
+              <span><strong>Base de travail</strong> pour fixer un prix de mise en vente réaliste</span>
             </li>
           </ul>
         </div>
@@ -95,9 +95,8 @@
         <div style="padding: 1rem 1.5rem; background: rgba(var(--primary-rgb), 0.04); border-radius: 10px; border-left: 4px solid var(--primary);">
           <p style="margin: 0; font-size: 0.9rem; color: var(--text); line-height: 1.6;">
             <i class="fas fa-lightbulb" style="color: var(--primary);"></i>
-            <strong>Le saviez-vous ?</strong> Le terme correct est <strong>« Avis de Valeur »</strong>.
-            Le mot « estimation » est souvent utilisé à tort. Les outils en ligne donnent des indications statistiques,
-            seul un expert d'estimation agréé peut réaliser un véritable Avis de Valeur.
+            <strong>Le saviez-vous ?</strong> Un avis de valeur est rédigé par un professionnel de l'immobilier après visite du bien.
+            Il s'appuie sur l'analyse du marché local et sur les caractéristiques réelles de votre logement pour proposer un prix de mise en vente cohérent.
           </p>
         </div>
       </div>
@@ -107,9 +106,9 @@
         <div class="form-header">
           <h3 style="display: flex; align-items: center; gap: 0.5rem;">
             <i class="fas fa-handshake" style="color: var(--primary);"></i>
-            Demander un Avis de Valeur expert
+            Demander un avis de valeur
           </h3>
-          <p class="muted">Un expert agréé vous recontacte pour organiser une visite et vous remettre un Avis de Valeur complet.</p>
+          <p class="muted">Un conseiller immobilier vous recontacte pour organiser une visite et vous remettre un avis de valeur complet.</p>
         </div>
 
         <form action="/lead" method="post" class="form-grid form-lead">
@@ -157,7 +156,7 @@
           </div>
 
           <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 1rem;">
-            <i class="fas fa-certificate"></i> Demander mon Avis de Valeur expert
+            <i class="fas fa-certificate"></i> Demander mon avis de valeur
           </button>
 
           <p style="text-align: center; margin: 0.5rem 0 0; font-size: 0.8rem; color: var(--muted);">
