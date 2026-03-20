@@ -766,10 +766,8 @@ textarea:focus {
 }
 
 .result-layout {
-  display: grid;
-  grid-template-columns: 1.5fr 1fr;
-  gap: 2rem;
-  align-items: start;
+  max-width: 750px;
+  margin-inline: auto;
 }
 
 .result-summary {
