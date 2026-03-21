@@ -43,6 +43,7 @@ $router->post('/admin/test-smtp/save', [AuthController::class, 'testSmtpSave']);
 $router->post('/admin/test-smtp/reset', [AuthController::class, 'testSmtpReset']);
 $router->post('/admin/test-smtp/run', [AuthController::class, 'testSmtpRun']);
 $router->post('/admin/test-smtp/send', [AuthController::class, 'testSmtpSendEmail']);
+$router->post('/admin/dev-skip-auth/toggle', [AuthController::class, 'toggleDevSkipAuth']);
 
 // Protected admin routes
 $router->get('/admin', [AdminDashboardController::class, 'index']);

@@ -459,6 +459,14 @@
     </div>
   </header>
 
+  <?php if (filter_var($_ENV['DEV_SKIP_AUTH'] ?? $_SERVER['DEV_SKIP_AUTH'] ?? 'false', FILTER_VALIDATE_BOOLEAN)): ?>
+  <div style="background:linear-gradient(90deg,#92400e,#d97706);color:#fff;padding:0.5rem 2rem;font-size:0.82rem;font-weight:600;display:flex;align-items:center;gap:0.5rem;">
+    <i class="fas fa-exclamation-triangle"></i>
+    Mode d&eacute;veloppeur actif &mdash; authentification d&eacute;sactiv&eacute;e (DEV_SKIP_AUTH=true)
+    <a href="/admin/diagnostic" style="color:#fff;margin-left:auto;text-decoration:underline;font-weight:400;">G&eacute;rer</a>
+  </div>
+  <?php endif; ?>
+
   <div class="admin-content">
     %%ADMIN_CONTENT%%
   </div>
