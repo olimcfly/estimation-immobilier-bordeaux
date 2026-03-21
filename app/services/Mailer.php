@@ -26,12 +26,21 @@ final class Mailer
             if ($smtpHost !== '') {
                 $mail->isSMTP();
                 $mail->Host = $smtpHost;
-                $mail->Port = (int) Config::get('mail.smtp_port', 587);
+                $smtpPort = (int) Config::get('mail.smtp_port', 587);
+                $mail->Port = $smtpPort;
                 $mail->SMTPAuth = true;
                 $mail->Username = (string) Config::get('mail.smtp_user');
                 $mail->Password = (string) Config::get('mail.smtp_pass');
-                $mail->SMTPSecure = (string) Config::get('mail.smtp_encryption', 'tls');
                 $mail->Timeout = 15;
+
+                $smtpEnc = (string) Config::get('mail.smtp_encryption', 'tls');
+                if ($smtpPort === 465) {
+                    $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+                } elseif ($smtpEnc === 'tls' || $smtpPort === 587) {
+                    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                } else {
+                    $mail->SMTPSecure = $smtpEnc;
+                }
             } else {
                 error_log('Mailer warning: SMTP host is empty. Check MAIL_HOST or MAIL_SMTP_HOST in .env');
             }
