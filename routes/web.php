@@ -12,11 +12,7 @@ use App\Controllers\AuthController;
 use App\Controllers\BlogController;
 use App\Controllers\EstimationController;
 use App\Controllers\PageController;
-use App\Controllers\AdminDashboardController;
-use App\Controllers\AdminLeadController;
-use App\Controllers\AdminPartenaireController;
-use App\Controllers\AdminAchatController;
-use App\Controllers\AdminSocialImageController;
+use App\Controllers\LandingPageController;
 use App\Controllers\ToolController;
 
 $router->get('/', [PageController::class, 'home']);
@@ -105,34 +101,11 @@ $router->post('/admin/sequences/delete', [AdminSequenceController::class, 'delet
 $router->post('/admin/sequences/save-persona', [AdminSequenceController::class, 'savePersona']);
 $router->get('/admin/sequences/article-suggestions', [AdminSequenceController::class, 'articleSuggestions']);
 
-// Admin dashboard routes
-$router->get('/admin/dashboard', [AdminDashboardController::class, 'index']);
-$router->get('/admin/funnel', [AdminDashboardController::class, 'funnel']);
-$router->get('/admin/portfolio', [AdminDashboardController::class, 'portfolio']);
-$router->post('/admin/portfolio/update-rate', [AdminDashboardController::class, 'updateCommissionRate']);
+// Google Ads Landing Pages (capture pages — no navigation)
+$router->get('/lp/estimation-bordeaux', [LandingPageController::class, 'estimationBordeaux']);
+$router->get('/lp/vendre-maison-bordeaux', [LandingPageController::class, 'vendreMaisonBordeaux']);
+$router->get('/lp/avis-valeur-gratuit', [LandingPageController::class, 'avisValeurGratuit']);
+$router->post('/lp/submit', [LandingPageController::class, 'submitLead']);
 
-// Admin partenaire routes
-$router->get('/admin/partenaires', [AdminPartenaireController::class, 'index']);
-$router->get('/admin/partenaires/edit', [AdminPartenaireController::class, 'edit']);
-$router->post('/admin/partenaires/save', [AdminPartenaireController::class, 'save']);
-$router->post('/admin/partenaires/delete', [AdminPartenaireController::class, 'delete']);
-
-// Admin social media image routes
-$router->get('/admin/social-images', [AdminSocialImageController::class, 'index']);
-$router->get('/admin/social-images/history', [AdminSocialImageController::class, 'history']);
-$router->post('/admin/social-images/save', [AdminSocialImageController::class, 'save']);
-$router->post('/admin/social-images/delete', [AdminSocialImageController::class, 'delete']);
-
-// Admin achat (purchase) routes
-$router->get('/admin/achats', [AdminAchatController::class, 'index']);
-$router->get('/admin/achats/edit', [AdminAchatController::class, 'edit']);
-$router->post('/admin/achats/save', [AdminAchatController::class, 'save']);
-$router->post('/admin/achats/delete', [AdminAchatController::class, 'delete']);
-$router->post('/admin/achats/create-table', [AdminAchatController::class, 'createTable']);
-
-// Admin lead status update
-$router->post('/admin/leads/update-statut', [EstimationController::class, 'updateLeadStatut']);
-$router->post('/admin/leads/update-inline', [EstimationController::class, 'updateLeadInline']);
-
-// Admin pipeline view
-$router->get('/admin/pipeline', [EstimationController::class, 'pipeline']);
+// Admin: Google Ads guide & best practices
+$router->get('/admin/google-ads', [LandingPageController::class, 'guide']);
