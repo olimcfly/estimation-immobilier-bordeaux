@@ -373,5 +373,99 @@
         "tendance": "+5.8%"
       }
     ]
+  },
+
+  "aix": {
+    "city_name": "Aix-en-Provence",
+    "city_slug": "aix",
+    "city_region": "Provence-Alpes-Côte d'Azur",
+    "city_departement": "Bouches-du-Rhône",
+    "city_code_postal": "13100",
+    "city_coords": "43.5297,5.4474",
+    "prix_m2_moyen": 5200,
+    "city_factor": 1.25,
+    "domain": "estimation-immobilier-aix.fr",
+    "db_name": "estimation_immobilier_aix",
+    "telephone": "+33442000000",
+    "colors": {
+      "primary": "#C2185B",
+      "primary_dark": "#880E4F",
+      "accent": "#FFB300",
+      "accent_light": "#FFD54F"
+    },
+    "quartiers": [
+      {
+        "nom": "Centre Historique / Cours Mirabeau",
+        "description": "Coeur vibrant d'Aix-en-Provence avec le célèbre Cours Mirabeau, ses fontaines, hôtels particuliers XVIIe-XVIIIe et terrasses de cafés. Architecture provençale remarquable, commerces haut de gamme.",
+        "prix_m2": 6200,
+        "prix_moyen": 520000,
+        "caracteristiques": ["Historique", "Cours Mirabeau", "Fontaines", "Patrimoine"],
+        "population": "~12000 habitants",
+        "transports": "Bus Aix en Bus, Centre piéton, Navettes",
+        "attractivite": "Très haute",
+        "coords": "43.5263,5.4481",
+        "tendance": "+3.8%"
+      },
+      {
+        "nom": "Mazarin",
+        "description": "Quartier aristocratique au sud du Cours Mirabeau. Hôtels particuliers, rues calmes et élégantes, musée Granet. L'un des quartiers les plus prestigieux d'Aix.",
+        "prix_m2": 6500,
+        "prix_moyen": 580000,
+        "caracteristiques": ["Prestige", "Hôtels particuliers", "Musée Granet", "Élégant"],
+        "population": "~6000 habitants",
+        "transports": "Bus, Piéton, Parking Mignet",
+        "attractivite": "Très haute",
+        "coords": "43.5240,5.4500",
+        "tendance": "+3.2%"
+      },
+      {
+        "nom": "Jas de Bouffan",
+        "description": "Quartier résidentiel à l'ouest d'Aix, lié à l'histoire de Cézanne. Centre commercial, logements variés et accès rapide à l'autoroute. Bon rapport qualité-prix.",
+        "prix_m2": 4200,
+        "prix_moyen": 380000,
+        "caracteristiques": ["Résidentiel", "Cézanne", "Commerces", "Accessible"],
+        "population": "~15000 habitants",
+        "transports": "Bus Aix en Bus, Accès A8/A51",
+        "attractivite": "Haute",
+        "coords": "43.5250,5.4200",
+        "tendance": "+4.5%"
+      },
+      {
+        "nom": "Pont de l'Arc / Les Milles",
+        "description": "Secteur sud dynamique entre Aix et la zone d'activités des Milles. Résidences récentes, familles et actifs. Proximité du technopôle de l'Arbois et de la gare TGV.",
+        "prix_m2": 4600,
+        "prix_moyen": 420000,
+        "caracteristiques": ["Dynamique", "Technopôle", "Gare TGV", "Familles"],
+        "population": "~18000 habitants",
+        "transports": "Bus, Gare TGV Aix, Accès autoroute",
+        "attractivite": "Haute",
+        "coords": "43.5050,5.4300",
+        "tendance": "+5.1%"
+      },
+      {
+        "nom": "Puyricard",
+        "description": "Village provençal au nord d'Aix, réputé pour ses calissons et son cadre champêtre. Bastides, mas et villas avec piscine dans un écrin de verdure. Très prisé des familles aisées.",
+        "prix_m2": 5800,
+        "prix_moyen": 750000,
+        "caracteristiques": ["Village", "Bastides", "Calissons", "Nature"],
+        "population": "~8000 habitants",
+        "transports": "Voiture, Bus scolaire",
+        "attractivite": "Très haute",
+        "coords": "43.5650,5.4250",
+        "tendance": "+3.5%"
+      },
+      {
+        "nom": "La Torse / Saint-Jérôme",
+        "description": "Quartier résidentiel prisé à l'est d'Aix. Proximité du parc de la Torse, villas avec vue sur la Sainte-Victoire. Cadre de vie exceptionnel entre ville et campagne.",
+        "prix_m2": 5400,
+        "prix_moyen": 620000,
+        "caracteristiques": ["Résidentiel", "Sainte-Victoire", "Parc", "Villas"],
+        "population": "~10000 habitants",
+        "transports": "Bus, Pistes cyclables",
+        "attractivite": "Très haute",
+        "coords": "43.5300,5.4700",
+        "tendance": "+4.2%"
+      }
+    ]
   }
 }

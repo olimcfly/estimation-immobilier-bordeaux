@@ -1,0 +1,7 @@
+/storage/logs/*
+/storage/cache/*
+/logs/*.log
+.env
+/config/smtp_override.json
+/vendor/
+.phpunit.cache

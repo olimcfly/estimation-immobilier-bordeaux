@@ -1,0 +1,26 @@
+ServerSignature Off
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Keep admin API reachable before any hardening deny rules (e.g. ^modules/ - [F]).
+  RewriteRule ^admin/api/ - [L]
+
+  # Serve static assets from /public/assets when DocumentRoot is the project root.
+  RewriteRule ^assets/(.*)$ public/assets/$1 [L]
+
+  # Front controller fallback.
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^ index.php [L,QSA]
+</IfModule>
+
+<IfModule mod_headers.c>
+  <FilesMatch "\.(?:css|js|jpg|jpeg|png|gif|webp|svg|ico)$">
+    Header set Cache-Control "max-age=3600, public"
+  </FilesMatch>
+</IfModule>
+
+<FilesMatch "^\.env|composer\.(json|lock)|config\.php$">
+  Require all denied
+</FilesMatch>

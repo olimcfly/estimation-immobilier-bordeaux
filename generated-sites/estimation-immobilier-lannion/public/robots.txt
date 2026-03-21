@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /leads
+Disallow: /api/
+Disallow: /phpinfo.php
+
+Sitemap: https://estimation-immobilier-lannion.fr/sitemap.xml
