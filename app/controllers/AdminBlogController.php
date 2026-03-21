@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\Core\Database;
 use App\Core\Validator;
 use App\Core\View;
 use App\Models\Article;
@@ -15,8 +16,25 @@ final class AdminBlogController
     {
         AuthController::requireAuth();
 
-        $articleModel = new Article();
-        $articles = $articleModel->findAll();
+        try {
+            if (!Database::tableExists('articles')) {
+                $this->createArticlesTable();
+            }
+
+            $articleModel = new Article();
+            $articles = $articleModel->findAll();
+        } catch (\Throwable $e) {
+            error_log('[blog] index error: ' . $e->getMessage());
+            View::renderAdmin('admin/blog/index', [
+                'page_title' => 'Blog - Admin',
+                'admin_page_title' => 'Blog / CMS',
+                'admin_page' => 'blog',
+                'articles' => [],
+                'message' => '',
+                'error' => 'Erreur de base de données : ' . $e->getMessage(),
+            ]);
+            return;
+        }
 
         View::renderAdmin('admin/blog/index', [
             'page_title' => 'Blog - Admin',
@@ -208,6 +226,48 @@ final class AdminBlogController
         $text = trim($text, '-');
 
         return $text !== '' ? $text : 'article';
+    }
+
+    private function createArticlesTable(): void
+    {
+        $pdo = Database::connection();
+
+        $pdo->exec('CREATE TABLE IF NOT EXISTS articles (
+            id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+            website_id INT UNSIGNED NOT NULL,
+            title VARCHAR(255) NOT NULL,
+            slug VARCHAR(255) NOT NULL,
+            content LONGTEXT NOT NULL,
+            meta_title VARCHAR(255) NOT NULL,
+            meta_description TEXT NOT NULL,
+            persona VARCHAR(100) NOT NULL,
+            awareness_level VARCHAR(50) NOT NULL,
+            status ENUM(\'draft\', \'published\') NOT NULL DEFAULT \'draft\',
+            created_at DATETIME NOT NULL,
+            UNIQUE KEY uq_articles_website_slug (website_id, slug),
+            INDEX idx_website_id (website_id),
+            INDEX idx_status_created_at (status, created_at)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci');
+
+        $pdo->exec('CREATE TABLE IF NOT EXISTS article_revisions (
+            id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+            article_id INT UNSIGNED NOT NULL,
+            revision_number INT UNSIGNED NOT NULL,
+            title VARCHAR(255) NOT NULL,
+            slug VARCHAR(255) NOT NULL,
+            content LONGTEXT NOT NULL,
+            meta_title VARCHAR(255) NOT NULL,
+            meta_description TEXT NOT NULL,
+            persona VARCHAR(100) NOT NULL,
+            awareness_level VARCHAR(50) NOT NULL,
+            status ENUM(\'draft\', \'published\') NOT NULL DEFAULT \'draft\',
+            created_at DATETIME NOT NULL,
+            UNIQUE KEY uniq_article_revision (article_id, revision_number),
+            INDEX idx_article_created_at (article_id, created_at),
+            CONSTRAINT fk_article_revisions_article
+                FOREIGN KEY (article_id) REFERENCES articles(id)
+                ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci');
     }
 
     private function redirect(string $path): void
