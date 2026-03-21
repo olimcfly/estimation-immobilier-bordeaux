@@ -49,6 +49,7 @@ return [
     'mail' => [
         'from' => $_ENV['MAIL_FROM_ADDRESS'] ?? $_ENV['MAIL_FROM'] ?? 'contact@estimation-immobilier-bordeaux.fr',
         'from_name' => $_ENV['MAIL_FROM_NAME'] ?? 'Estimation Immobilier Bordeaux',
+        'admin_email' => $_ENV['MAIL_ADMIN_EMAIL'] ?? $_ENV['MAIL_FROM_ADDRESS'] ?? $_ENV['MAIL_FROM'] ?? 'contact@estimation-immobilier-bordeaux.fr',
         'smtp_host' => $_ENV['MAIL_SMTP_HOST'] ?? $_ENV['MAIL_HOST'] ?? '',
         'smtp_port' => (int) ($_ENV['MAIL_SMTP_PORT'] ?? $_ENV['MAIL_PORT'] ?? 587),
         'smtp_user' => $_ENV['MAIL_SMTP_USER'] ?? $_ENV['MAIL_USERNAME'] ?? '',

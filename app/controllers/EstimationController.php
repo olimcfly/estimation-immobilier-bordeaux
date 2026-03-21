@@ -10,6 +10,7 @@ use App\Core\View;
 use App\Models\DesignTemplate;
 use App\Models\Lead;
 use App\Services\EstimationService;
+use App\Services\LeadNotificationService;
 use App\Services\LeadScoringService;
 use App\Services\PerplexityService;
 
@@ -171,6 +172,19 @@ final class EstimationController
                 'ip' => $this->getClientIp(),
                 'submitted_at' => time(),
             ];
+
+            LeadNotificationService::notify($leadId, $temperature, [
+                'nom' => $nom,
+                'email' => $email,
+                'telephone' => $telephone,
+                'adresse' => $adresse,
+                'ville' => $ville,
+                'estimation' => $estimation,
+                'urgence' => $urgence,
+                'motivation' => $motivation,
+                'notes' => $notes,
+                'statut' => 'nouveau',
+            ]);
 
             View::render('estimation/lead_saved', [
                 'leadId' => $leadId,
