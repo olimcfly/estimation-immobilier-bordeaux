@@ -118,6 +118,7 @@ $router->post('/admin/partenaires/delete', [AdminPartenaireController::class, 'd
 
 // Admin social media image routes
 $router->get('/admin/social-images', [AdminSocialImageController::class, 'index']);
+$router->get('/admin/social-images/history', [AdminSocialImageController::class, 'history']);
 $router->post('/admin/social-images/save', [AdminSocialImageController::class, 'save']);
 $router->post('/admin/social-images/delete', [AdminSocialImageController::class, 'delete']);
 

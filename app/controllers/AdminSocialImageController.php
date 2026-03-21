@@ -22,6 +22,18 @@ final class AdminSocialImageController
         ]);
     }
 
+    public function history(): void
+    {
+        $images = $this->listSavedImages();
+
+        View::renderAdmin('admin/social-images/history', [
+            'page_title' => 'Historique des images',
+            'admin_page' => 'social-images',
+            'breadcrumb' => 'Historique',
+            'images' => $images,
+        ]);
+    }
+
     public function save(): void
     {
         header('Content-Type: application/json; charset=utf-8');
