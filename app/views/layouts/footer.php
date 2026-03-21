@@ -152,11 +152,23 @@
     const nav = document.querySelector('.top-nav');
     if (!toggle || !nav) return;
 
+    function closeMenu() {
+      nav.classList.remove('active');
+      toggle.classList.remove('active');
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.setAttribute('aria-label', 'Ouvrir le menu');
+      document.body.style.overflow = '';
+      document.querySelectorAll('.has-dropdown').forEach(function(d) {
+        d.classList.remove('active');
+      });
+    }
+
     toggle.addEventListener('click', function() {
-      nav.classList.toggle('active');
+      const isOpen = nav.classList.toggle('active');
       toggle.classList.toggle('active');
-      toggle.setAttribute('aria-expanded', nav.classList.contains('active'));
-      document.body.style.overflow = nav.classList.contains('active') ? 'hidden' : '';
+      toggle.setAttribute('aria-expanded', String(isOpen));
+      toggle.setAttribute('aria-label', isOpen ? 'Fermer le menu' : 'Ouvrir le menu');
+      document.body.style.overflow = isOpen ? 'hidden' : '';
     });
 
     // Mobile dropdown toggles (touch-friendly)
@@ -164,7 +176,9 @@
       link.addEventListener('click', function(e) {
         if (window.innerWidth <= 768) {
           e.preventDefault();
-          const parent = this.parentElement;
+          e.stopPropagation();
+          var parent = this.parentElement;
+          // Close other dropdowns
           document.querySelectorAll('.has-dropdown').forEach(function(d) {
             if (d !== parent) d.classList.remove('active');
           });
@@ -176,21 +190,16 @@
     // Close menu on resize to desktop
     window.addEventListener('resize', function() {
       if (window.innerWidth > 768) {
-        nav.classList.remove('active');
-        toggle.classList.remove('active');
-        document.body.style.overflow = '';
-        document.querySelectorAll('.has-dropdown').forEach(function(d) {
-          d.classList.remove('active');
-        });
+        closeMenu();
       }
     });
 
-    // Close menu when clicking a nav link (mobile)
-    nav.querySelectorAll('a:not(.has-dropdown > .nav-link)').forEach(function(link) {
+    // Close menu when clicking a dropdown sub-link or regular nav link (mobile)
+    nav.querySelectorAll('.dropdown-menu a, .nav-item:not(.has-dropdown) .nav-link, .nav-cta-mobile a').forEach(function(link) {
       link.addEventListener('click', function() {
-        nav.classList.remove('active');
-        toggle.classList.remove('active');
-        document.body.style.overflow = '';
+        if (window.innerWidth <= 768) {
+          closeMenu();
+        }
       });
     });
   })();
