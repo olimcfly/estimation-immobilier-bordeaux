@@ -14,6 +14,7 @@ use App\Controllers\AdminLeadController;
 use App\Controllers\AdminPartenaireController;
 use App\Controllers\AdminSequenceController;
 use App\Controllers\AdminDiagnosticController;
+use App\Controllers\AdminAchatController;
 use App\Controllers\AdminApiController;
 use App\Controllers\AdminSocialImageController;
 use App\Controllers\AuthController;

@@ -13,13 +13,24 @@ final class AdminActualiteController
 {
     public function index(): void
     {
-        $model = new Actualite();
+        $actualites = [];
+        $cronLogs = [];
+        $dbError = null;
+
+        try {
+            $model = new Actualite();
+            $actualites = $model->findAll();
+            $cronLogs = $model->getCronLogs(10);
+        } catch (\Throwable $e) {
+            error_log('Actualites index error: ' . $e->getMessage());
+            $dbError = 'Erreur base de données : la table "actualites" est peut-être absente. Exécutez "php database/migrate.php".';
+        }
 
         View::renderAdmin('admin/actualites/index', [
-            'actualites' => $model->findAll(),
-            'cronLogs' => $model->getCronLogs(10),
+            'actualites' => $actualites,
+            'cronLogs' => $cronLogs,
             'message' => (string) ($_GET['message'] ?? ''),
-            'error' => (string) ($_GET['error'] ?? ''),
+            'error' => $dbError ?? (string) ($_GET['error'] ?? ''),
             'page_title' => 'Actualités - Admin',
             'admin_page' => 'actualites',
             'breadcrumb' => 'Actualités',
