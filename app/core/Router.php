@@ -64,7 +64,8 @@ final class Router
         try {
             $controller->{$controllerMethod}(...$params);
         } catch (\Throwable $e) {
-            error_log(sprintf('[router][error] %s::%s - %s', $controllerClass, $controllerMethod, $e->getMessage()));
+            error_log(sprintf('[router][error] %s::%s - %s in %s:%d', $controllerClass, $controllerMethod, $e->getMessage(), $e->getFile(), $e->getLine()));
+            error_log('[router][trace] ' . $e->getTraceAsString());
             http_response_code(500);
             header('Content-Type: text/html; charset=utf-8');
             echo '<h1>Erreur 500</h1><p>Une erreur interne est survenue. Veuillez réessayer plus tard.</p>';

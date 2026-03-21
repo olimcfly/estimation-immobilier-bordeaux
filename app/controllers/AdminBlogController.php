@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\Core\Database;
 use App\Core\Validator;
 use App\Core\View;
 use App\Models\Article;
@@ -15,8 +16,23 @@ final class AdminBlogController
     {
         AuthController::requireAuth();
 
-        $articleModel = new Article();
-        $articles = $articleModel->findAll();
+        try {
+            $this->ensureArticlesSchema();
+
+            $articleModel = new Article();
+            $articles = $articleModel->findAll();
+        } catch (\Throwable $e) {
+            error_log('[blog] index error: ' . $e->getMessage());
+            View::renderAdmin('admin/blog/index', [
+                'page_title' => 'Blog - Admin',
+                'admin_page_title' => 'Blog / CMS',
+                'admin_page' => 'blog',
+                'articles' => [],
+                'message' => '',
+                'error' => 'Erreur de base de données : ' . $e->getMessage(),
+            ]);
+            return;
+        }
 
         View::renderAdmin('admin/blog/index', [
             'page_title' => 'Blog - Admin',
@@ -208,6 +224,101 @@ final class AdminBlogController
         $text = trim($text, '-');
 
         return $text !== '' ? $text : 'article';
+    }
+
+    /**
+     * Ensure the articles and article_revisions tables have the expected schema.
+     * Creates missing tables or adds missing columns to existing ones.
+     */
+    private function ensureArticlesSchema(): void
+    {
+        $pdo = Database::connection();
+
+        if (!Database::tableExists('articles')) {
+            $pdo->exec('CREATE TABLE articles (
+                id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                website_id INT UNSIGNED NOT NULL DEFAULT 1,
+                title VARCHAR(255) NOT NULL,
+                slug VARCHAR(255) NOT NULL,
+                content LONGTEXT NOT NULL,
+                meta_title VARCHAR(255) NOT NULL DEFAULT \'\',
+                meta_description TEXT NOT NULL,
+                persona VARCHAR(100) NOT NULL DEFAULT \'\',
+                awareness_level VARCHAR(50) NOT NULL DEFAULT \'\',
+                status ENUM(\'draft\', \'published\') NOT NULL DEFAULT \'draft\',
+                created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE KEY uq_articles_website_slug (website_id, slug),
+                INDEX idx_website_id (website_id),
+                INDEX idx_status_created_at (status, created_at)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci');
+        } else {
+            $this->addMissingColumns($pdo, 'articles', [
+                'website_id' => 'INT UNSIGNED NOT NULL DEFAULT 1',
+                'title' => 'VARCHAR(255) NOT NULL DEFAULT \'\'',
+                'slug' => 'VARCHAR(255) NOT NULL DEFAULT \'\'',
+                'content' => 'LONGTEXT NOT NULL',
+                'meta_title' => 'VARCHAR(255) NOT NULL DEFAULT \'\'',
+                'meta_description' => 'TEXT NOT NULL',
+                'persona' => 'VARCHAR(100) NOT NULL DEFAULT \'\'',
+                'awareness_level' => 'VARCHAR(50) NOT NULL DEFAULT \'\'',
+                'status' => 'ENUM(\'draft\', \'published\') NOT NULL DEFAULT \'draft\'',
+                'created_at' => 'DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP',
+            ]);
+        }
+
+        if (!Database::tableExists('article_revisions')) {
+            $pdo->exec('CREATE TABLE article_revisions (
+                id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                article_id INT UNSIGNED NOT NULL,
+                revision_number INT UNSIGNED NOT NULL,
+                title VARCHAR(255) NOT NULL,
+                slug VARCHAR(255) NOT NULL,
+                content LONGTEXT NOT NULL,
+                meta_title VARCHAR(255) NOT NULL DEFAULT \'\',
+                meta_description TEXT NOT NULL,
+                persona VARCHAR(100) NOT NULL DEFAULT \'\',
+                awareness_level VARCHAR(50) NOT NULL DEFAULT \'\',
+                status ENUM(\'draft\', \'published\') NOT NULL DEFAULT \'draft\',
+                created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE KEY uniq_article_revision (article_id, revision_number),
+                INDEX idx_article_created_at (article_id, created_at),
+                CONSTRAINT fk_article_revisions_article
+                    FOREIGN KEY (article_id) REFERENCES articles(id)
+                    ON DELETE CASCADE
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci');
+        } else {
+            $this->addMissingColumns($pdo, 'article_revisions', [
+                'article_id' => 'INT UNSIGNED NOT NULL',
+                'revision_number' => 'INT UNSIGNED NOT NULL DEFAULT 0',
+                'title' => 'VARCHAR(255) NOT NULL DEFAULT \'\'',
+                'slug' => 'VARCHAR(255) NOT NULL DEFAULT \'\'',
+                'content' => 'LONGTEXT NOT NULL',
+                'meta_title' => 'VARCHAR(255) NOT NULL DEFAULT \'\'',
+                'meta_description' => 'TEXT NOT NULL',
+                'persona' => 'VARCHAR(100) NOT NULL DEFAULT \'\'',
+                'awareness_level' => 'VARCHAR(50) NOT NULL DEFAULT \'\'',
+                'status' => 'ENUM(\'draft\', \'published\') NOT NULL DEFAULT \'draft\'',
+                'created_at' => 'DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP',
+            ]);
+        }
+    }
+
+    /**
+     * Add missing columns to an existing table.
+     *
+     * @param array<string, string> $expectedColumns column_name => column_definition
+     */
+    private function addMissingColumns(\PDO $pdo, string $table, array $expectedColumns): void
+    {
+        $stmt = $pdo->query('SHOW COLUMNS FROM ' . $table);
+        $existingColumns = array_column($stmt->fetchAll(), 'Field');
+
+        foreach ($expectedColumns as $column => $definition) {
+            if (!in_array($column, $existingColumns, true)) {
+                $pdo->exec(sprintf('ALTER TABLE %s ADD COLUMN %s %s', $table, $column, $definition));
+                error_log(sprintf('[blog] Added missing column %s.%s', $table, $column));
+            }
+        }
     }
 
     private function redirect(string $path): void
