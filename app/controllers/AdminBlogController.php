@@ -16,14 +16,15 @@ final class AdminBlogController
         AuthController::requireAuth();
 
         $articleModel = new Article();
+        $articles = $articleModel->findAll();
 
         View::renderAdmin('admin/blog/index', [
             'page_title' => 'Blog - Admin',
             'admin_page_title' => 'Blog / CMS',
-            'admin_current_page' => 'blog',
+            'admin_page' => 'blog',
             'articles' => $articles,
             'message' => (string) ($_GET['message'] ?? ''),
-            'error' => $dbError ?? (string) ($_GET['error'] ?? ''),
+            'error' => (string) ($_GET['error'] ?? ''),
         ]);
     }
 
@@ -33,7 +34,7 @@ final class AdminBlogController
 
         View::renderAdmin('admin/blog/form', [
             'admin_page_title' => 'Nouvel article',
-            'admin_current_page' => 'blog',
+            'admin_page' => 'blog',
             'article' => null,
             'errors' => [],
             'action' => '/admin/blog/store',
@@ -53,7 +54,7 @@ final class AdminBlogController
         } catch (\Throwable $throwable) {
             View::renderAdmin('admin/blog/form', [
                 'admin_page_title' => 'Nouvel article',
-                'admin_current_page' => 'blog',
+                'admin_page' => 'blog',
                 'article' => $_POST,
                 'errors' => [$throwable->getMessage()],
                 'action' => '/admin/blog/store',
@@ -75,7 +76,7 @@ final class AdminBlogController
 
         View::renderAdmin('admin/blog/form', [
             'admin_page_title' => 'Modifier l\'article',
-            'admin_current_page' => 'blog',
+            'admin_page' => 'blog',
             'article' => $article,
             'revisions' => $articleModel->findRevisionsByArticleId((int) $id),
             'errors' => [],
@@ -101,7 +102,7 @@ final class AdminBlogController
 
             View::renderAdmin('admin/blog/form', [
                 'admin_page_title' => 'Modifier l\'article',
-                'admin_current_page' => 'blog',
+                'admin_page' => 'blog',
                 'article' => $article,
                 'revisions' => $articleModel->findRevisionsByArticleId((int) $id),
                 'errors' => [$throwable->getMessage()],
@@ -148,7 +149,7 @@ final class AdminBlogController
 
             View::renderAdmin('admin/blog/form', [
                 'admin_page_title' => 'Article généré par IA',
-                'admin_current_page' => 'blog',
+                'admin_page' => 'blog',
                 'article' => [
                     'title' => $generated['title'],
                     'slug' => $this->slugify($generated['title']),
