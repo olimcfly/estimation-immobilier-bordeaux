@@ -30,6 +30,9 @@ final class Mailer
                 $mail->Username = (string) Config::get('mail.smtp_user');
                 $mail->Password = (string) Config::get('mail.smtp_pass');
                 $mail->SMTPSecure = (string) Config::get('mail.smtp_encryption', 'tls');
+                $mail->Timeout = 15;
+            } else {
+                error_log('Mailer warning: SMTP host is empty. Check MAIL_HOST or MAIL_SMTP_HOST in .env');
             }
 
             $mail->CharSet = 'UTF-8';
