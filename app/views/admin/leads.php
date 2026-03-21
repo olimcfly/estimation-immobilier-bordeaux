@@ -6,6 +6,12 @@
       <p class="muted">Liste des leads enregistrés depuis le formulaire d'estimation.</p>
     </div>
 
+    <?php if (!empty($dbError ?? '')): ?>
+      <div style="background: #fef2f2; border: 1px solid #fca5a5; color: #991b1b; padding: 1rem 1.5rem; border-radius: 0.5rem; margin-bottom: 1.5rem;">
+        <?= e($dbError) ?>
+      </div>
+    <?php endif; ?>
+
     <div class="card">
       <div class="table-wrapper">
         <table class="leads-table">

@@ -36,10 +36,20 @@ final class EstimationController
     {
         AuthController::requireAuth();
 
-        $leadModel = new Lead();
+        $leads = [];
+        $dbError = null;
+
+        try {
+            $leadModel = new Lead();
+            $leads = $leadModel->findAllLeads();
+        } catch (\Throwable $e) {
+            $dbError = 'Base de données indisponible : les leads ne peuvent pas être chargés.';
+        }
+
         View::render('admin/leads', [
             'page_title' => 'Gestion des Leads - Admin',
-            'leads' => $leadModel->findAllLeads(),
+            'leads' => $leads,
+            'dbError' => $dbError,
         ]);
     }
 
