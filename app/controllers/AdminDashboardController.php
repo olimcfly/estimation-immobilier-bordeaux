@@ -152,56 +152,67 @@ final class AdminDashboardController
         $pdo = Database::connection();
         $websiteId = (int) Config::get('website.id', 1);
 
-        // Full pipeline data with estimation values and commission
-        $stmt = $pdo->prepare(
-            'SELECT statut, COUNT(*) as cnt, COALESCE(SUM(estimation), 0) as valeur,
-                    COALESCE(SUM(COALESCE(commission_montant, estimation * COALESCE(commission_taux, 3) / 100)), 0) as commission
-             FROM leads WHERE website_id = :wid AND lead_type = :lt GROUP BY statut'
-        );
-        $stmt->execute([':wid' => $websiteId, ':lt' => 'qualifie']);
         $pipelineData = [];
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $pipelineData[$row['statut']] = [
-                'count' => (int) $row['cnt'],
-                'valeur' => (float) $row['valeur'],
-                'commission' => (float) $row['commission'],
-            ];
-        }
-
         $total = 0;
         $totalValeur = 0;
-        foreach ($pipelineData as $d) {
-            $total += $d['count'];
-            $totalValeur += $d['valeur'];
+        $scoreData = [];
+        $scoreValeurs = [];
+        $tendanceCount = 0;
+        $monthlyData = [];
+        $dbError = null;
+
+        try {
+            // Full pipeline data with estimation values and commission
+            $stmt = $pdo->prepare(
+                'SELECT statut, COUNT(*) as cnt, COALESCE(SUM(estimation), 0) as valeur,
+                        COALESCE(SUM(CASE WHEN commission_montant IS NOT NULL THEN commission_montant ELSE COALESCE(estimation, 0) * COALESCE(commission_taux, 3) / 100 END), 0) as commission
+                 FROM leads WHERE website_id = :wid AND lead_type = :lt GROUP BY statut'
+            );
+            $stmt->execute([':wid' => $websiteId, ':lt' => 'qualifie']);
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $pipelineData[$row['statut']] = [
+                    'count' => (int) $row['cnt'],
+                    'valeur' => (float) $row['valeur'],
+                    'commission' => (float) $row['commission'],
+                ];
+            }
+
+            foreach ($pipelineData as $d) {
+                $total += $d['count'];
+                $totalValeur += $d['valeur'];
+            }
+
+            // Leads by score for the funnel
+            $stmt = $pdo->prepare('SELECT score, COUNT(*) as cnt FROM leads WHERE website_id = :wid AND lead_type = :lt GROUP BY score');
+            $stmt->execute([':wid' => $websiteId, ':lt' => 'qualifie']);
+            $scoreData = $stmt->fetchAll(PDO::FETCH_KEY_PAIR) ?: [];
+
+            // Score distribution with values
+            $stmt = $pdo->prepare(
+                'SELECT score, COALESCE(SUM(estimation), 0) as valeur
+                 FROM leads WHERE website_id = :wid AND lead_type = :lt GROUP BY score'
+            );
+            $stmt->execute([':wid' => $websiteId, ':lt' => 'qualifie']);
+            $scoreValeurs = $stmt->fetchAll(PDO::FETCH_KEY_PAIR) ?: [];
+
+            // Tendance leads count
+            $stmt = $pdo->prepare('SELECT COUNT(*) FROM leads WHERE website_id = :wid AND lead_type = :lt');
+            $stmt->execute([':wid' => $websiteId, ':lt' => 'tendance']);
+            $tendanceCount = (int) $stmt->fetchColumn();
+
+            // Monthly conversion trend (last 6 months)
+            $stmt = $pdo->prepare(
+                "SELECT DATE_FORMAT(created_at, '%Y-%m') as mois, statut, COUNT(*) as cnt
+                 FROM leads WHERE website_id = :wid AND lead_type = :lt
+                 AND created_at >= DATE_SUB(NOW(), INTERVAL 6 MONTH)
+                 GROUP BY mois, statut ORDER BY mois ASC"
+            );
+            $stmt->execute([':wid' => $websiteId, ':lt' => 'qualifie']);
+            $monthlyData = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+        } catch (\PDOException $e) {
+            error_log('Funnel DB error: ' . $e->getMessage());
+            $dbError = 'Erreur base de données : la table "leads" est peut-être absente. Exécutez "php database/migrate.php" pour créer les tables manquantes.';
         }
-
-        // Leads by score for the funnel
-        $stmt = $pdo->prepare('SELECT score, COUNT(*) as cnt FROM leads WHERE website_id = :wid AND lead_type = :lt GROUP BY score');
-        $stmt->execute([':wid' => $websiteId, ':lt' => 'qualifie']);
-        $scoreData = $stmt->fetchAll(PDO::FETCH_KEY_PAIR) ?: [];
-
-        // Score distribution with values
-        $stmt = $pdo->prepare(
-            'SELECT score, COALESCE(SUM(estimation), 0) as valeur
-             FROM leads WHERE website_id = :wid AND lead_type = :lt GROUP BY score'
-        );
-        $stmt->execute([':wid' => $websiteId, ':lt' => 'qualifie']);
-        $scoreValeurs = $stmt->fetchAll(PDO::FETCH_KEY_PAIR) ?: [];
-
-        // Tendance leads count
-        $stmt = $pdo->prepare('SELECT COUNT(*) FROM leads WHERE website_id = :wid AND lead_type = :lt');
-        $stmt->execute([':wid' => $websiteId, ':lt' => 'tendance']);
-        $tendanceCount = (int) $stmt->fetchColumn();
-
-        // Monthly conversion trend (last 6 months)
-        $stmt = $pdo->prepare(
-            "SELECT DATE_FORMAT(created_at, '%Y-%m') as mois, statut, COUNT(*) as cnt
-             FROM leads WHERE website_id = :wid AND lead_type = :lt
-             AND created_at >= DATE_SUB(NOW(), INTERVAL 6 MONTH)
-             GROUP BY mois, statut ORDER BY mois ASC"
-        );
-        $stmt->execute([':wid' => $websiteId, ':lt' => 'qualifie']);
-        $monthlyData = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 
         View::renderAdmin('admin/funnel', [
             'page_title' => 'Entonnoir de Vente - Admin CRM',
@@ -215,6 +226,7 @@ final class AdminDashboardController
             'total' => $total,
             'totalValeur' => $totalValeur,
             'monthlyData' => $monthlyData,
+            'dbError' => $dbError,
         ]);
     }
 

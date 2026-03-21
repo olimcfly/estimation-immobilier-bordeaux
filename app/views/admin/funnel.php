@@ -590,6 +590,15 @@
 
 <a href="/admin/dashboard" class="back-link"><i class="fas fa-arrow-left"></i> Retour au tableau de bord</a>
 
+<?php if (!empty($dbError)): ?>
+  <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: var(--admin-radius); padding: 1.25rem; margin-bottom: 1.5rem; color: #991b1b;">
+    <div style="display: flex; align-items: center; gap: 0.5rem; font-weight: 600; margin-bottom: 0.5rem;">
+      <i class="fas fa-exclamation-triangle" style="color: #ef4444;"></i> Erreur
+    </div>
+    <p style="margin: 0; font-size: 0.88rem;"><?= htmlspecialchars($dbError, ENT_QUOTES, 'UTF-8') ?></p>
+  </div>
+<?php endif; ?>
+
 <!-- KPI SUMMARY -->
 <div class="funnel-kpis">
   <div class="funnel-kpi">
