@@ -30,7 +30,19 @@ final class Mailer
                 $mail->SMTPAuth = true;
                 $mail->Username = (string) Config::get('mail.smtp_user');
                 $mail->Password = (string) Config::get('mail.smtp_pass');
-                $mail->SMTPSecure = (string) Config::get('mail.smtp_encryption', 'tls');
+
+                $encryption = (string) Config::get('mail.smtp_encryption', 'tls');
+                if ($mail->Port === 465) {
+                    $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+                } elseif ($encryption === 'tls' || $mail->Port === 587) {
+                    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                } else {
+                    $mail->SMTPSecure = $encryption;
+                }
+
+                // Laisser PHPMailer auto-détecter le mécanisme AUTH
+                // (CRAM-MD5, LOGIN, PLAIN selon ce que le serveur supporte)
+                $mail->AuthType = '';
             }
 
             $mail->CharSet = 'UTF-8';

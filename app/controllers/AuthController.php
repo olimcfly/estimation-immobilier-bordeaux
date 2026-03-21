@@ -360,9 +360,18 @@ final class AuthController
             $mail->SMTPAuth = true;
             $mail->Username = $smtpUser;
             $mail->Password = $smtpPass;
-            $mail->SMTPSecure = $smtpEnc;
             $mail->Timeout = 10;
             $mail->SMTPDebug = 0;
+
+            // Port 465 = SSL implicite, sinon STARTTLS
+            if ($smtpPort === 465) {
+                $mail->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SMTPS;
+            } elseif ($smtpEnc === 'tls' || $smtpPort === 587) {
+                $mail->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
+            } else {
+                $mail->SMTPSecure = $smtpEnc;
+            }
+            $mail->AuthType = '';
 
             $mail->smtpConnect();
             $mail->smtpClose();
