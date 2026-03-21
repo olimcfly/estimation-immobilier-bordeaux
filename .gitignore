@@ -1,5 +1,6 @@
 /storage/logs/*
 /storage/cache/*
+/logs/*.log
 .env
 /vendor/
 .phpunit.cache

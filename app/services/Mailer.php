@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Core\Config;
+use App\Services\SmtpLogger;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
@@ -44,13 +45,30 @@ final class Mailer
             $mail->AltBody = strip_tags(str_replace(['<br>', '<br/>', '<br />'], "\n", $htmlBody));
 
             $mail->send();
+            SmtpLogger::log(
+                (string) ($mail->Host ?? ''),
+                (int) ($mail->Port ?? 0),
+                'OK'
+            );
             return true;
         } catch (Exception $e) {
             error_log('Mailer error: ' . $e->getMessage());
             error_log('Mailer debug: host=' . ($mail->Host ?? '') . ' port=' . ($mail->Port ?? '') . ' user=' . ($mail->Username ?? ''));
+            SmtpLogger::log(
+                (string) ($mail->Host ?? ''),
+                (int) ($mail->Port ?? 0),
+                'ECHEC',
+                $e->getMessage()
+            );
             return false;
         } catch (\Throwable $e) {
             error_log('Mailer unexpected error: ' . $e->getMessage());
+            SmtpLogger::log(
+                (string) ($mail->Host ?? ''),
+                (int) ($mail->Port ?? 0),
+                'ECHEC',
+                $e->getMessage()
+            );
             return false;
         }
     }
