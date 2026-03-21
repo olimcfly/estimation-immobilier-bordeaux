@@ -28,11 +28,19 @@ $router->post('/admin/login', [AuthController::class, 'login']);
 $router->get('/admin/logout', [AuthController::class, 'logout']);
 $router->get('/admin/diagnostic', [AdminDiagnosticController::class, 'index']);
 $router->get('/admin/test-smtp', [AuthController::class, 'testSmtp']);
+$router->post('/admin/test-smtp/save', [AuthController::class, 'testSmtpSave']);
+$router->post('/admin/test-smtp/reset', [AuthController::class, 'testSmtpReset']);
 $router->post('/admin/test-smtp/run', [AuthController::class, 'testSmtpRun']);
 $router->post('/admin/test-smtp/send', [AuthController::class, 'testSmtpSendEmail']);
 
-// Protected admin routes
-$router->get('/admin/leads', [EstimationController::class, 'leads']);
+// Admin lead management routes
+$router->get('/admin/leads', [AdminLeadController::class, 'index']);
+$router->get('/admin/leads/detail', [AdminLeadController::class, 'show']);
+$router->get('/admin/leads/edit', [AdminLeadController::class, 'edit']);
+$router->post('/admin/leads/update', [AdminLeadController::class, 'update']);
+$router->post('/admin/leads/add-note', [AdminLeadController::class, 'addNote']);
+$router->post('/admin/leads/delete-note', [AdminLeadController::class, 'deleteNote']);
+$router->post('/admin/leads/delete', [AdminLeadController::class, 'delete']);
 
 $router->get('/services', [PageController::class, 'services']);
 $router->get('/about', [PageController::class, 'about']);

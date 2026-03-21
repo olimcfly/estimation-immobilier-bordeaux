@@ -365,14 +365,33 @@ $adminEmail = $_SESSION['admin_user_email'] ?? '';
   <nav class="sidebar-nav">
     <div class="sidebar-section">
       <div class="sidebar-section-title">Principal</div>
+      <a href="/admin/dashboard" class="sidebar-link <?= $currentPage === 'dashboard' ? 'active' : '' ?>">
+        <i class="fas fa-chart-line"></i> Tableau de Bord
+      </a>
       <a href="/admin/leads" class="sidebar-link <?= $currentPage === 'leads' ? 'active' : '' ?>">
         <i class="fas fa-users"></i> Leads
         <?php if (!empty($leadCount)): ?>
           <span class="badge"><?= (int) $leadCount ?></span>
         <?php endif; ?>
       </a>
-      <a href="/admin/leads?score=chaud" class="sidebar-link <?= $currentPage === 'leads-chaud' ? 'active' : '' ?>">
-        <i class="fas fa-fire" style="color: #ef4444;"></i> Leads Chauds
+      <a href="/admin/pipeline" class="sidebar-link <?= $currentPage === 'pipeline' ? 'active' : '' ?>">
+        <i class="fas fa-columns"></i> Pipeline
+      </a>
+      <a href="/admin/funnel" class="sidebar-link <?= $currentPage === 'funnel' ? 'active' : '' ?>">
+        <i class="fas fa-filter"></i> Entonnoir
+      </a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Commercial</div>
+      <a href="/admin/portfolio" class="sidebar-link <?= $currentPage === 'portfolio' ? 'active' : '' ?>">
+        <i class="fas fa-briefcase"></i> Portefeuille
+      </a>
+      <a href="/admin/partenaires" class="sidebar-link <?= $currentPage === 'partenaires' ? 'active' : '' ?>">
+        <i class="fas fa-handshake"></i> Partenaires
+      </a>
+      <a href="/admin/achats" class="sidebar-link <?= $currentPage === 'achats' ? 'active' : '' ?>">
+        <i class="fas fa-shopping-cart"></i> Achats
       </a>
     </div>
 
@@ -380,6 +399,9 @@ $adminEmail = $_SESSION['admin_user_email'] ?? '';
       <div class="sidebar-section-title">Contenu</div>
       <a href="/blog" class="sidebar-link <?= $currentPage === 'blog' ? 'active' : '' ?>">
         <i class="fas fa-newspaper"></i> Articles
+      </a>
+      <a href="/admin/social-images" class="sidebar-link <?= $currentPage === 'social-images' ? 'active' : '' ?>">
+        <i class="fas fa-share-alt"></i> Images Sociales
       </a>
     </div>
 
@@ -398,8 +420,14 @@ $adminEmail = $_SESSION['admin_user_email'] ?? '';
       <a href="/admin/database" class="sidebar-link <?= $currentPage === 'database' ? 'active' : '' ?>">
         <i class="fas fa-database"></i> Base de donn&eacute;es
       </a>
+      <a href="/admin/test-smtp" class="sidebar-link <?= $currentPage === 'smtp' ? 'active' : '' ?>">
+        <i class="fas fa-envelope-open-text"></i> Config SMTP
+      </a>
       <a href="/admin/diagnostic" class="sidebar-link <?= $currentPage === 'diagnostic' ? 'active' : '' ?>">
         <i class="fas fa-stethoscope"></i> Diagnostic
+      </a>
+      <a href="/admin/test-smtp" class="sidebar-link <?= $currentPage === 'smtp' ? 'active' : '' ?>" target="_blank">
+        <i class="fas fa-envelope-open-text"></i> Test SMTP
       </a>
       <a href="/" class="sidebar-link" target="_blank">
         <i class="fas fa-external-link-alt"></i> Voir le site
