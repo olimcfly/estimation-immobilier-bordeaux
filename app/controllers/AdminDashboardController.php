@@ -104,7 +104,7 @@ final class AdminDashboardController
         // Full pipeline data with estimation values and commission
         $stmt = $pdo->prepare(
             'SELECT statut, COUNT(*) as cnt, COALESCE(SUM(estimation), 0) as valeur,
-                    COALESCE(SUM(COALESCE(commission_montant, estimation * COALESCE(commission_taux, 3) / 100)), 0) as commission
+                    COALESCE(SUM(CASE WHEN commission_montant IS NOT NULL THEN commission_montant ELSE COALESCE(estimation, 0) * COALESCE(commission_taux, 3) / 100 END), 0) as commission
              FROM leads WHERE website_id = :wid AND lead_type = :lt GROUP BY statut'
         );
         $stmt->execute([':wid' => $websiteId, ':lt' => 'qualifie']);
