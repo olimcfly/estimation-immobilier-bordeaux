@@ -294,9 +294,16 @@ final class AdminDashboardController
     public function updateCommissionRate(): void
     {
         AuthController::requireAuth();
-        AuthController::verifyCsrfToken();
 
         header('Content-Type: application/json; charset=utf-8');
+
+        $csrfToken = (string) ($_POST['csrf_token'] ?? '');
+        $sessionToken = $_SESSION['csrf_token'] ?? '';
+        if ($sessionToken === '' || $csrfToken === '' || !hash_equals($sessionToken, $csrfToken)) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'error' => 'Token CSRF invalide']);
+            return;
+        }
 
         $id = (int) ($_POST['id'] ?? 0);
         $rate = (float) ($_POST['commission_taux'] ?? 0);
