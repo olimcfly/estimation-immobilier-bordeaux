@@ -8,6 +8,7 @@ use App\Core\Config;
 use App\Core\Database;
 use App\Core\View;
 use App\Models\Lead;
+use App\Models\Article;
 use PDO;
 
 final class AdminDashboardController
@@ -20,24 +21,42 @@ final class AdminDashboardController
         $websiteId = (int) Config::get('website.id', 1);
         $stats = [];
 
-        // Total contacts
-        $stmt = $pdo->prepare('SELECT COUNT(*) as total FROM leads WHERE website_id = :wid AND lead_type = :lt');
+        // Total leads
+        $stmt = $pdo->prepare('SELECT COUNT(*) FROM leads WHERE website_id = :wid AND lead_type = :lt');
         $stmt->execute([':wid' => $websiteId, ':lt' => 'qualifie']);
-        $stats['total_contacts'] = (int) $stmt->fetchColumn();
+        $stats['total_leads'] = (int) $stmt->fetchColumn();
+
+        // Nouveaux leads aujourd'hui
+        $stmt = $pdo->prepare('SELECT COUNT(*) FROM leads WHERE website_id = :wid AND lead_type = :lt AND DATE(created_at) = CURDATE()');
+        $stmt->execute([':wid' => $websiteId, ':lt' => 'qualifie']);
+        $stats['new_leads_today'] = (int) $stmt->fetchColumn();
 
         // Leads par score
         $stmt = $pdo->prepare('SELECT score, COUNT(*) as cnt FROM leads WHERE website_id = :wid AND lead_type = :lt GROUP BY score');
         $stmt->execute([':wid' => $websiteId, ':lt' => 'qualifie']);
         $scoreData = $stmt->fetchAll(PDO::FETCH_KEY_PAIR) ?: [];
-        $stats['leads_chaud'] = (int) ($scoreData['chaud'] ?? 0);
-        $stats['leads_tiede'] = (int) ($scoreData['tiede'] ?? 0);
-        $stats['leads_froid'] = (int) ($scoreData['froid'] ?? 0);
+        $stats['hot_leads'] = (int) ($scoreData['chaud'] ?? 0);
 
         // Leads par statut (pipeline)
         $stmt = $pdo->prepare('SELECT statut, COUNT(*) as cnt FROM leads WHERE website_id = :wid AND lead_type = :lt GROUP BY statut');
         $stmt->execute([':wid' => $websiteId, ':lt' => 'qualifie']);
         $statutData = $stmt->fetchAll(PDO::FETCH_KEY_PAIR) ?: [];
         $stats['pipeline'] = $statutData;
+        $stats['pending_leads'] = (int) ($statutData['nouveau'] ?? 0);
+
+        // Articles stats
+        if (Database::tableExists('articles')) {
+            $stmt = $pdo->prepare('SELECT COUNT(*) FROM articles WHERE website_id = :wid');
+            $stmt->execute([':wid' => $websiteId]);
+            $stats['total_articles'] = (int) $stmt->fetchColumn();
+
+            $stmt = $pdo->prepare('SELECT COUNT(*) FROM articles WHERE website_id = :wid AND status = :st');
+            $stmt->execute([':wid' => $websiteId, ':st' => 'draft']);
+            $stats['draft_articles'] = (int) $stmt->fetchColumn();
+        } else {
+            $stats['total_articles'] = 0;
+            $stats['draft_articles'] = 0;
+        }
 
         // CA signé (revenu gagné)
         $stmt = $pdo->prepare('SELECT COALESCE(SUM(commission_montant), 0) as total FROM leads WHERE website_id = :wid AND statut = :st AND commission_montant IS NOT NULL');
@@ -63,7 +82,7 @@ final class AdminDashboardController
         $stmt = $pdo->prepare('SELECT COUNT(*) as total FROM leads WHERE website_id = :wid AND lead_type = :lt AND statut IN ("signe","co_signature_partenaire")');
         $stmt->execute([':wid' => $websiteId, ':lt' => 'qualifie']);
         $signes = (int) $stmt->fetchColumn();
-        $stats['taux_conversion'] = $stats['total_contacts'] > 0 ? round(($signes / $stats['total_contacts']) * 100, 1) : 0;
+        $stats['taux_conversion'] = $stats['total_leads'] > 0 ? round(($signes / $stats['total_leads']) * 100, 1) : 0;
 
         // Taux par étape (funnel)
         $pipelineOrder = [
@@ -80,7 +99,7 @@ final class AdminDashboardController
         // Leads récents
         $stmt = $pdo->prepare('SELECT id, nom, email, telephone, ville, estimation, score, statut, created_at FROM leads WHERE website_id = :wid AND lead_type = :lt ORDER BY created_at DESC LIMIT 10');
         $stmt->execute([':wid' => $websiteId, ':lt' => 'qualifie']);
-        $stats['leads_recents'] = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+        $recentLeads = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 
         // Leads par mois (6 derniers mois)
         $stmt = $pdo->prepare("SELECT DATE_FORMAT(created_at, '%Y-%m') as mois, COUNT(*) as cnt FROM leads WHERE website_id = :wid AND lead_type = :lt AND created_at >= DATE_SUB(NOW(), INTERVAL 6 MONTH) GROUP BY mois ORDER BY mois ASC");
@@ -92,6 +111,7 @@ final class AdminDashboardController
             'admin_page' => 'dashboard',
             'breadcrumb' => 'Tableau de Bord',
             'stats' => $stats,
+            'recent_leads' => $recentLeads,
         ]);
     }
 
