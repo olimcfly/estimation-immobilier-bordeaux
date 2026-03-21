@@ -205,6 +205,14 @@ final class AuthController
 
     public static function requireAuth(): void
     {
+        if (self::isDevSkipAuth()) {
+            // Auto-login en mode développeur
+            $_SESSION['admin_logged_in'] = true;
+            $_SESSION['admin_user_email'] = 'dev@localhost';
+            $_SESSION['admin_user_name'] = 'Dev Admin';
+            return;
+        }
+
         if (empty($_SESSION['admin_logged_in'])) {
             header('Location: /admin/login');
             exit;
@@ -213,7 +221,19 @@ final class AuthController
 
     public static function isLoggedIn(): bool
     {
+        if (self::isDevSkipAuth()) {
+            return true;
+        }
         return !empty($_SESSION['admin_logged_in']);
+    }
+
+    /**
+     * Vérifie si le mode développeur sans authentification est activé.
+     */
+    private static function isDevSkipAuth(): bool
+    {
+        $value = $_ENV['DEV_SKIP_AUTH'] ?? $_SERVER['DEV_SKIP_AUTH'] ?? 'false';
+        return filter_var($value, FILTER_VALIDATE_BOOLEAN);
     }
 
     public static function generateCsrfToken(): string
