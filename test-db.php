@@ -47,24 +47,41 @@ if (empty($tables)) {
     }
 }
 
-// 5. Vérifier la table admin_users
-echo "\n5. Table admin_users :\n";
+// 5. Vérifier les tables requises par l'application
+echo "\n5. Tables requises :\n";
+$requiredTables = ['articles', 'article_revisions', 'leads', 'admin_users', 'newsletter_subscribers'];
+$missingTables = [];
+foreach ($requiredTables as $required) {
+    $exists = in_array($required, $tables, true);
+    echo "   - {$required} : " . ($exists ? 'OK' : 'ABSENTE') . "\n";
+    if (!$exists) {
+        $missingTables[] = $required;
+    }
+}
+
+if (!empty($missingTables)) {
+    echo "\n   Tables manquantes détectées.\n";
+    echo "   Exécutez : php database/setup.php\n";
+}
+
+// 6. Vérifier la table admin_users en détail
+echo "\n6. Table admin_users :\n";
 if (!in_array('admin_users', $tables, true)) {
-    echo "   ABSENTE - Exécutez : php database/setup-admin.php\n";
+    echo "   ABSENTE - Exécutez : php database/setup.php\n";
 } else {
     $columns = $pdo->query("SHOW COLUMNS FROM admin_users")->fetchAll(\PDO::FETCH_COLUMN);
     echo "   Colonnes : " . implode(', ', $columns) . "\n";
 
     if (!in_array('login_code', $columns, true)) {
         echo "   ATTENTION : colonne 'login_code' manquante ! La table doit être recréée.\n";
-        echo "   Exécutez : php database/setup-admin.php\n";
+        echo "   Exécutez : php database/setup.php\n";
     }
 
     $count = $pdo->query("SELECT COUNT(*) FROM admin_users")->fetchColumn();
     echo "   Nombre d'admins : {$count}\n";
 
     if ((int) $count === 0) {
-        echo "   AUCUN ADMIN - Exécutez : php database/setup-admin.php\n";
+        echo "   AUCUN ADMIN - Exécutez : php database/setup.php\n";
     } else {
         $admins = $pdo->query("SELECT email FROM admin_users")->fetchAll(\PDO::FETCH_COLUMN);
         foreach ($admins as $email) {
@@ -72,5 +89,9 @@ if (!in_array('admin_users', $tables, true)) {
         }
     }
 }
+
+// 7. Test de santé via Database::ping()
+echo "\n7. Health check (ping) : ";
+echo Database::ping() ? "OK\n" : "ECHEC\n";
 
 echo "\n=== Diagnostic terminé ===\n";

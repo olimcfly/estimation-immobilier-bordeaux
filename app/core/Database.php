@@ -22,6 +22,10 @@ final class Database
         $pass = (string) Config::get('db.pass');
         $charset = (string) Config::get('db.charset', 'utf8mb4');
 
+        if ($name === '') {
+            throw new RuntimeException('La configuration DB_NAME est requise.');
+        }
+
         $dsn = sprintf('mysql:host=%s;port=%d;dbname=%s;charset=%s', $host, $port, $name, $charset);
 
         try {
@@ -50,6 +54,36 @@ final class Database
     public static function connection(): PDO
     {
         return self::getInstance()->connection;
+    }
+
+    public static function ping(): bool
+    {
+        try {
+            $pdo = self::connection();
+            $pdo->query('SELECT 1');
+            return true;
+        } catch (\Throwable) {
+            self::$instance = null;
+            return false;
+        }
+    }
+
+    public static function tableExists(string $table): bool
+    {
+        $stmt = self::connection()->prepare(
+            'SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA = :db AND TABLE_NAME = :table'
+        );
+        $stmt->execute([
+            'db' => (string) Config::get('db.name'),
+            'table' => $table,
+        ]);
+
+        return (int) $stmt->fetchColumn() > 0;
+    }
+
+    public static function reset(): void
+    {
+        self::$instance = null;
     }
 
     private function __clone()
