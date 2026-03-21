@@ -122,71 +122,38 @@ CREATE TABLE IF NOT EXISTS design_templates (
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS email_templates (
+CREATE TABLE IF NOT EXISTS actualites (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    slug VARCHAR(100) NOT NULL UNIQUE,
-    name VARCHAR(255) NOT NULL,
-    subject VARCHAR(255) NOT NULL,
-    body_html LONGTEXT NOT NULL,
-    signature TEXT NULL,
-    category ENUM('notification', 'client', 'sequence', 'marketing') NOT NULL DEFAULT 'notification',
+    website_id INT UNSIGNED NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    slug VARCHAR(255) NOT NULL,
+    content LONGTEXT NOT NULL,
+    excerpt TEXT NOT NULL DEFAULT '',
+    meta_title VARCHAR(255) NOT NULL DEFAULT '',
+    meta_description TEXT NOT NULL DEFAULT '',
+    image_url VARCHAR(500) DEFAULT NULL,
+    image_prompt TEXT DEFAULT NULL,
+    source_query TEXT DEFAULT NULL,
+    source_results LONGTEXT DEFAULT NULL,
+    status ENUM('draft', 'published') NOT NULL DEFAULT 'draft',
+    generated_by ENUM('manual', 'ai', 'cron') NOT NULL DEFAULT 'manual',
+    published_at DATETIME DEFAULT NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    INDEX idx_category (category)
+    UNIQUE KEY uq_actualites_website_slug (website_id, slug),
+    INDEX idx_actualites_website (website_id),
+    INDEX idx_actualites_status (status, published_at),
+    INDEX idx_actualites_created (created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS email_logs (
+CREATE TABLE IF NOT EXISTS actualites_cron_log (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    recipient VARCHAR(180) NOT NULL,
-    subject VARCHAR(255) NOT NULL,
-    body_html LONGTEXT NULL,
-    status ENUM('sent', 'failed') NOT NULL DEFAULT 'sent',
-    template_id INT UNSIGNED NULL,
-    sent_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    INDEX idx_recipient (recipient),
-    INDEX idx_status (status),
-    INDEX idx_sent_at (sent_at)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-CREATE TABLE IF NOT EXISTS email_sequences (
-    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    persona VARCHAR(50) NULL,
-    trigger_event VARCHAR(50) NOT NULL DEFAULT 'lead_created',
-    status ENUM('draft', 'active', 'paused') NOT NULL DEFAULT 'draft',
+    website_id INT UNSIGNED NOT NULL,
+    query_used TEXT NOT NULL,
+    articles_found INT UNSIGNED NOT NULL DEFAULT 0,
+    article_published_id INT UNSIGNED DEFAULT NULL,
+    status ENUM('success', 'error') NOT NULL DEFAULT 'success',
+    error_message TEXT DEFAULT NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    INDEX idx_status (status),
-    INDEX idx_persona (persona)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-CREATE TABLE IF NOT EXISTS email_sequence_steps (
-    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    sequence_id INT UNSIGNED NOT NULL,
-    step_order INT UNSIGNED NOT NULL DEFAULT 1,
-    delay_days INT UNSIGNED NOT NULL DEFAULT 0,
-    subject VARCHAR(255) NOT NULL,
-    body_html LONGTEXT NOT NULL,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    INDEX idx_sequence_order (sequence_id, step_order),
-    CONSTRAINT fk_seq_steps_sequence
-        FOREIGN KEY (sequence_id) REFERENCES email_sequences(id)
-        ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-CREATE TABLE IF NOT EXISTS lead_personas (
-    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    lead_id INT UNSIGNED NOT NULL UNIQUE,
-    neuropersona VARCHAR(50) NULL,
-    bant_budget TEXT NULL,
-    bant_authority TEXT NULL,
-    bant_need TEXT NULL,
-    bant_timeline TEXT NULL,
-    notes TEXT NULL,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    INDEX idx_neuropersona (neuropersona),
-    CONSTRAINT fk_persona_lead
-        FOREIGN KEY (lead_id) REFERENCES leads(id)
-        ON DELETE CASCADE
+    INDEX idx_cron_log_website (website_id, created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

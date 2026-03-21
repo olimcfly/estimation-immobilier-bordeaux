@@ -1,8 +1,7 @@
-<section class="section">
-  <div class="container">
-    <a href="/admin/blog" class="btn btn-small btn-ghost">&larr; Retour CMS</a>
-    <h1>Générateur d'images IA</h1>
-    <p style="color:var(--muted);margin-bottom:1.5rem;">Générez des visuels immobiliers avec l'IA (gpt-image-1) pour vos articles de blog.</p>
+<div class="container">
+    <a href="/admin/blog" class="btn btn-small btn-ghost" style="margin-bottom: 1rem; display: inline-block;">&larr; Retour CMS</a>
+    <h1 style="font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 700; margin: 0 0 0.25rem;">Générateur d'images IA</h1>
+    <p style="color:#6b6459;margin-bottom:1.5rem;font-size:0.9rem;">Générez des visuels immobiliers avec l'IA (gpt-image-1) pour vos articles de blog.</p>
 
     <?php if (($message ?? '') !== ''): ?>
       <p class="success"><?= e((string) $message) ?></p>
@@ -122,8 +121,7 @@
         </div>
       </div>
     <?php endif; ?>
-  </div>
-</section>
+</div>
 
 <script>
 (function() {

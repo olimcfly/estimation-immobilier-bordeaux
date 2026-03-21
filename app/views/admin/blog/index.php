@@ -1,9 +1,7 @@
-<section class="section">
-  <div class="container">
-    <div class="admin-header">
+<div class="container">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
       <div>
-        <p class="eyebrow">Administration CMS</p>
-        <h1>Gestion du blog</h1>
+        <h1 style="font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 700; margin: 0 0 0.25rem;">Gestion du blog</h1>
       </div>
       <a href="/admin/blog/create" class="btn">Nouvel article</a>
     </div>
@@ -70,5 +68,4 @@
         </table>
       </div>
     </section>
-  </div>
-</section>
+</div>

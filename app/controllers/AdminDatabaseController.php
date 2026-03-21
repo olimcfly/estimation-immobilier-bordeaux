@@ -104,6 +104,7 @@ final class AdminDatabaseController
 
         View::renderAdmin('admin/database', [
             'page_title' => 'Administration Base de Données',
+            'admin_page_title' => 'Base de données',
             'admin_page' => 'database',
             'breadcrumb' => 'Base de Données',
             'connected' => $connected,

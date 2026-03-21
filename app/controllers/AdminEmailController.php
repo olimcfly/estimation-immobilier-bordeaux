@@ -35,6 +35,7 @@ final class AdminEmailController
 
         View::renderAdmin('admin/emails', [
             'page_title' => 'Gestion des Emails',
+            'admin_page_title' => 'Templates Email',
             'admin_page' => 'emails',
             'breadcrumb' => 'Emails',
             'templates' => $templates,

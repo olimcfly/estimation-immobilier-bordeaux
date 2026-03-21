@@ -273,6 +273,11 @@ $step = $step ?? 'email';
         <?= e($login_email ?? '') ?>
       </div>
 
+      <div id="countdown-bar" style="background: rgba(var(--success-rgb), 0.08); border: 1px solid var(--success); border-radius: 10px; padding: 0.75rem 1rem; margin-bottom: 1.5rem; text-align: center; font-size: 0.85rem; color: #15803d;">
+        <i class="fas fa-clock" style="margin-right: 0.4rem;"></i>
+        Code valable pendant <strong id="countdown-timer">10:00</strong>
+      </div>
+
       <form method="POST" action="/admin/login" class="login-form">
         <input type="hidden" name="csrf_token" value="<?= e($csrfToken) ?>">
         <input type="hidden" name="action" value="verify_code">
@@ -296,16 +301,63 @@ $step = $step ?? 'email';
           >
         </div>
 
-        <button type="submit" class="btn-submit">
+        <button type="submit" class="btn-submit" id="btn-verify">
           <i class="fas fa-sign-in-alt" style="margin-right: 0.5rem;"></i>Se connecter
         </button>
       </form>
+
+      <div style="text-align: center; margin-top: 1.5rem;">
+        <form method="POST" action="/admin/login" style="display: inline;">
+          <input type="hidden" name="csrf_token" value="<?= e($csrfToken) ?>">
+          <input type="hidden" name="action" value="send_code">
+          <input type="hidden" name="email" value="<?= e($login_email ?? '') ?>">
+          <button type="submit" class="back-link" style="background: none; border: none; cursor: pointer; font-family: inherit; font-size: 0.85rem; color: var(--muted);">
+            <i class="fas fa-redo"></i> Renvoyer le code
+          </button>
+        </form>
+      </div>
 
       <div style="text-align: center;">
         <a href="/admin/login" class="back-link">
           <i class="fas fa-arrow-left"></i>Utiliser une autre adresse
         </a>
       </div>
+
+      <script>
+      (function() {
+        var totalSeconds = 10 * 60;
+        var timerEl = document.getElementById('countdown-timer');
+        var barEl = document.getElementById('countdown-bar');
+        var btnEl = document.getElementById('btn-verify');
+
+        function updateTimer() {
+          if (totalSeconds <= 0) {
+            barEl.style.background = 'rgba(226, 75, 74, 0.08)';
+            barEl.style.borderColor = '#e24b4a';
+            barEl.style.color = '#e24b4a';
+            timerEl.textContent = 'expire';
+            barEl.querySelector('i').className = 'fas fa-exclamation-triangle';
+            barEl.innerHTML = '<i class="fas fa-exclamation-triangle" style="margin-right: 0.4rem;"></i> Code expire. Veuillez renvoyer un nouveau code.';
+            btnEl.disabled = true;
+            btnEl.style.opacity = '0.5';
+            btnEl.style.cursor = 'not-allowed';
+            return;
+          }
+          totalSeconds--;
+          var m = Math.floor(totalSeconds / 60);
+          var s = totalSeconds % 60;
+          timerEl.textContent = m + ':' + (s < 10 ? '0' : '') + s;
+
+          if (totalSeconds <= 60) {
+            barEl.style.background = 'rgba(249, 115, 22, 0.08)';
+            barEl.style.borderColor = '#f97316';
+            barEl.style.color = '#f97316';
+          }
+        }
+
+        setInterval(updateTimer, 1000);
+      })();
+      </script>
 
     <?php endif; ?>
 

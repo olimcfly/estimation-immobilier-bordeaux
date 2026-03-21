@@ -30,7 +30,7 @@ final class View
     }
 
     /**
-     * Render a template inside the admin CRM layout (sidebar + topbar).
+     * Render a template inside the admin layout with sidebar navigation.
      */
     public static function renderAdmin(string $template, array $data = []): void
     {
@@ -43,10 +43,14 @@ final class View
         }
 
         $pageContent = self::renderTemplate($templatePath, $data);
-        $data['pageContent'] = $pageContent;
 
+        $layoutPath = __DIR__ . '/../views/layouts/admin.php';
+        ob_start();
         extract($data, EXTR_SKIP);
-        include __DIR__ . '/../views/layouts/admin.php';
+        include $layoutPath;
+        $layoutHtml = (string) ob_get_clean();
+
+        echo str_replace('%%ADMIN_CONTENT%%', $pageContent, $layoutHtml);
     }
 
     /**

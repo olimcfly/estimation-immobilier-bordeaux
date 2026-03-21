@@ -20,6 +20,7 @@ final class AdminPartenaireController
 
         View::renderAdmin('admin/partenaires', [
             'page_title' => 'Partenaires - Admin CRM',
+            'admin_page_title' => 'Partenaires',
             'admin_page' => 'partenaires',
             'breadcrumb' => 'Partenaires',
             'partenaires' => $partenaires,
