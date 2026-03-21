@@ -329,26 +329,97 @@ final class AuthController
     {
         self::requireAuth();
 
-        $smtpHost = (string) Config::get('mail.smtp_host');
-        $smtpPort = (int) Config::get('mail.smtp_port', 587);
-        $smtpUser = (string) Config::get('mail.smtp_user');
-        $smtpPass = (string) Config::get('mail.smtp_pass');
-        $smtpEnc = (string) Config::get('mail.smtp_encryption', 'tls');
-        $mailFrom = (string) Config::get('mail.from', '');
-        $mailFromName = (string) Config::get('mail.from_name', '');
+        $overrides = Config::getSmtpOverrides();
+        $hasOverrides = !empty($overrides);
+
+        // If ?from_env=1, show raw .env values (ignoring overrides)
+        $fromEnv = ($_GET['from_env'] ?? '') === '1';
+
+        if ($fromEnv && $hasOverrides) {
+            // Read raw env values directly
+            $smtpHost = (string) ($_ENV['MAIL_SMTP_HOST'] ?? $_ENV['MAIL_HOST'] ?? '');
+            $smtpPort = (int) ($_ENV['MAIL_SMTP_PORT'] ?? $_ENV['MAIL_PORT'] ?? 587);
+            $smtpUser = (string) ($_ENV['MAIL_SMTP_USER'] ?? $_ENV['MAIL_USERNAME'] ?? '');
+            $smtpPass = (string) ($_ENV['MAIL_SMTP_PASS'] ?? $_ENV['MAIL_PASSWORD'] ?? '');
+            $smtpEnc = (string) ($_ENV['MAIL_SMTP_ENCRYPTION'] ?? $_ENV['MAIL_ENCRYPTION'] ?? 'tls');
+            $mailFrom = (string) ($_ENV['MAIL_FROM_ADDRESS'] ?? $_ENV['MAIL_FROM'] ?? '');
+            $mailFromName = (string) ($_ENV['MAIL_FROM_NAME'] ?? '');
+        } else {
+            $smtpHost = (string) Config::get('mail.smtp_host');
+            $smtpPort = (int) Config::get('mail.smtp_port', 587);
+            $smtpUser = (string) Config::get('mail.smtp_user');
+            $smtpPass = (string) Config::get('mail.smtp_pass');
+            $smtpEnc = (string) Config::get('mail.smtp_encryption', 'tls');
+            $mailFrom = (string) Config::get('mail.from', '');
+            $mailFromName = (string) Config::get('mail.from_name', '');
+        }
+
+        $flashSuccess = $_SESSION['smtp_flash_success'] ?? '';
+        $flashError = $_SESSION['smtp_flash_error'] ?? '';
+        unset($_SESSION['smtp_flash_success'], $_SESSION['smtp_flash_error']);
 
         View::renderAdmin('admin/test-smtp', [
-            'admin_page'  => 'smtp',
-            'page_title'  => 'Test SMTP',
-            'breadcrumb'  => [['label' => 'Outils'], ['label' => 'Test SMTP']],
-            'smtp_host'   => $smtpHost,
-            'smtp_port'   => $smtpPort,
-            'smtp_user'   => $smtpUser,
-            'smtp_pass'   => $smtpPass !== '' ? '(defini)' : '(vide)',
-            'smtp_enc'    => $smtpEnc,
-            'mail_from'   => $mailFrom,
+            'admin_page'     => 'smtp',
+            'page_title'     => 'Configuration SMTP',
+            'breadcrumb'     => 'Configuration SMTP',
+            'smtp_host'      => $smtpHost,
+            'smtp_port'      => $smtpPort,
+            'smtp_user'      => $smtpUser,
+            'smtp_pass'      => $smtpPass,
+            'smtp_enc'       => $smtpEnc,
+            'mail_from'      => $mailFrom,
             'mail_from_name' => $mailFromName,
+            'has_overrides'  => $hasOverrides,
+            'flash_success'  => $flashSuccess,
+            'flash_error'    => $flashError,
         ]);
+    }
+
+    public function testSmtpSave(): void
+    {
+        self::requireAuth();
+
+        $data = [
+            'smtp_host'       => trim((string) ($_POST['smtp_host'] ?? '')),
+            'smtp_port'       => trim((string) ($_POST['smtp_port'] ?? '587')),
+            'smtp_user'       => trim((string) ($_POST['smtp_user'] ?? '')),
+            'smtp_pass'       => (string) ($_POST['smtp_pass'] ?? ''),
+            'smtp_encryption' => trim((string) ($_POST['smtp_encryption'] ?? 'tls')),
+            'from'            => trim((string) ($_POST['mail_from'] ?? '')),
+            'from_name'       => trim((string) ($_POST['mail_from_name'] ?? '')),
+        ];
+
+        // Don't save if password field is the placeholder
+        if ($data['smtp_pass'] === '********') {
+            // Keep existing password
+            $existing = Config::getSmtpOverrides();
+            $data['smtp_pass'] = $existing['smtp_pass'] ?? (string) Config::get('mail.smtp_pass', '');
+        }
+
+        $saved = Config::saveSmtpOverrides($data);
+
+        if ($saved) {
+            $_SESSION['smtp_flash_success'] = 'Configuration SMTP sauvegardee avec succes.';
+        } else {
+            $_SESSION['smtp_flash_error'] = 'Erreur lors de la sauvegarde. Verifiez les permissions du dossier config/.';
+        }
+
+        header('Location: /admin/test-smtp');
+        exit;
+    }
+
+    public function testSmtpReset(): void
+    {
+        self::requireAuth();
+
+        $path = Config::getSmtpOverridePath();
+        if (is_file($path)) {
+            unlink($path);
+        }
+
+        $_SESSION['smtp_flash_success'] = 'Configuration reintialisee. Les valeurs du fichier .env sont utilisees.';
+        header('Location: /admin/test-smtp');
+        exit;
     }
 
     public function testSmtpRun(): void
@@ -356,11 +427,18 @@ final class AuthController
         self::requireAuth();
         header('Content-Type: application/json; charset=utf-8');
 
-        $smtpHost = (string) Config::get('mail.smtp_host');
-        $smtpPort = (int) Config::get('mail.smtp_port', 587);
-        $smtpUser = (string) Config::get('mail.smtp_user');
-        $smtpPass = (string) Config::get('mail.smtp_pass');
-        $smtpEnc = (string) Config::get('mail.smtp_encryption', 'tls');
+        // Use values from POST (form fields) for testing, not saved config
+        $smtpHost = trim((string) ($_POST['smtp_host'] ?? (string) Config::get('mail.smtp_host')));
+        $smtpPort = (int) ($_POST['smtp_port'] ?? (int) Config::get('mail.smtp_port', 587));
+        $smtpUser = trim((string) ($_POST['smtp_user'] ?? (string) Config::get('mail.smtp_user')));
+        $smtpPass = (string) ($_POST['smtp_pass'] ?? '');
+        $smtpEnc = trim((string) ($_POST['smtp_encryption'] ?? (string) Config::get('mail.smtp_encryption', 'tls')));
+
+        // If password is placeholder, use saved password
+        if ($smtpPass === '********' || $smtpPass === '') {
+            $overrides = Config::getSmtpOverrides();
+            $smtpPass = $overrides['smtp_pass'] ?? (string) Config::get('mail.smtp_pass', '');
+        }
 
         $steps = [];
 
@@ -368,7 +446,7 @@ final class AuthController
         $steps[] = [
             'label' => 'Configuration SMTP',
             'status' => $smtpHost !== '' ? 'ok' : 'error',
-            'detail' => $smtpHost !== '' ? "Host: $smtpHost | Port: $smtpPort | Encryption: $smtpEnc" : 'MAIL_SMTP_HOST est vide dans .env',
+            'detail' => $smtpHost !== '' ? "Host: $smtpHost | Port: $smtpPort | Encryption: $smtpEnc" : 'Le champ Host SMTP est vide.',
         ];
 
         if ($smtpHost === '') {

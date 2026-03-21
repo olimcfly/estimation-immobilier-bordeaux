@@ -411,6 +411,9 @@ $adminEmail = $_SESSION['admin_user_email'] ?? '';
       <a href="/admin/database" class="sidebar-link <?= $currentPage === 'database' ? 'active' : '' ?>">
         <i class="fas fa-database"></i> Base de donn&eacute;es
       </a>
+      <a href="/admin/test-smtp" class="sidebar-link <?= $currentPage === 'smtp' ? 'active' : '' ?>">
+        <i class="fas fa-envelope-open-text"></i> Config SMTP
+      </a>
       <a href="/admin/diagnostic" class="sidebar-link <?= $currentPage === 'diagnostic' ? 'active' : '' ?>">
         <i class="fas fa-stethoscope"></i> Diagnostic
       </a>
