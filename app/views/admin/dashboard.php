@@ -1,5 +1,12 @@
 <div class="container">
 
+  <?php if (!empty($dbError ?? '')): ?>
+    <div style="background: #fef2f2; border: 1px solid #fca5a5; color: #991b1b; padding: 1rem 1.5rem; border-radius: 0.5rem; margin-bottom: 1.5rem;">
+      <i class="fas fa-exclamation-triangle"></i> <?= htmlspecialchars($dbError, ENT_QUOTES, 'UTF-8') ?>
+      <a href="/admin/diagnostic" style="color: #991b1b; font-weight: 600; margin-left: 0.5rem;">Voir le diagnostic</a>
+    </div>
+  <?php endif; ?>
+
   <!-- Stats Cards -->
   <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.25rem; margin-bottom: 2rem;">
 
