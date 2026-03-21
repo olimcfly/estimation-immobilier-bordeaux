@@ -6,6 +6,12 @@ use App\Core\Config;
 
 require_once __DIR__ . '/helpers.php';
 
+// Charger l'autoloader Composer (PHPMailer, etc.)
+$composerAutoload = dirname(__DIR__, 2) . '/vendor/autoload.php';
+if (is_file($composerAutoload)) {
+    require_once $composerAutoload;
+}
+
 // Charger le fichier .env dans $_ENV
 $envFile = dirname(__DIR__, 2) . '/.env';
 if (is_file($envFile)) {

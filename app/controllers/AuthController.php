@@ -51,13 +51,24 @@ final class AuthController
                     'error_message' => 'Requête invalide.',
                 ]);
             }
-        } catch (\RuntimeException $e) {
+        } catch (\Throwable $e) {
             error_log('Auth error: ' . $e->getMessage());
             http_response_code(500);
+
+            $message = 'Erreur serveur. Veuillez réessayer plus tard.';
+            if ($e instanceof \RuntimeException) {
+                $message = 'Erreur serveur : impossible de se connecter à la base de données. Vérifiez la configuration.';
+            } elseif ($e instanceof \PDOException) {
+                $message = 'Erreur de base de données. Vérifiez que les tables sont correctement créées.';
+            } elseif ($e instanceof \Error) {
+                $message = 'Erreur serveur : une dépendance est manquante. Exécutez "composer install".';
+            }
+
             View::renderBare('admin/login', [
                 'page_title' => 'Connexion Admin - Estimation Immobilier Bordeaux',
-                'step' => 'email',
-                'error_message' => 'Erreur serveur : impossible de se connecter à la base de données. Vérifiez la configuration.',
+                'step' => $action === 'verify_code' ? 'code' : 'email',
+                'login_email' => $action === 'verify_code' ? trim((string) ($_POST['email'] ?? '')) : '',
+                'error_message' => $message,
             ]);
         }
     }

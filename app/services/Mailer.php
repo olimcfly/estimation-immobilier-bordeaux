@@ -12,6 +12,11 @@ final class Mailer
 {
     public static function send(string $to, string $subject, string $htmlBody): bool
     {
+        if (!class_exists(PHPMailer::class)) {
+            error_log('Mailer error: PHPMailer is not installed. Run "composer install".');
+            return false;
+        }
+
         $mail = new PHPMailer(true);
 
         try {

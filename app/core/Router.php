@@ -58,7 +58,7 @@ final class Router
 
         try {
             $controller->{$controllerMethod}(...$params);
-        } catch (\RuntimeException $e) {
+        } catch (\Throwable $e) {
             error_log(sprintf('[router][error] %s::%s - %s', $controllerClass, $controllerMethod, $e->getMessage()));
             http_response_code(500);
             header('Content-Type: text/html; charset=utf-8');
