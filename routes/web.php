@@ -7,6 +7,7 @@ use App\Controllers\AdminDatabaseController;
 use App\Controllers\AdminEmailController;
 use App\Controllers\AdminImageController;
 use App\Controllers\AdminSequenceController;
+use App\Controllers\AdminDiagnosticController;
 use App\Controllers\AuthController;
 use App\Controllers\BlogController;
 use App\Controllers\EstimationController;
@@ -24,7 +25,7 @@ $router->post('/lead', [EstimationController::class, 'storeLead']);
 $router->get('/admin/login', [AuthController::class, 'loginForm']);
 $router->post('/admin/login', [AuthController::class, 'login']);
 $router->get('/admin/logout', [AuthController::class, 'logout']);
-$router->get('/admin/diagnostic', [AuthController::class, 'diagnostic']);
+$router->get('/admin/diagnostic', [AdminDiagnosticController::class, 'index']);
 $router->get('/admin/test-smtp', [AuthController::class, 'testSmtp']);
 
 // Protected admin routes
