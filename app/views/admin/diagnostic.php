@@ -543,7 +543,92 @@
     </div>
   </div>
 
-  <!-- 7. Issues -->
+  <!-- 7. DEV_SKIP_AUTH Toggle -->
+  <div class="diag-card diag-card-full">
+    <div class="diag-card-header">
+      <h3><i class="fas fa-code"></i> Mode D&eacute;veloppeur (DEV_SKIP_AUTH)</h3>
+      <span class="diag-status <?= $devSkipAuth ? 'diag-status-warn' : 'diag-status-ok' ?>" id="dev-skip-auth-status">
+        <i class="fas <?= $devSkipAuth ? 'fa-exclamation-triangle' : 'fa-check-circle' ?>"></i>
+        <?= $devSkipAuth ? 'Activ&eacute;' : 'D&eacute;sactiv&eacute;' ?>
+      </span>
+    </div>
+    <div class="diag-card-body">
+      <div class="diag-row">
+        <span class="diag-row-label">Contourner l'authentification admin</span>
+        <span class="diag-row-value">
+          <label style="position:relative;display:inline-block;width:48px;height:26px;cursor:pointer;">
+            <input type="checkbox" id="dev-skip-auth-toggle" <?= $devSkipAuth ? 'checked' : '' ?>
+                   style="opacity:0;width:0;height:0;">
+            <span style="position:absolute;inset:0;background:<?= $devSkipAuth ? '#d97706' : '#ccc' ?>;border-radius:26px;transition:background 0.2s;" id="dev-skip-auth-slider"></span>
+            <span style="position:absolute;top:3px;left:<?= $devSkipAuth ? '25px' : '3px' ?>;width:20px;height:20px;background:#fff;border-radius:50%;transition:left 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2);" id="dev-skip-auth-knob"></span>
+          </label>
+        </span>
+      </div>
+      <div class="diag-row">
+        <span class="diag-row-label">Variable .env</span>
+        <span class="diag-row-value muted">DEV_SKIP_AUTH=<?= $devSkipAuth ? 'true' : 'false' ?></span>
+      </div>
+      <?php if ($devSkipAuth): ?>
+        <div class="diag-advice" style="background:rgba(217,119,6,0.06);border-color:rgba(217,119,6,0.2);color:#92400e;">
+          <i class="fas fa-exclamation-triangle"></i>
+          <span><strong>Attention :</strong> L'authentification est d&eacute;sactiv&eacute;e. Toute personne acc&eacute;dant &agrave; <code>/admin</code> sera automatiquement connect&eacute;e en tant que &laquo; Dev Admin &raquo;. <strong>Ne pas utiliser en production.</strong></span>
+        </div>
+      <?php else: ?>
+        <div class="diag-advice" style="background:rgba(34,197,94,0.06);border-color:rgba(34,197,94,0.2);color:#16a34a;">
+          <i class="fas fa-shield-alt"></i>
+          <span>L'authentification fonctionne normalement. Activez le mode d&eacute;veloppeur uniquement pour les tests locaux.</span>
+        </div>
+      <?php endif; ?>
+      <div id="dev-skip-auth-msg" style="display:none;margin-top:0.75rem;padding:0.6rem 1rem;border-radius:6px;font-size:0.85rem;font-weight:500;"></div>
+    </div>
+  </div>
+
+  <script>
+  (function() {
+    var toggle = document.getElementById('dev-skip-auth-toggle');
+    var slider = document.getElementById('dev-skip-auth-slider');
+    var knob = document.getElementById('dev-skip-auth-knob');
+    var status = document.getElementById('dev-skip-auth-status');
+    var msgBox = document.getElementById('dev-skip-auth-msg');
+    if (!toggle) return;
+
+    toggle.addEventListener('change', function() {
+      var enable = toggle.checked;
+      var fd = new FormData();
+      fd.append('enable', enable ? '1' : '0');
+
+      slider.style.background = enable ? '#d97706' : '#ccc';
+      knob.style.left = enable ? '25px' : '3px';
+
+      fetch('/admin/dev-skip-auth/toggle', { method: 'POST', body: fd })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          if (data.success) {
+            status.className = 'diag-status ' + (data.enabled ? 'diag-status-warn' : 'diag-status-ok');
+            status.innerHTML = '<i class="fas ' + (data.enabled ? 'fa-exclamation-triangle' : 'fa-check-circle') + '"></i> ' + (data.enabled ? 'Activ\u00e9' : 'D\u00e9sactiv\u00e9');
+            msgBox.style.display = 'block';
+            msgBox.style.background = data.enabled ? 'rgba(217,119,6,0.08)' : 'rgba(34,197,94,0.08)';
+            msgBox.style.color = data.enabled ? '#92400e' : '#16a34a';
+            msgBox.textContent = data.message;
+            setTimeout(function() { msgBox.style.display = 'none'; }, 4000);
+          } else {
+            toggle.checked = !enable;
+            slider.style.background = !enable ? '#d97706' : '#ccc';
+            knob.style.left = !enable ? '25px' : '3px';
+            alert('Erreur : ' + (data.error || 'Erreur inconnue'));
+          }
+        })
+        .catch(function() {
+          toggle.checked = !enable;
+          slider.style.background = !enable ? '#d97706' : '#ccc';
+          knob.style.left = !enable ? '25px' : '3px';
+          alert('Erreur de connexion');
+        });
+    });
+  })();
+  </script>
+
+  <!-- 8. Issues -->
   <?php if (!empty($issues)): ?>
   <div class="diag-card diag-card-full">
     <div class="diag-card-header">

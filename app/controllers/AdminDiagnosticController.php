@@ -140,11 +140,18 @@ final class AdminDiagnosticController
             $issues[] = 'La connexion SMTP a échoué.';
         }
 
+        // 9. DEV_SKIP_AUTH status
+        $devSkipAuth = AuthController::isLoggedIn() && filter_var(
+            $_ENV['DEV_SKIP_AUTH'] ?? $_SERVER['DEV_SKIP_AUTH'] ?? 'false',
+            FILTER_VALIDATE_BOOLEAN
+        );
+
         View::renderAdmin('admin/diagnostic', [
             'page_title' => 'Diagnostic - Admin',
             'admin_page_title' => 'Diagnostic',
             'admin_page' => 'diagnostic',
             'breadcrumb' => 'Diagnostic',
+            'devSkipAuth' => $devSkipAuth,
             'envExists' => $envExists,
             'dbConfig' => $dbConfig,
             'dbPassDefined' => $dbPassDefined,

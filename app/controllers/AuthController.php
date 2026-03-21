@@ -240,6 +240,52 @@ final class AuthController
         return filter_var($value, FILTER_VALIDATE_BOOLEAN);
     }
 
+    /**
+     * Toggle DEV_SKIP_AUTH in the .env file (admin AJAX endpoint).
+     */
+    public function toggleDevSkipAuth(): void
+    {
+        self::requireAuth();
+
+        header('Content-Type: application/json; charset=utf-8');
+
+        $enable = filter_var($_POST['enable'] ?? 'false', FILTER_VALIDATE_BOOLEAN);
+        $newValue = $enable ? 'true' : 'false';
+
+        $envFile = dirname(__DIR__, 2) . '/.env';
+        if (!is_file($envFile)) {
+            echo json_encode(['success' => false, 'error' => 'Fichier .env introuvable']);
+            return;
+        }
+
+        $envContent = (string) file_get_contents($envFile);
+
+        if (preg_match('/^DEV_SKIP_AUTH=/m', $envContent)) {
+            $envContent = preg_replace(
+                '/^DEV_SKIP_AUTH=.*$/m',
+                'DEV_SKIP_AUTH=' . $newValue,
+                $envContent
+            );
+        } else {
+            $envContent = rtrim($envContent) . "\nDEV_SKIP_AUTH=" . $newValue . "\n";
+        }
+
+        $written = file_put_contents($envFile, $envContent);
+        if ($written === false) {
+            echo json_encode(['success' => false, 'error' => 'Impossible d\'ecrire dans .env']);
+            return;
+        }
+
+        $_ENV['DEV_SKIP_AUTH'] = $newValue;
+        $_SERVER['DEV_SKIP_AUTH'] = $newValue;
+
+        echo json_encode([
+            'success' => true,
+            'enabled' => $enable,
+            'message' => $enable ? 'Mode dev active (authentification desactivee)' : 'Mode dev desactive (authentification normale)',
+        ]);
+    }
+
     public static function generateCsrfToken(): string
     {
         if (empty($_SESSION['csrf_token'])) {
