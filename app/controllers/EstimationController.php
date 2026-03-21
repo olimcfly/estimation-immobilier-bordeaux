@@ -232,6 +232,23 @@ final class EstimationController
     }
 
 
+    public function updateLeadStatut(): void
+    {
+        AuthController::requireAuth();
+        AuthController::verifyCsrfToken();
+
+        $id = isset($_POST['id']) ? (int) $_POST['id'] : 0;
+        $statut = trim((string) ($_POST['statut'] ?? ''));
+
+        if ($id > 0 && $statut !== '') {
+            $leadModel = new Lead();
+            $leadModel->updateStatut($id, $statut);
+        }
+
+        header('Location: /admin/leads');
+        exit;
+    }
+
     private function assertLeadRequestAllowed(): void
     {
         $context = $_SESSION['lead_form_context'] ?? null;

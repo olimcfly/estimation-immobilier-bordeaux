@@ -88,6 +88,15 @@ final class Lead
 
     public function updateStatut(int $id, string $statut): bool
     {
+        $allowed = [
+            'nouveau', 'contacte', 'rdv_pris', 'visite_realisee',
+            'mandat_simple', 'mandat_exclusif', 'compromis_vente',
+            'signe', 'co_signature_partenaire', 'assigne_autre',
+        ];
+        if (!in_array($statut, $allowed, true)) {
+            return false;
+        }
+
         $sql = 'UPDATE leads
                 SET statut = :statut
                 WHERE id = :id
@@ -100,6 +109,40 @@ final class Lead
         $stmt->execute();
 
         return $stmt->rowCount() > 0;
+    }
+
+    public function updateLeadDetails(int $id, array $data): bool
+    {
+        $fields = [];
+        $params = [':id' => $id, ':website_id' => $this->websiteId()];
+
+        $updatable = ['statut', 'partenaire_id', 'commission_taux', 'commission_montant',
+                      'assigne_a', 'date_mandat', 'date_compromis', 'date_signature', 'prix_vente', 'score'];
+
+        foreach ($updatable as $field) {
+            if (array_key_exists($field, $data)) {
+                $fields[] = "$field = :$field";
+                $params[":$field"] = $data[$field];
+            }
+        }
+
+        if (empty($fields)) {
+            return false;
+        }
+
+        $sql = 'UPDATE leads SET ' . implode(', ', $fields) . ' WHERE id = :id AND website_id = :website_id';
+        $stmt = Database::connection()->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->rowCount() > 0;
+    }
+
+    public function findById(int $id): ?array
+    {
+        $sql = 'SELECT * FROM leads WHERE id = :id AND website_id = :website_id';
+        $stmt = Database::connection()->prepare($sql);
+        $stmt->execute([':id' => $id, ':website_id' => $this->websiteId()]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $row ?: null;
     }
 
     private function websiteId(): int

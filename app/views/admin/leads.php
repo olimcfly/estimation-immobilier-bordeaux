@@ -200,13 +200,36 @@
     gap: 0.3rem;
     padding: 0.25rem 0.65rem;
     border-radius: 20px;
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     font-weight: 600;
   }
 
   .badge-nouveau { background: rgba(59,130,246,0.1); color: #2563eb; }
   .badge-contacte { background: rgba(245,158,11,0.1); color: #d97706; }
+  .badge-rdv_pris { background: rgba(139,92,246,0.1); color: #7c3aed; }
+  .badge-visite_realisee { background: rgba(236,72,153,0.1); color: #db2777; }
+  .badge-mandat_simple { background: rgba(14,165,233,0.1); color: #0284c7; }
+  .badge-mandat_exclusif { background: rgba(20,184,166,0.1); color: #0d9488; }
+  .badge-compromis_vente { background: rgba(249,115,22,0.1); color: #c2410c; }
   .badge-signe { background: rgba(34,197,94,0.1); color: #16a34a; }
+  .badge-co_signature_partenaire { background: rgba(168,85,247,0.1); color: #7c3aed; }
+  .badge-assigne_autre { background: rgba(100,116,139,0.1); color: #475569; }
+
+  .statut-select {
+    padding: 0.3rem 0.5rem;
+    border: 1px solid var(--admin-border);
+    border-radius: 5px;
+    font-size: 0.75rem;
+    font-family: inherit;
+    color: var(--admin-text);
+    background: #fff;
+    cursor: pointer;
+  }
+
+  .statut-select:focus {
+    outline: none;
+    border-color: var(--admin-primary);
+  }
 
   .badge-type {
     display: inline-flex;
@@ -379,12 +402,20 @@
                 'tiede' => 'fa-temperature-half',
                 default => 'fa-snowflake',
               };
-              $statutClass = match($lead['statut'] ?? '') {
-                'nouveau' => 'badge-nouveau',
-                'contacté' => 'badge-contacte',
-                'signé' => 'badge-signe',
-                default => 'badge-nouveau',
-              };
+              $statutLabels = [
+                'nouveau' => 'Nouveau',
+                'contacte' => 'Contact&eacute;',
+                'rdv_pris' => 'RDV Pris',
+                'visite_realisee' => 'Visite R&eacute;alis&eacute;e',
+                'mandat_simple' => 'Mandat Simple',
+                'mandat_exclusif' => 'Mandat Exclusif',
+                'compromis_vente' => 'Compromis',
+                'signe' => 'Sign&eacute;',
+                'co_signature_partenaire' => 'Co-signature',
+                'assigne_autre' => 'Assign&eacute;',
+              ];
+              $statutKey = $lead['statut'] ?? 'nouveau';
+              $statutClass = 'badge-' . $statutKey;
               $typeBien = $lead['type_bien'] ?? '';
               $surface = $lead['surface_m2'] ?? '';
               $pieces = $lead['pieces'] ?? '';
@@ -420,7 +451,17 @@
               <td><strong><?= number_format((float) $lead['estimation'], 0, ',', ' ') ?> &euro;</strong></td>
               <td><?= !empty($lead['urgence']) ? e((string) $lead['urgence']) : '<span style="color:var(--admin-muted);">-</span>' ?></td>
               <td><span class="badge-score <?= $scoreClass ?>"><i class="fas <?= $scoreIcon ?>"></i> <?= e((string) $lead['score']) ?></span></td>
-              <td><span class="badge-statut <?= $statutClass ?>"><?= e((string) $lead['statut']) ?></span></td>
+              <td>
+                <form method="POST" action="/admin/leads/update-statut" style="display:inline;">
+                  <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
+                  <input type="hidden" name="id" value="<?= (int)$lead['id'] ?>">
+                  <select name="statut" class="statut-select" onchange="this.form.submit()">
+                    <?php foreach ($statutLabels as $sKey => $sLabel): ?>
+                      <option value="<?= $sKey ?>" <?= $statutKey === $sKey ? 'selected' : '' ?>><?= $sLabel ?></option>
+                    <?php endforeach; ?>
+                  </select>
+                </form>
+              </td>
               <td><?= e((string) $lead['created_at']) ?></td>
             </tr>
           <?php endforeach; ?>

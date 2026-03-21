@@ -12,6 +12,8 @@ use App\Controllers\AuthController;
 use App\Controllers\BlogController;
 use App\Controllers\EstimationController;
 use App\Controllers\PageController;
+use App\Controllers\AdminDashboardController;
+use App\Controllers\AdminPartenaireController;
 use App\Controllers\ToolController;
 
 $router->get('/', [PageController::class, 'home']);
@@ -91,3 +93,17 @@ $router->post('/admin/sequences/save', [AdminSequenceController::class, 'save'])
 $router->post('/admin/sequences/delete', [AdminSequenceController::class, 'delete']);
 $router->post('/admin/sequences/save-persona', [AdminSequenceController::class, 'savePersona']);
 $router->get('/admin/sequences/article-suggestions', [AdminSequenceController::class, 'articleSuggestions']);
+
+// Admin dashboard routes
+$router->get('/admin/dashboard', [AdminDashboardController::class, 'index']);
+$router->get('/admin/funnel', [AdminDashboardController::class, 'funnel']);
+$router->get('/admin/portfolio', [AdminDashboardController::class, 'portfolio']);
+
+// Admin partenaire routes
+$router->get('/admin/partenaires', [AdminPartenaireController::class, 'index']);
+$router->get('/admin/partenaires/edit', [AdminPartenaireController::class, 'edit']);
+$router->post('/admin/partenaires/save', [AdminPartenaireController::class, 'save']);
+$router->post('/admin/partenaires/delete', [AdminPartenaireController::class, 'delete']);
+
+// Admin lead status update
+$router->post('/admin/leads/update-statut', [EstimationController::class, 'updateLeadStatut']);

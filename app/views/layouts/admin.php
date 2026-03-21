@@ -365,14 +365,27 @@ $adminEmail = $_SESSION['admin_user_email'] ?? '';
   <nav class="sidebar-nav">
     <div class="sidebar-section">
       <div class="sidebar-section-title">Principal</div>
+      <a href="/admin/dashboard" class="sidebar-link <?= $currentPage === 'dashboard' ? 'active' : '' ?>">
+        <i class="fas fa-chart-line"></i> Tableau de Bord
+      </a>
       <a href="/admin/leads" class="sidebar-link <?= $currentPage === 'leads' ? 'active' : '' ?>">
         <i class="fas fa-users"></i> Leads
         <?php if (!empty($leadCount)): ?>
           <span class="badge"><?= (int) $leadCount ?></span>
         <?php endif; ?>
       </a>
-      <a href="/admin/leads?score=chaud" class="sidebar-link <?= $currentPage === 'leads-chaud' ? 'active' : '' ?>">
-        <i class="fas fa-fire" style="color: #ef4444;"></i> Leads Chauds
+      <a href="/admin/funnel" class="sidebar-link <?= $currentPage === 'funnel' ? 'active' : '' ?>">
+        <i class="fas fa-filter"></i> Entonnoir
+      </a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Commercial</div>
+      <a href="/admin/portfolio" class="sidebar-link <?= $currentPage === 'portfolio' ? 'active' : '' ?>">
+        <i class="fas fa-briefcase"></i> Portefeuille
+      </a>
+      <a href="/admin/partenaires" class="sidebar-link <?= $currentPage === 'partenaires' ? 'active' : '' ?>">
+        <i class="fas fa-handshake"></i> Partenaires
       </a>
     </div>
 
