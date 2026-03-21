@@ -136,6 +136,7 @@
       font-size: 1.4rem;
       letter-spacing: -0.02em;
       flex-shrink: 0;
+      min-width: 200px;
     }
 
     .brand-icon {
@@ -172,7 +173,7 @@
       display: flex;
       align-items: center;
       gap: 0.4rem;
-      padding: 0.8rem 1.2rem;
+      padding: 0.8rem 0.9rem;
       text-decoration: none;
       color: var(--muted);
       font-weight: 500;
@@ -523,6 +524,8 @@
       padding: 0.9rem 2rem;
       font-size: 1rem;
       flex-shrink: 0;
+      min-width: 200px;
+      text-align: center;
     }
 
     .nav-cta-mobile {
@@ -605,9 +608,6 @@
         </ul>
       </div>
 
-      <div class="nav-item">
-        <a href="/blog" class="nav-link">Actualités</a>
-      </div>
       <div class="nav-item">
         <a href="/a-propos" class="nav-link">À propos</a>
       </div>

@@ -80,7 +80,9 @@ a {
 .top-nav {
   display: flex;
   align-items: center;
-  gap: 1.35rem;
+  justify-content: center;
+  gap: 0.5rem;
+  flex: 1;
 }
 
 .nav-item {
