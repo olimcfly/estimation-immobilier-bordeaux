@@ -111,14 +111,21 @@ if [ -d "$DEST_DIR" ]; then
 fi
 
 # Copie en excluant les éléments non nécessaires
-rsync -a --progress \
-    --exclude='.git' \
-    --exclude='vendor/' \
-    --exclude='node_modules/' \
-    --exclude='.env' \
-    --exclude='logs/*.log' \
-    --exclude='tools/' \
-    "$SOURCE_DIR/" "$DEST_DIR/"
+if command -v rsync &> /dev/null; then
+    rsync -a --progress \
+        --exclude='.git' \
+        --exclude='vendor/' \
+        --exclude='node_modules/' \
+        --exclude='.env' \
+        --exclude='logs/*.log' \
+        --exclude='tools/' \
+        "$SOURCE_DIR/" "$DEST_DIR/"
+else
+    cp -r "$SOURCE_DIR/" "$DEST_DIR/"
+    # Nettoyage des éléments exclus
+    rm -rf "$DEST_DIR/.git" "$DEST_DIR/vendor" "$DEST_DIR/node_modules" "$DEST_DIR/.env" "$DEST_DIR/tools"
+    find "$DEST_DIR/logs" -name "*.log" -delete 2>/dev/null || true
+fi
 
 log_ok "Projet copié dans $DEST_DIR"
 
@@ -222,56 +229,7 @@ log_info "Génération des données de quartiers..."
 
 QUARTIERS_FILE="$DEST_DIR/app/views/pages/quartiers.php"
 if [ -f "$QUARTIERS_FILE" ]; then
-    # Générer le nouveau tableau PHP des quartiers à partir du JSON
-    QUARTIERS_PHP=$(python3 << 'PYEOF'
-import json, sys
-
-with open(sys.argv[1]) as f:
-    data = json.load(f)
-
-city = data[sys.argv[2]]
-quartiers = city["quartiers"]
-
-lines = []
-lines.append("$quartiers = [")
-for i, q in enumerate(quartiers):
-    lines.append("    [")
-    lines.append(f"        'nom' => '{q['nom']}',")
-    desc = q['description'].replace("'", "\\'")
-    lines.append(f"        'description' => \"{q['description']}\",")
-    lines.append(f"        'prix_m2' => {q['prix_m2']},")
-    lines.append(f"        'prix_moyen' => {q['prix_moyen']},")
-    carac = "', '".join(q['caracteristiques'])
-    lines.append(f"        'caracteristiques' => ['{carac}'],")
-    lines.append(f"        'population' => '{q['population']}',")
-    lines.append(f"        'transports' => '{q['transports']}',")
-    lines.append(f"        'attractivite' => '{q['attractivite']}',")
-    lines.append(f"        'coords' => '{q['coords']}',")
-    lines.append(f"        'tendance' => '{q['tendance']}',")
-    lines.append("    ],")
-
-lines.append("];")
-print("\n".join(lines))
-PYEOF
-    "$CITIES_FILE" "$CITY_SLUG")
-
-    # Remplacer le bloc $quartiers dans le fichier
-    # On utilise Python pour un remplacement multi-lignes fiable
-    python3 << PYEOF
-import re
-
-with open("$QUARTIERS_FILE", "r") as f:
-    content = f.read()
-
-# Remplacer le bloc \$quartiers = [...];
-new_quartiers = """$QUARTIERS_PHP"""
-pattern = r'\$quartiers\s*=\s*\[.*?\];'
-content = re.sub(pattern, new_quartiers, content, flags=re.DOTALL)
-
-with open("$QUARTIERS_FILE", "w") as f:
-    f.write(content)
-PYEOF
-
+    python3 "$SCRIPT_DIR/generate-quartiers.py" "$CITIES_FILE" "$CITY_SLUG" "$QUARTIERS_FILE"
     log_ok "Quartiers générés"
 fi
 
@@ -339,17 +297,18 @@ if [ -d "$LANDING_DIR" ]; then
 fi
 
 # =============================================================================
-# ÉTAPE 11: Initialiser git
+# ÉTAPE 11: Initialiser git (optionnel)
 # =============================================================================
-log_info "Initialisation du dépôt Git..."
-
-cd "$DEST_DIR"
-git init
-git add -A
-git commit -m "Initial commit: Estimation Immobilier $CITY_NAME (dupliqué depuis Bordeaux)"
-cd - > /dev/null
-
-log_ok "Dépôt Git initialisé"
+if [ "${SKIP_GIT_INIT:-0}" != "1" ]; then
+    log_info "Initialisation du dépôt Git..."
+    cd "$DEST_DIR"
+    if git init && git add -A && git commit -m "Initial commit: Estimation Immobilier $CITY_NAME (dupliqué depuis Bordeaux)" 2>/dev/null; then
+        log_ok "Dépôt Git initialisé"
+    else
+        log_warn "Git init ignoré (non bloquant)"
+    fi
+    cd - > /dev/null
+fi
 
 # =============================================================================
 # ÉTAPE 12: Installer les dépendances (si composer disponible)
