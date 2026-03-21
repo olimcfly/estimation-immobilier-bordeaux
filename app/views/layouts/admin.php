@@ -385,6 +385,24 @@
 
   <nav class="admin-sidebar-nav">
     <div class="admin-sidebar-section">Principal</div>
+    <a href="/admin" class="admin-sidebar-link <?= ($admin_page ?? '') === 'dashboard' ? 'active' : '' ?>">
+      <i class="fas fa-tachometer-alt"></i> Tableau de bord
+    </a>
+    <a href="/admin/leads" class="admin-sidebar-link <?= ($admin_page ?? '') === 'leads' ? 'active' : '' ?>">
+      <i class="fas fa-users"></i> Leads
+    </a>
+    <a href="/admin/partenaires" class="admin-sidebar-link <?= ($admin_page ?? '') === 'partenaires' ? 'active' : '' ?>">
+      <i class="fas fa-handshake"></i> Partenaires
+    </a>
+
+    <div class="admin-sidebar-section">Contenu</div>
+    <a href="/admin/blog" class="admin-sidebar-link <?= ($admin_page ?? '') === 'blog' ? 'active' : '' ?>">
+      <i class="fas fa-pen-fancy"></i> Articles Blog
+    </a>
+    <a href="/admin/actualites" class="admin-sidebar-link <?= ($admin_page ?? '') === 'actualites' ? 'active' : '' ?>">
+      <i class="fas fa-newspaper"></i> Actualités
+    </a>
+    <a href="/admin/images" class="admin-sidebar-link <?= ($admin_page ?? '') === 'images' ? 'active' : '' ?>">
     <a href="/admin/leads" class="admin-sidebar-link <?= $currentPage === 'leads' ? 'active' : '' ?>">
       <i class="fas fa-users"></i> Leads
       <?php if (!empty($leadCount)): ?>
@@ -407,6 +425,14 @@
     </a>
 
     <div class="admin-sidebar-section">Outils</div>
+    <a href="/admin/api-management" class="admin-sidebar-link <?= ($admin_page ?? '') === 'api-management' ? 'active' : '' ?>">
+      <i class="fas fa-key"></i> API
+    </a>
+    <a href="/admin/diagnostic" class="admin-sidebar-link <?= ($admin_page ?? '') === 'diagnostic' ? 'active' : '' ?>">
+      <i class="fas fa-stethoscope"></i> Diagnostic
+    </a>
+    <a href="/admin/test-smtp" class="admin-sidebar-link <?= ($admin_page ?? '') === 'smtp' ? 'active' : '' ?>">
+      <i class="fas fa-envelope"></i> SMTP
     <a href="/admin/diagnostic" class="admin-sidebar-link <?= $currentPage === 'diagnostic' ? 'active' : '' ?>" target="_blank">
       <i class="fas fa-stethoscope"></i> Diagnostic DB
     </a>
