@@ -13,15 +13,24 @@ final class AdminBlogController
 {
     public function index(): void
     {
-        $articleModel = new Article();
+        $articles = [];
+        $dbError = null;
+
+        try {
+            $articleModel = new Article();
+            $articles = $articleModel->findAll();
+        } catch (\Throwable $e) {
+            error_log('Blog index error: ' . $e->getMessage());
+            $dbError = 'Erreur base de données : la table "articles" est peut-être absente. Exécutez "php database/migrate.php".';
+        }
 
         View::renderAdmin('admin/blog/index', [
             'page_title' => 'Blog - Admin',
             'admin_page_title' => 'Blog / CMS',
             'admin_current_page' => 'blog',
-            'articles' => $articleModel->findAll(),
+            'articles' => $articles,
             'message' => (string) ($_GET['message'] ?? ''),
-            'error' => (string) ($_GET['error'] ?? ''),
+            'error' => $dbError ?? (string) ($_GET['error'] ?? ''),
         ]);
     }
 
