@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Controllers\AdminBlogController;
+use App\Controllers\AdminImageController;
 use App\Controllers\AuthController;
 use App\Controllers\BlogController;
 use App\Controllers\EstimationController;
@@ -47,3 +48,20 @@ $router->get('/conditions-utilisation', [PageController::class, 'conditionsUtili
 $router->get('/rgpd', [PageController::class, 'rgpd']);
 
 $router->get('/tools/calculatrice', [ToolController::class, 'calculatrice']);
+
+// Admin blog routes
+$router->get('/admin/blog', [AdminBlogController::class, 'index']);
+$router->get('/admin/blog/create', [AdminBlogController::class, 'create']);
+$router->post('/admin/blog/store', [AdminBlogController::class, 'store']);
+$router->get('/admin/blog/edit/{id}', [AdminBlogController::class, 'edit']);
+$router->post('/admin/blog/update/{id}', [AdminBlogController::class, 'update']);
+$router->get('/admin/blog/delete/{id}', [AdminBlogController::class, 'delete']);
+$router->post('/admin/blog/generate', [AdminBlogController::class, 'generate']);
+$router->post('/admin/blog/restore/{id}/{revisionId}', [AdminBlogController::class, 'restoreRevision']);
+
+// Admin AI image generation routes
+$router->get('/admin/images', [AdminImageController::class, 'index']);
+$router->post('/admin/images/generate', [AdminImageController::class, 'generate']);
+$router->post('/admin/images/delete', [AdminImageController::class, 'delete']);
+$router->post('/admin/api/images/generate', [AdminImageController::class, 'apiGenerate']);
+$router->get('/admin/api/images/seo-prompt', [AdminImageController::class, 'apiSeoPrompt']);
