@@ -36,6 +36,7 @@ $router->get('/admin/login', [AuthController::class, 'loginForm']);
 $router->post('/admin/login', [AuthController::class, 'login']);
 $router->get('/admin/logout', [AuthController::class, 'logout']);
 $router->get('/admin/diagnostic', [AdminDiagnosticController::class, 'index']);
+$router->get('/admin/diagnostic/database', [AdminDiagnosticController::class, 'databaseDiagnostic']);
 $router->get('/admin/test-smtp', [AuthController::class, 'testSmtp']);
 $router->post('/admin/test-smtp/save', [AuthController::class, 'testSmtpSave']);
 $router->post('/admin/test-smtp/reset', [AuthController::class, 'testSmtpReset']);

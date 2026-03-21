@@ -284,6 +284,7 @@
   <h1><i class="fas fa-stethoscope"></i> Diagnostic syst&egrave;me</h1>
   <div class="diag-actions">
     <a href="/admin/diagnostic" class="btn-refresh"><i class="fas fa-sync-alt"></i> Rafra&icirc;chir</a>
+    <a href="/admin/diagnostic/database" class="btn-smtp"><i class="fas fa-database"></i> Diagnostic BDD</a>
     <a href="/admin/test-smtp" class="btn-smtp"><i class="fas fa-envelope-open-text"></i> Test SMTP</a>
   </div>
 </div>
