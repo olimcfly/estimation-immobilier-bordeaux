@@ -12,6 +12,7 @@ use App\Controllers\AuthController;
 use App\Controllers\BlogController;
 use App\Controllers\EstimationController;
 use App\Controllers\PageController;
+use App\Controllers\LandingPageController;
 use App\Controllers\ToolController;
 
 $router->get('/', [PageController::class, 'home']);
@@ -91,3 +92,12 @@ $router->post('/admin/sequences/save', [AdminSequenceController::class, 'save'])
 $router->post('/admin/sequences/delete', [AdminSequenceController::class, 'delete']);
 $router->post('/admin/sequences/save-persona', [AdminSequenceController::class, 'savePersona']);
 $router->get('/admin/sequences/article-suggestions', [AdminSequenceController::class, 'articleSuggestions']);
+
+// Google Ads Landing Pages (capture pages — no navigation)
+$router->get('/lp/estimation-bordeaux', [LandingPageController::class, 'estimationBordeaux']);
+$router->get('/lp/vendre-maison-bordeaux', [LandingPageController::class, 'vendreMaisonBordeaux']);
+$router->get('/lp/avis-valeur-gratuit', [LandingPageController::class, 'avisValeurGratuit']);
+$router->post('/lp/submit', [LandingPageController::class, 'submitLead']);
+
+// Admin: Google Ads guide & best practices
+$router->get('/admin/google-ads', [LandingPageController::class, 'guide']);
