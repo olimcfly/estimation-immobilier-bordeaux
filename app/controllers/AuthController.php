@@ -110,20 +110,12 @@ final class AuthController
             $this->buildCodeEmail($code, (string) ($user['name'] ?? 'Administrateur'))
         );
 
-        if (!$sent) {
-            View::renderBare('admin/login', [
-                'page_title' => 'Connexion Admin - Estimation Immobilier Bordeaux',
-                'step' => 'email',
-                'error_message' => 'Impossible d\'envoyer l\'email. Vérifiez la configuration SMTP.',
-            ]);
-            return;
-        }
-
         View::renderBare('admin/login', [
             'page_title' => 'Connexion Admin - Estimation Immobilier Bordeaux',
             'step' => 'code',
             'login_email' => $email,
-            'success_message' => 'Un code de connexion a été envoyé à votre adresse email.',
+            'success_message' => $sent ? 'Un code de connexion a été envoyé à votre adresse email.' : null,
+            'error_message' => $sent ? null : 'L\'email n\'a pas pu être envoyé. Vérifiez la configuration SMTP dans l\'administration ou cliquez sur « Renvoyer le code ».',
         ]);
     }
 

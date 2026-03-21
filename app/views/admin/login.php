@@ -311,9 +311,15 @@ $step = $step ?? 'email';
           <input type="hidden" name="csrf_token" value="<?= e($csrfToken) ?>">
           <input type="hidden" name="action" value="send_code">
           <input type="hidden" name="email" value="<?= e($login_email ?? '') ?>">
+          <?php if (!empty($error_message)): ?>
+          <button type="submit" class="btn-submit" style="background: linear-gradient(135deg, #f97316, #ea580c); margin-bottom: 0.5rem;">
+            <i class="fas fa-redo" style="margin-right: 0.5rem;"></i>Renvoyer le code
+          </button>
+          <?php else: ?>
           <button type="submit" class="back-link" style="background: none; border: none; cursor: pointer; font-family: inherit; font-size: 0.85rem; color: var(--muted);">
             <i class="fas fa-redo"></i> Renvoyer le code
           </button>
+          <?php endif; ?>
         </form>
       </div>
 
