@@ -45,6 +45,7 @@ final class AdminLeadController
 
         View::renderAdmin('admin/leads', [
             'page_title' => 'Leads - Admin CRM',
+            'admin_page_title' => 'Leads',
             'admin_page' => 'leads',
             'breadcrumb' => 'Leads',
             'leads' => $leads,

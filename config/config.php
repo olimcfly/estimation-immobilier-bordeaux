@@ -61,6 +61,21 @@ return [
         'model' => $_ENV['OPENAI_MODEL'] ?? 'gpt-4o-mini',
         'endpoint' => $_ENV['OPENAI_ENDPOINT'] ?? 'https://api.openai.com/v1/chat/completions',
     ],
+    'anthropic' => [
+        'api_key' => $_ENV['ANTHROPIC_API_KEY'] ?? '',
+        'model' => $_ENV['ANTHROPIC_MODEL'] ?? 'claude-sonnet-4-20250514',
+    ],
+    'google_maps' => [
+        'api_key' => $_ENV['GOOGLE_MAPS_API_KEY'] ?? '',
+    ],
+    'sms_partner' => [
+        'api_key' => $_ENV['SMSPARTNER_API_KEY'] ?? '',
+    ],
+    'twilio' => [
+        'account_sid' => $_ENV['TWILIO_ACCOUNT_SID'] ?? '',
+        'auth_token' => $_ENV['TWILIO_AUTH_TOKEN'] ?? '',
+        'phone_number' => $_ENV['TWILIO_PHONE_NUMBER'] ?? '',
+    ],
     'city' => [
         'name' => CITY_NAME,
         'region' => CITY_REGION,

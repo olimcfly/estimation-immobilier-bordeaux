@@ -219,6 +219,7 @@ final class AdminDiagnosticController
 
         View::renderAdmin('admin/diagnostic', [
             'page_title' => 'Diagnostic - Admin',
+            'admin_page_title' => 'Diagnostic',
             'admin_page' => 'diagnostic',
             'breadcrumb' => 'Diagnostic',
             'diagnostics' => $diagnostics,

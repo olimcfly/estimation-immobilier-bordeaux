@@ -129,6 +129,7 @@ final class AdminSequenceController
 
         View::renderAdmin('admin/sequences', [
             'page_title' => 'S&eacute;quences Email & Personas',
+            'admin_page_title' => 'Séquences Email',
             'admin_page' => 'sequences',
             'breadcrumb' => 'S&eacute;quences',
             'sequences' => $sequences,

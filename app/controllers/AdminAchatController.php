@@ -47,6 +47,7 @@ final class AdminAchatController
 
         View::renderAdmin('admin/achats', [
             'page_title' => 'Achats - Admin CRM',
+            'admin_page_title' => 'Achats',
             'admin_page' => 'achats',
             'breadcrumb' => 'Achats',
             'achats' => $achats,

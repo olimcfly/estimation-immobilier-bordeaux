@@ -14,6 +14,7 @@ final class AdminSocialImageController
 
         View::renderAdmin('admin/social-images/index', [
             'page_title' => 'Images Réseaux Sociaux',
+            'admin_page_title' => 'Images Sociales',
             'admin_page' => 'social-images',
             'breadcrumb' => 'Images Sociales',
             'images' => $images,

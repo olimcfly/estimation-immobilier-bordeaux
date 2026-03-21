@@ -195,7 +195,8 @@ final class LandingPageController
 
         View::renderAdmin('admin/landing-guide', [
             'page_title'  => 'Guide Google Ads & Landing Pages',
-            'admin_page'  => 'landing-guide',
+            'admin_page_title' => 'Google Ads',
+            'admin_page'  => 'google-ads',
             'breadcrumb'  => 'Guide Google Ads',
         ]);
     }

@@ -29,6 +29,13 @@ final class AdminDashboardController
         // Nouveaux leads aujourd'hui
         $stmt = $pdo->prepare('SELECT COUNT(*) FROM leads WHERE website_id = :wid AND lead_type = :lt AND DATE(created_at) = CURDATE()');
         $stmt->execute([':wid' => $websiteId, ':lt' => 'qualifie']);
+        $stmt = $pdo->prepare('SELECT COUNT(*) as total FROM leads WHERE website_id = :wid AND lead_type = :lt');
+        $stmt->execute([':wid' => $websiteId, ':lt' => 'qualifie']);
+        $stats['total_leads'] = (int) $stmt->fetchColumn();
+
+        // New leads today
+        $stmt = $pdo->prepare('SELECT COUNT(*) FROM leads WHERE website_id = :wid AND lead_type = :lt AND DATE(created_at) = CURDATE()');
+        $stmt->execute([':wid' => $websiteId, ':lt' => 'qualifie']);
         $stats['new_leads_today'] = (int) $stmt->fetchColumn();
 
         // Leads par score
@@ -36,6 +43,27 @@ final class AdminDashboardController
         $stmt->execute([':wid' => $websiteId, ':lt' => 'qualifie']);
         $scoreData = $stmt->fetchAll(PDO::FETCH_KEY_PAIR) ?: [];
         $stats['hot_leads'] = (int) ($scoreData['chaud'] ?? 0);
+        $stats['leads_tiede'] = (int) ($scoreData['tiede'] ?? 0);
+        $stats['leads_froid'] = (int) ($scoreData['froid'] ?? 0);
+
+        // Pending leads (nouveau status, awaiting contact)
+        $stmt = $pdo->prepare('SELECT COUNT(*) FROM leads WHERE website_id = :wid AND lead_type = :lt AND statut = :st');
+        $stmt->execute([':wid' => $websiteId, ':lt' => 'qualifie', ':st' => 'nouveau']);
+        $stats['pending_leads'] = (int) $stmt->fetchColumn();
+
+        // Article stats
+        if (Database::tableExists('articles')) {
+            $stmt = $pdo->prepare('SELECT COUNT(*) FROM articles WHERE website_id = :wid AND status = :st');
+            $stmt->execute([':wid' => $websiteId, ':st' => 'published']);
+            $stats['total_articles'] = (int) $stmt->fetchColumn();
+
+            $stmt = $pdo->prepare('SELECT COUNT(*) FROM articles WHERE website_id = :wid AND status = :st');
+            $stmt->execute([':wid' => $websiteId, ':st' => 'draft']);
+            $stats['draft_articles'] = (int) $stmt->fetchColumn();
+        } else {
+            $stats['total_articles'] = 0;
+            $stats['draft_articles'] = 0;
+        }
 
         // Leads par statut (pipeline)
         $stmt = $pdo->prepare('SELECT statut, COUNT(*) as cnt FROM leads WHERE website_id = :wid AND lead_type = :lt GROUP BY statut');
@@ -108,10 +136,12 @@ final class AdminDashboardController
 
         View::renderAdmin('admin/dashboard', [
             'page_title' => 'Tableau de Bord - Admin CRM',
+            'admin_page_title' => 'Tableau de bord',
             'admin_page' => 'dashboard',
             'breadcrumb' => 'Tableau de Bord',
             'stats' => $stats,
             'recent_leads' => $recentLeads,
+            'recent_leads' => $stats['leads_recents'],
         ]);
     }
 
@@ -175,6 +205,7 @@ final class AdminDashboardController
 
         View::renderAdmin('admin/funnel', [
             'page_title' => 'Entonnoir de Vente - Admin CRM',
+            'admin_page_title' => 'Funnel de vente',
             'admin_page' => 'funnel',
             'breadcrumb' => 'Entonnoir de Vente',
             'pipelineData' => $pipelineData,
@@ -238,6 +269,7 @@ final class AdminDashboardController
 
         View::renderAdmin('admin/portfolio', [
             'page_title' => 'Portefeuille Client - Admin CRM',
+            'admin_page_title' => 'Portfolio',
             'admin_page' => 'portfolio',
             'breadcrumb' => 'Portefeuille Client',
             'leads' => $leads,

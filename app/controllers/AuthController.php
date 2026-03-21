@@ -421,6 +421,7 @@ final class AuthController
 
         View::renderAdmin('admin/test-smtp', [
             'admin_page'     => 'smtp',
+            'admin_page_title' => 'Test SMTP',
             'page_title'     => 'Configuration SMTP',
             'breadcrumb'     => 'Configuration SMTP',
             'smtp_host'      => $smtpHost,
