@@ -46,9 +46,12 @@ final class EstimationController
             $dbError = 'Base de données indisponible : les leads ne peuvent pas être chargés.';
         }
 
-        View::render('admin/leads', [
-            'page_title' => 'Gestion des Leads - Admin',
+        View::renderAdmin('admin/leads', [
+            'page_title' => 'Leads - Admin CRM',
+            'admin_page' => 'leads',
+            'breadcrumb' => 'Leads',
             'leads' => $leads,
+            'leadCount' => count($leads),
             'dbError' => $dbError,
         ]);
     }
