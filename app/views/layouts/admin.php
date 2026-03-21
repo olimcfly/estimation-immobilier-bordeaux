@@ -383,28 +383,60 @@
     </span>
   </a>
 
+  <?php $current = $admin_current_page ?? $admin_page ?? ''; ?>
   <nav class="admin-sidebar-nav">
     <div class="admin-sidebar-section">Principal</div>
-    <a href="/admin" class="admin-sidebar-link <?= ($admin_current_page ?? '') === 'dashboard' ? 'active' : '' ?>">
+    <a href="/admin" class="admin-sidebar-link <?= $current === 'dashboard' ? 'active' : '' ?>">
       <i class="fas fa-tachometer-alt"></i> Tableau de bord
     </a>
-    <a href="/admin/leads" class="admin-sidebar-link <?= ($admin_current_page ?? '') === 'leads' ? 'active' : '' ?>">
+    <a href="/admin/leads" class="admin-sidebar-link <?= $current === 'leads' ? 'active' : '' ?>">
       <i class="fas fa-users"></i> Leads
+    </a>
+    <a href="/admin/achats" class="admin-sidebar-link <?= $current === 'achats' ? 'active' : '' ?>">
+      <i class="fas fa-shopping-cart"></i> Achats
+    </a>
+
+    <div class="admin-sidebar-section">Commercial</div>
+    <a href="/admin/funnel" class="admin-sidebar-link <?= $current === 'funnel' ? 'active' : '' ?>">
+      <i class="fas fa-filter"></i> Funnel de vente
+    </a>
+    <a href="/admin/portfolio" class="admin-sidebar-link <?= $current === 'portfolio' ? 'active' : '' ?>">
+      <i class="fas fa-briefcase"></i> Portfolio
+    </a>
+    <a href="/admin/partenaires" class="admin-sidebar-link <?= $current === 'partenaires' ? 'active' : '' ?>">
+      <i class="fas fa-handshake"></i> Partenaires
     </a>
 
     <div class="admin-sidebar-section">Contenu</div>
-    <a href="/admin/blog" class="admin-sidebar-link <?= ($admin_current_page ?? '') === 'blog' ? 'active' : '' ?>">
+    <a href="/admin/blog" class="admin-sidebar-link <?= $current === 'blog' ? 'active' : '' ?>">
       <i class="fas fa-newspaper"></i> Blog / CMS
     </a>
-    <a href="/admin/images" class="admin-sidebar-link <?= ($admin_current_page ?? '') === 'images' ? 'active' : '' ?>">
+    <a href="/admin/images" class="admin-sidebar-link <?= $current === 'images' ? 'active' : '' ?>">
       <i class="fas fa-images"></i> Images IA
+    </a>
+    <a href="/admin/social-images" class="admin-sidebar-link <?= $current === 'social-images' ? 'active' : '' ?>">
+      <i class="fas fa-share-nodes"></i> Images Sociales
+    </a>
+
+    <div class="admin-sidebar-section">Marketing</div>
+    <a href="/admin/emails" class="admin-sidebar-link <?= $current === 'emails' ? 'active' : '' ?>">
+      <i class="fas fa-envelope"></i> Templates Email
+    </a>
+    <a href="/admin/sequences" class="admin-sidebar-link <?= $current === 'sequences' ? 'active' : '' ?>">
+      <i class="fas fa-layer-group"></i> Séquences Email
+    </a>
+    <a href="/admin/google-ads" class="admin-sidebar-link <?= $current === 'google-ads' ? 'active' : '' ?>">
+      <i class="fab fa-google"></i> Google Ads
     </a>
 
     <div class="admin-sidebar-section">Outils</div>
-    <a href="/admin/diagnostic" class="admin-sidebar-link <?= ($admin_current_page ?? '') === 'diagnostic' ? 'active' : '' ?>">
+    <a href="/admin/database" class="admin-sidebar-link <?= $current === 'database' ? 'active' : '' ?>">
+      <i class="fas fa-database"></i> Base de données
+    </a>
+    <a href="/admin/diagnostic" class="admin-sidebar-link <?= $current === 'diagnostic' ? 'active' : '' ?>">
       <i class="fas fa-stethoscope"></i> Diagnostic
     </a>
-    <a href="/admin/test-smtp" class="admin-sidebar-link <?= ($admin_current_page ?? '') === 'smtp' ? 'active' : '' ?>">
+    <a href="/admin/test-smtp" class="admin-sidebar-link <?= $current === 'smtp' ? 'active' : '' ?>">
       <i class="fas fa-envelope-circle-check"></i> Test SMTP
     </a>
     <a href="/" class="admin-sidebar-link" target="_blank">

@@ -2,11 +2,18 @@
 
 declare(strict_types=1);
 
+use App\Controllers\AdminAchatController;
 use App\Controllers\AdminBlogController;
 use App\Controllers\AdminController;
+use App\Controllers\AdminDashboardController;
+use App\Controllers\AdminDatabaseController;
+use App\Controllers\AdminEmailController;
 use App\Controllers\AdminImageController;
+use App\Controllers\AdminLeadController;
+use App\Controllers\AdminPartenaireController;
 use App\Controllers\AdminSequenceController;
 use App\Controllers\AdminDiagnosticController;
+use App\Controllers\AdminSocialImageController;
 use App\Controllers\AuthController;
 use App\Controllers\BlogController;
 use App\Controllers\EstimationController;
@@ -33,8 +40,39 @@ $router->post('/admin/test-smtp/run', [AuthController::class, 'testSmtpRun']);
 $router->post('/admin/test-smtp/send', [AuthController::class, 'testSmtpSendEmail']);
 
 // Protected admin routes
-$router->get('/admin', [AdminController::class, 'dashboard']);
-$router->get('/admin/leads', [EstimationController::class, 'leads']);
+$router->get('/admin', [AdminDashboardController::class, 'index']);
+$router->get('/admin/leads', [AdminLeadController::class, 'index']);
+$router->get('/admin/leads/{id}', [AdminLeadController::class, 'show']);
+$router->get('/admin/leads/edit/{id}', [AdminLeadController::class, 'edit']);
+$router->post('/admin/leads/update/{id}', [AdminLeadController::class, 'update']);
+$router->post('/admin/leads/statut/{id}', [AdminLeadController::class, 'updateStatut']);
+$router->post('/admin/leads/note/{id}', [AdminLeadController::class, 'addNote']);
+$router->post('/admin/leads/note/delete/{id}', [AdminLeadController::class, 'deleteNote']);
+$router->post('/admin/leads/delete/{id}', [AdminLeadController::class, 'delete']);
+
+// Admin funnel & portfolio
+$router->get('/admin/funnel', [AdminDashboardController::class, 'funnel']);
+$router->get('/admin/portfolio', [AdminDashboardController::class, 'portfolio']);
+$router->post('/admin/portfolio/commission', [AdminDashboardController::class, 'updateCommissionRate']);
+
+// Admin achats routes
+$router->get('/admin/achats', [AdminAchatController::class, 'index']);
+$router->get('/admin/achats/edit', [AdminAchatController::class, 'edit']);
+$router->post('/admin/achats/save', [AdminAchatController::class, 'save']);
+$router->post('/admin/achats/delete', [AdminAchatController::class, 'delete']);
+$router->post('/admin/achats/create-table', [AdminAchatController::class, 'createTable']);
+
+// Admin partenaires routes
+$router->get('/admin/partenaires', [AdminPartenaireController::class, 'index']);
+$router->get('/admin/partenaires/edit', [AdminPartenaireController::class, 'edit']);
+$router->post('/admin/partenaires/save', [AdminPartenaireController::class, 'save']);
+$router->post('/admin/partenaires/delete', [AdminPartenaireController::class, 'delete']);
+
+// Admin social images routes
+$router->get('/admin/social-images', [AdminSocialImageController::class, 'index']);
+$router->get('/admin/social-images/history', [AdminSocialImageController::class, 'history']);
+$router->post('/admin/social-images/save', [AdminSocialImageController::class, 'save']);
+$router->post('/admin/social-images/delete', [AdminSocialImageController::class, 'delete']);
 
 $router->get('/services', [PageController::class, 'services']);
 $router->get('/about', [PageController::class, 'about']);
