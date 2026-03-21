@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Controllers\ActualiteController;
+use App\Controllers\AdminAchatController;
 use App\Controllers\AdminActualiteController;
 use App\Controllers\AdminBlogController;
 use App\Controllers\AdminController;

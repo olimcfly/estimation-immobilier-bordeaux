@@ -26,13 +26,6 @@ final class AdminDashboardController
         $stmt->execute([':wid' => $websiteId, ':lt' => 'qualifie']);
         $stats['total_leads'] = (int) $stmt->fetchColumn();
 
-        // Nouveaux leads aujourd'hui
-        $stmt = $pdo->prepare('SELECT COUNT(*) FROM leads WHERE website_id = :wid AND lead_type = :lt AND DATE(created_at) = CURDATE()');
-        $stmt->execute([':wid' => $websiteId, ':lt' => 'qualifie']);
-        $stmt = $pdo->prepare('SELECT COUNT(*) as total FROM leads WHERE website_id = :wid AND lead_type = :lt');
-        $stmt->execute([':wid' => $websiteId, ':lt' => 'qualifie']);
-        $stats['total_leads'] = (int) $stmt->fetchColumn();
-
         // New leads today
         $stmt = $pdo->prepare('SELECT COUNT(*) FROM leads WHERE website_id = :wid AND lead_type = :lt AND DATE(created_at) = CURDATE()');
         $stmt->execute([':wid' => $websiteId, ':lt' => 'qualifie']);
@@ -50,20 +43,6 @@ final class AdminDashboardController
         $stmt = $pdo->prepare('SELECT COUNT(*) FROM leads WHERE website_id = :wid AND lead_type = :lt AND statut = :st');
         $stmt->execute([':wid' => $websiteId, ':lt' => 'qualifie', ':st' => 'nouveau']);
         $stats['pending_leads'] = (int) $stmt->fetchColumn();
-
-        // Article stats
-        if (Database::tableExists('articles')) {
-            $stmt = $pdo->prepare('SELECT COUNT(*) FROM articles WHERE website_id = :wid AND status = :st');
-            $stmt->execute([':wid' => $websiteId, ':st' => 'published']);
-            $stats['total_articles'] = (int) $stmt->fetchColumn();
-
-            $stmt = $pdo->prepare('SELECT COUNT(*) FROM articles WHERE website_id = :wid AND status = :st');
-            $stmt->execute([':wid' => $websiteId, ':st' => 'draft']);
-            $stats['draft_articles'] = (int) $stmt->fetchColumn();
-        } else {
-            $stats['total_articles'] = 0;
-            $stats['draft_articles'] = 0;
-        }
 
         // Leads par statut (pipeline)
         $stmt = $pdo->prepare('SELECT statut, COUNT(*) as cnt FROM leads WHERE website_id = :wid AND lead_type = :lt GROUP BY statut');
@@ -141,7 +120,6 @@ final class AdminDashboardController
             'breadcrumb' => 'Tableau de Bord',
             'stats' => $stats,
             'recent_leads' => $recentLeads,
-            'recent_leads' => $stats['leads_recents'],
         ]);
     }
 

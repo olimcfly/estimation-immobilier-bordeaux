@@ -13,6 +13,7 @@ final class AdminActualiteController
 {
     public function index(): void
     {
+        AuthController::requireAuth();
         $model = new Actualite();
 
         View::renderAdmin('admin/actualites/index', [
@@ -28,6 +29,7 @@ final class AdminActualiteController
 
     public function create(): void
     {
+        AuthController::requireAuth();
         View::renderAdmin('admin/actualites/form', [
             'actualite' => null,
             'errors' => [],
@@ -41,6 +43,7 @@ final class AdminActualiteController
 
     public function store(): void
     {
+        AuthController::requireAuth();
         $model = new Actualite();
 
         try {
@@ -62,6 +65,7 @@ final class AdminActualiteController
 
     public function edit(string $id): void
     {
+        AuthController::requireAuth();
         $model = new Actualite();
         $actualite = $model->findById((int) $id);
 
@@ -85,6 +89,7 @@ final class AdminActualiteController
 
     public function update(string $id): void
     {
+        AuthController::requireAuth();
         $model = new Actualite();
 
         try {
@@ -109,6 +114,7 @@ final class AdminActualiteController
 
     public function delete(string $id): void
     {
+        AuthController::requireAuth();
         $model = new Actualite();
         $model->delete((int) $id);
         $this->redirect('/admin/actualites?message=' . urlencode('Actualité supprimée.'));
@@ -119,6 +125,7 @@ final class AdminActualiteController
      */
     public function search(): void
     {
+        AuthController::requireAuth();
         $query = trim((string) ($_POST['query'] ?? ''));
         $service = new ActualiteService();
 
@@ -143,6 +150,7 @@ final class AdminActualiteController
      */
     public function generate(): void
     {
+        AuthController::requireAuth();
         $service = new ActualiteService();
 
         try {

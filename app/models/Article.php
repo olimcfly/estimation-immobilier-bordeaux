@@ -136,6 +136,23 @@ final class Article
         ]);
     }
 
+    public function findRevisionsByArticleId(int $articleId): array
+    {
+        if (!Database::tableExists('article_revisions')) {
+            return [];
+        }
+
+        $sql = 'SELECT id, article_id, revision_number, title, status, created_at
+                FROM article_revisions
+                WHERE article_id = :article_id
+                ORDER BY revision_number DESC';
+
+        $stmt = Database::connection()->prepare($sql);
+        $stmt->execute([':article_id' => $articleId]);
+
+        return $stmt->fetchAll();
+    }
+
     private function websiteId(): int
     {
         return (int) Config::get('website.id', 1);

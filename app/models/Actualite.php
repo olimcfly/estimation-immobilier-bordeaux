@@ -187,6 +187,10 @@ final class Actualite
 
     public function getCronLogs(int $limit = 20): array
     {
+        if (!Database::tableExists('actualites_cron_log')) {
+            return [];
+        }
+
         $sql = 'SELECT * FROM actualites_cron_log
                 WHERE website_id = :website_id
                 ORDER BY created_at DESC

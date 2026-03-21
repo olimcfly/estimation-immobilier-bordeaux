@@ -13,6 +13,7 @@ final class AdminBlogController
 {
     public function index(): void
     {
+        AuthController::requireAuth();
         $articleModel = new Article();
 
         View::renderAdmin('admin/blog/index', [
@@ -27,6 +28,7 @@ final class AdminBlogController
 
     public function create(): void
     {
+        AuthController::requireAuth();
         View::renderAdmin('admin/blog/form', [
             'admin_page_title' => 'Nouvel article',
             'admin_current_page' => 'blog',
@@ -39,6 +41,7 @@ final class AdminBlogController
 
     public function store(): void
     {
+        AuthController::requireAuth();
         $articleModel = new Article();
 
         try {
@@ -58,6 +61,7 @@ final class AdminBlogController
 
     public function edit(string $id): void
     {
+        AuthController::requireAuth();
         $articleModel = new Article();
         $article = $articleModel->findById((int) $id);
 
@@ -80,6 +84,7 @@ final class AdminBlogController
 
     public function update(string $id): void
     {
+        AuthController::requireAuth();
         $articleModel = new Article();
 
         try {
@@ -103,6 +108,7 @@ final class AdminBlogController
 
     public function restoreRevision(string $id, string $revisionId): void
     {
+        AuthController::requireAuth();
         $articleModel = new Article();
 
         try {
@@ -115,6 +121,7 @@ final class AdminBlogController
 
     public function delete(string $id): void
     {
+        AuthController::requireAuth();
         $articleModel = new Article();
         $articleModel->delete((int) $id);
         $this->redirect('/admin/blog?message=' . urlencode('Article supprimé.'));
@@ -122,6 +129,7 @@ final class AdminBlogController
 
     public function generate(): void
     {
+        AuthController::requireAuth();
         try {
             $persona = Validator::string($_POST, 'persona', 3, 100);
             $awarenessLevel = Validator::string($_POST, 'awareness_level', 3, 50);
