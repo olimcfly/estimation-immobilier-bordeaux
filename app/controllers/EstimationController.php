@@ -46,9 +46,12 @@ final class EstimationController
             $dbError = 'Base de données indisponible : les leads ne peuvent pas être chargés.';
         }
 
-        View::render('admin/leads', [
-            'page_title' => 'Gestion des Leads - Admin',
+        View::renderAdmin('admin/leads', [
+            'page_title' => 'Leads - Admin CRM',
+            'admin_page' => 'leads',
+            'breadcrumb' => 'Leads',
             'leads' => $leads,
+            'leadCount' => count($leads),
             'dbError' => $dbError,
         ]);
     }
@@ -71,6 +74,24 @@ final class EstimationController
                 'issued_at' => $now,
                 'expires_at' => $now + self::LEAD_FORM_TTL_SECONDS,
             ];
+
+            // Capture lead "tendance" (sans coordonnées)
+            try {
+                $leadModel = new Lead();
+                $leadModel->create([
+                    'lead_type' => 'tendance',
+                    'ville' => $city,
+                    'type_bien' => $propertyType,
+                    'surface_m2' => $surface,
+                    'pieces' => $rooms,
+                    'estimation' => $estimate['estimated_mid'],
+                    'score' => 'froid',
+                    'statut' => 'nouveau',
+                ]);
+            } catch (\Throwable $e) {
+                // Silently fail — don't block the estimation result
+                error_log('Tendance lead capture failed: ' . $e->getMessage());
+            }
 
             View::render('estimation/result', [
                 'estimate' => $estimate,
@@ -154,6 +175,7 @@ final class EstimationController
 
             $leadModel = new Lead();
             $leadId = $leadModel->create([
+                'lead_type' => 'qualifie',
                 'nom' => $nom,
                 'email' => $email,
                 'telephone' => $telephone,

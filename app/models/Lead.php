@@ -44,21 +44,25 @@ final class Lead
 
     public function create(array $data): int
     {
-        $sql = 'INSERT INTO leads (website_id, nom, email, telephone, adresse, ville, estimation, urgence, motivation, notes, score, statut, created_at)
-                VALUES (:website_id, :nom, :email, :telephone, :adresse, :ville, :estimation, :urgence, :motivation, :notes, :score, :statut, NOW())';
+        $sql = 'INSERT INTO leads (website_id, lead_type, nom, email, telephone, adresse, ville, type_bien, surface_m2, pieces, estimation, urgence, motivation, notes, score, statut, created_at)
+                VALUES (:website_id, :lead_type, :nom, :email, :telephone, :adresse, :ville, :type_bien, :surface_m2, :pieces, :estimation, :urgence, :motivation, :notes, :score, :statut, NOW())';
 
         $stmt = Database::connection()->prepare($sql);
         $stmt->execute([
             ':website_id' => $this->websiteId(),
-            ':nom' => $data['nom'],
-            ':email' => $data['email'],
-            ':telephone' => $data['telephone'],
-            ':adresse' => $data['adresse'],
+            ':lead_type' => $data['lead_type'] ?? 'qualifie',
+            ':nom' => $data['nom'] ?? null,
+            ':email' => $data['email'] ?? null,
+            ':telephone' => $data['telephone'] ?? null,
+            ':adresse' => $data['adresse'] ?? null,
             ':ville' => $data['ville'],
+            ':type_bien' => $data['type_bien'] ?? null,
+            ':surface_m2' => $data['surface_m2'] ?? null,
+            ':pieces' => $data['pieces'] ?? null,
             ':estimation' => $data['estimation'],
-            ':urgence' => $data['urgence'],
-            ':motivation' => $data['motivation'],
-            ':notes' => $data['notes'] !== '' ? $data['notes'] : null,
+            ':urgence' => $data['urgence'] ?? null,
+            ':motivation' => $data['motivation'] ?? null,
+            ':notes' => !empty($data['notes']) ? $data['notes'] : null,
             ':score' => $data['score'],
             ':statut' => $data['statut'] ?? 'nouveau',
         ]);
@@ -71,7 +75,7 @@ final class Lead
      */
     public function findAllLeads(): array
     {
-        $sql = 'SELECT id, nom, email, telephone, ville, estimation, urgence, motivation, score, statut, created_at
+        $sql = 'SELECT id, lead_type, nom, email, telephone, ville, type_bien, surface_m2, pieces, estimation, urgence, motivation, score, statut, created_at
                 FROM leads
                 WHERE website_id = :website_id
                 ORDER BY created_at DESC';
