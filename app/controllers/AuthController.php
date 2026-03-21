@@ -14,7 +14,10 @@ final class AuthController
 {
     public function loginForm(): void
     {
-        if ($this->isLoggedIn()) {
+        // Ne pas rediriger si l'utilisateur vient de se déconnecter
+        $loggedOut = isset($_GET['logged_out']);
+
+        if (!$loggedOut && $this->isLoggedIn()) {
             header('Location: /admin');
             exit;
         }
@@ -22,6 +25,7 @@ final class AuthController
         View::renderBare('admin/login', [
             'page_title' => 'Connexion Admin - Estimation Immobilier Bordeaux',
             'step' => 'email',
+            'success_message' => $loggedOut ? 'Vous avez été déconnecté avec succès.' : null,
         ]);
     }
 
@@ -199,7 +203,7 @@ final class AuthController
 
         session_destroy();
 
-        header('Location: /admin/login');
+        header('Location: /admin/login?logged_out=1');
         exit;
     }
 

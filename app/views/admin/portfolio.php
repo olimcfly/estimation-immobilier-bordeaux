@@ -387,6 +387,13 @@
     : $defaultRate;
 ?>
 
+<?php if (!empty($dbError)): ?>
+  <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 1rem 1.25rem; margin-bottom: 1.5rem; color: #991b1b; font-size: 0.9rem;">
+    <i class="fas fa-exclamation-triangle" style="margin-right: 0.5rem;"></i>
+    <?= htmlspecialchars((string) $dbError, ENT_QUOTES, 'UTF-8') ?>
+  </div>
+<?php endif; ?>
+
 <!-- PAGE HEADER -->
 <div class="admin-page-header">
   <h1><i class="fas fa-briefcase"></i> Portefeuille Client</h1>
@@ -598,7 +605,7 @@
         form.append('csrf_token', csrfToken);
         form.append('id', leadId);
         form.append('commission_taux', rate.toString());
-        fetch('/admin/portfolio/update-rate', { method: 'POST', body: form })
+        fetch('/admin/portfolio/commission', { method: 'POST', body: form })
           .then(function(r) { return r.json(); })
           .then(function(data) {
             el.classList.remove('saving');

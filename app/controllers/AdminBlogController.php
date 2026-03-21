@@ -21,9 +21,9 @@ final class AdminBlogController
             'page_title' => 'Blog - Admin',
             'admin_page_title' => 'Blog / CMS',
             'admin_current_page' => 'blog',
-            'articles' => $articleModel->findAll(),
+            'articles' => $articles,
             'message' => (string) ($_GET['message'] ?? ''),
-            'error' => (string) ($_GET['error'] ?? ''),
+            'error' => $dbError ?? (string) ($_GET['error'] ?? ''),
         ]);
     }
 
