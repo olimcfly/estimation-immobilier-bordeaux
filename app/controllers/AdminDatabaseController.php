@@ -30,7 +30,10 @@ final class AdminDatabaseController
 
         $action = (string) ($_POST['action'] ?? '');
 
-        if ($action === 'connect' || !empty($_SESSION['db_admin_connected'])) {
+        // Auto-connect on first visit using app config if not yet connected and no explicit action
+        $autoConnect = ($action === '' && empty($_SESSION['db_admin_connected']) && $dbName !== '');
+
+        if ($action === 'connect' || !empty($_SESSION['db_admin_connected']) || $autoConnect) {
             try {
                 $dsn = sprintf('mysql:host=%s;port=%d;dbname=%s;charset=utf8mb4', $dbHost, $dbPort, $dbName);
                 $pdo = new PDO($dsn, $dbUser, $dbPass, [
@@ -66,7 +69,9 @@ final class AdminDatabaseController
                 $missingItems = $this->detectMissingItems($pdo, $tables, $tableDetails);
 
             } catch (PDOException $e) {
-                $error = $e->getMessage();
+                $error = $autoConnect
+                    ? 'Connexion automatique échouée: ' . $e->getMessage()
+                    : $e->getMessage();
                 $_SESSION['db_admin_connected'] = false;
             }
         }

@@ -480,6 +480,14 @@
 <?php if (!$connected): ?>
   <div class="db-connect-card">
     <h2><i class="fas fa-plug"></i> Connexion &agrave; la base de donn&eacute;es</h2>
+
+    <?php if (!empty($error)): ?>
+      <div style="background:#fffbeb;border:1px solid #fde68a;color:#92400e;padding:0.75rem 1rem;border-radius:6px;margin-bottom:1rem;font-size:0.85rem;">
+        <i class="fas fa-info-circle"></i>
+        V&eacute;rifiez vos identifiants de connexion dans le fichier <code>.env</code> ou saisissez-les ci-dessous.
+      </div>
+    <?php endif; ?>
+
     <form method="post" action="/admin/database">
       <input type="hidden" name="action" value="connect">
       <div class="db-form-row">
