@@ -20,18 +20,42 @@ final class AdminDashboardController
         $websiteId = (int) Config::get('website.id', 1);
         $stats = [];
 
-        // Total contacts
+        // Total leads
         $stmt = $pdo->prepare('SELECT COUNT(*) as total FROM leads WHERE website_id = :wid AND lead_type = :lt');
         $stmt->execute([':wid' => $websiteId, ':lt' => 'qualifie']);
-        $stats['total_contacts'] = (int) $stmt->fetchColumn();
+        $stats['total_leads'] = (int) $stmt->fetchColumn();
+
+        // New leads today
+        $stmt = $pdo->prepare('SELECT COUNT(*) FROM leads WHERE website_id = :wid AND lead_type = :lt AND DATE(created_at) = CURDATE()');
+        $stmt->execute([':wid' => $websiteId, ':lt' => 'qualifie']);
+        $stats['new_leads_today'] = (int) $stmt->fetchColumn();
 
         // Leads par score
         $stmt = $pdo->prepare('SELECT score, COUNT(*) as cnt FROM leads WHERE website_id = :wid AND lead_type = :lt GROUP BY score');
         $stmt->execute([':wid' => $websiteId, ':lt' => 'qualifie']);
         $scoreData = $stmt->fetchAll(PDO::FETCH_KEY_PAIR) ?: [];
-        $stats['leads_chaud'] = (int) ($scoreData['chaud'] ?? 0);
+        $stats['hot_leads'] = (int) ($scoreData['chaud'] ?? 0);
         $stats['leads_tiede'] = (int) ($scoreData['tiede'] ?? 0);
         $stats['leads_froid'] = (int) ($scoreData['froid'] ?? 0);
+
+        // Pending leads (nouveau status, awaiting contact)
+        $stmt = $pdo->prepare('SELECT COUNT(*) FROM leads WHERE website_id = :wid AND lead_type = :lt AND statut = :st');
+        $stmt->execute([':wid' => $websiteId, ':lt' => 'qualifie', ':st' => 'nouveau']);
+        $stats['pending_leads'] = (int) $stmt->fetchColumn();
+
+        // Article stats
+        if (Database::tableExists('articles')) {
+            $stmt = $pdo->prepare('SELECT COUNT(*) FROM articles WHERE website_id = :wid AND status = :st');
+            $stmt->execute([':wid' => $websiteId, ':st' => 'published']);
+            $stats['total_articles'] = (int) $stmt->fetchColumn();
+
+            $stmt = $pdo->prepare('SELECT COUNT(*) FROM articles WHERE website_id = :wid AND status = :st');
+            $stmt->execute([':wid' => $websiteId, ':st' => 'draft']);
+            $stats['draft_articles'] = (int) $stmt->fetchColumn();
+        } else {
+            $stats['total_articles'] = 0;
+            $stats['draft_articles'] = 0;
+        }
 
         // Leads par statut (pipeline)
         $stmt = $pdo->prepare('SELECT statut, COUNT(*) as cnt FROM leads WHERE website_id = :wid AND lead_type = :lt GROUP BY statut');
@@ -63,7 +87,7 @@ final class AdminDashboardController
         $stmt = $pdo->prepare('SELECT COUNT(*) as total FROM leads WHERE website_id = :wid AND lead_type = :lt AND statut IN ("signe","co_signature_partenaire")');
         $stmt->execute([':wid' => $websiteId, ':lt' => 'qualifie']);
         $signes = (int) $stmt->fetchColumn();
-        $stats['taux_conversion'] = $stats['total_contacts'] > 0 ? round(($signes / $stats['total_contacts']) * 100, 1) : 0;
+        $stats['taux_conversion'] = $stats['total_leads'] > 0 ? round(($signes / $stats['total_leads']) * 100, 1) : 0;
 
         // Taux par étape (funnel)
         $pipelineOrder = [
@@ -93,6 +117,7 @@ final class AdminDashboardController
             'admin_page' => 'dashboard',
             'breadcrumb' => 'Tableau de Bord',
             'stats' => $stats,
+            'recent_leads' => $stats['leads_recents'],
         ]);
     }
 
