@@ -13,6 +13,8 @@ final class AdminActualiteController
 {
     public function index(): void
     {
+        AuthController::requireAuth();
+
         $model = new Actualite();
 
         View::renderAdmin('admin/actualites/index', [
@@ -21,6 +23,7 @@ final class AdminActualiteController
             'message' => (string) ($_GET['message'] ?? ''),
             'error' => (string) ($_GET['error'] ?? ''),
             'page_title' => 'Actualités - Admin',
+            'admin_page_title' => 'Actualités',
             'admin_page' => 'actualites',
             'breadcrumb' => 'Actualités',
         ]);
@@ -28,12 +31,15 @@ final class AdminActualiteController
 
     public function create(): void
     {
+        AuthController::requireAuth();
+
         View::renderAdmin('admin/actualites/form', [
             'actualite' => null,
             'errors' => [],
             'action' => '/admin/actualites/store',
             'submitLabel' => 'Créer l\'actualité',
             'page_title' => 'Nouvelle actualité - Admin',
+            'admin_page_title' => 'Nouvelle actualité',
             'admin_page' => 'actualites',
             'breadcrumb' => 'Nouvelle actualité',
         ]);
@@ -41,6 +47,8 @@ final class AdminActualiteController
 
     public function store(): void
     {
+        AuthController::requireAuth();
+
         $model = new Actualite();
 
         try {
@@ -54,6 +62,7 @@ final class AdminActualiteController
                 'action' => '/admin/actualites/store',
                 'submitLabel' => 'Créer l\'actualité',
                 'page_title' => 'Nouvelle actualité - Admin',
+                'admin_page_title' => 'Nouvelle actualité',
                 'admin_page' => 'actualites',
                 'breadcrumb' => 'Nouvelle actualité',
             ]);
@@ -62,6 +71,8 @@ final class AdminActualiteController
 
     public function edit(string $id): void
     {
+        AuthController::requireAuth();
+
         $model = new Actualite();
         $actualite = $model->findById((int) $id);
 
@@ -78,6 +89,7 @@ final class AdminActualiteController
             'action' => '/admin/actualites/update/' . (int) $id,
             'submitLabel' => 'Mettre à jour',
             'page_title' => 'Modifier actualité - Admin',
+            'admin_page_title' => 'Modifier actualité',
             'admin_page' => 'actualites',
             'breadcrumb' => 'Modifier actualité',
         ]);
@@ -85,6 +97,8 @@ final class AdminActualiteController
 
     public function update(string $id): void
     {
+        AuthController::requireAuth();
+
         $model = new Actualite();
 
         try {
@@ -101,6 +115,7 @@ final class AdminActualiteController
                 'action' => '/admin/actualites/update/' . (int) $id,
                 'submitLabel' => 'Mettre à jour',
                 'page_title' => 'Modifier actualité - Admin',
+                'admin_page_title' => 'Modifier actualité',
                 'admin_page' => 'actualites',
                 'breadcrumb' => 'Modifier actualité',
             ]);
@@ -109,6 +124,8 @@ final class AdminActualiteController
 
     public function delete(string $id): void
     {
+        AuthController::requireAuth();
+
         $model = new Actualite();
         $model->delete((int) $id);
         $this->redirect('/admin/actualites?message=' . urlencode('Actualité supprimée.'));
@@ -119,6 +136,8 @@ final class AdminActualiteController
      */
     public function search(): void
     {
+        AuthController::requireAuth();
+
         $query = trim((string) ($_POST['query'] ?? ''));
         $service = new ActualiteService();
 
@@ -130,6 +149,7 @@ final class AdminActualiteController
                 'results' => $results['results'],
                 'source' => $results['source'],
                 'page_title' => 'Résultats de recherche - Admin',
+                'admin_page_title' => 'Recherche actualités',
                 'admin_page' => 'actualites',
                 'breadcrumb' => 'Recherche actualités',
             ]);
@@ -143,18 +163,36 @@ final class AdminActualiteController
      */
     public function generate(): void
     {
+        AuthController::requireAuth();
+
+        $model = new Actualite();
         $service = new ActualiteService();
 
         try {
             $customQuery = trim((string) ($_POST['query'] ?? ''));
-            $result = $service->runAutomatedPipeline($customQuery !== '' ? $customQuery : null);
+            $query = $customQuery !== '' ? $customQuery : null;
+            $result = $service->runAutomatedPipeline($query);
 
             if (!($result['success'] ?? false)) {
+                $model->logCron(
+                    $result['query'] ?? ($query ?? 'auto'),
+                    0,
+                    null,
+                    'error',
+                    $result['error'] ?? 'Erreur inconnue'
+                );
                 $this->redirect('/admin/actualites?error=' . urlencode($result['error'] ?? 'Erreur génération.'));
                 return;
             }
 
             $article = $result['article'];
+
+            $model->logCron(
+                $result['query'] ?? ($query ?? 'auto'),
+                $result['ideas_count'] ?? 0,
+                null,
+                'success'
+            );
 
             View::renderAdmin('admin/actualites/form', [
                 'actualite' => [
@@ -164,18 +202,29 @@ final class AdminActualiteController
                     'excerpt' => $article['excerpt'],
                     'meta_title' => $article['meta_title'],
                     'meta_description' => $article['meta_description'],
-                    'image_url' => $article['image_url'],
-                    'source_query' => $article['source_query'],
+                    'image_url' => $article['image_url'] ?? '',
+                    'image_prompt' => $article['image_prompt'] ?? '',
+                    'source_query' => $article['source_query'] ?? '',
+                    'source_results' => $result['source_results'] ?? '',
+                    'generated_by' => 'ai',
                     'status' => 'draft',
                 ],
                 'errors' => [],
                 'action' => '/admin/actualites/store',
                 'submitLabel' => 'Publier l\'actualité',
                 'page_title' => 'Article généré - Admin',
+                'admin_page_title' => 'Article généré par IA',
                 'admin_page' => 'actualites',
                 'breadcrumb' => 'Article généré par IA',
             ]);
         } catch (\Throwable $e) {
+            $model->logCron(
+                $customQuery !== '' ? $customQuery : 'auto',
+                0,
+                null,
+                'error',
+                $e->getMessage()
+            );
             $this->redirect('/admin/actualites?error=' . urlencode($e->getMessage()));
         }
     }
