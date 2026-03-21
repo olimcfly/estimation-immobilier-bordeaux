@@ -591,6 +591,9 @@
       </div>
 
       <div class="nav-item">
+        <a href="/blog" class="nav-link">Actualités</a>
+      </div>
+      <div class="nav-item">
         <a href="/a-propos" class="nav-link">À propos</a>
       </div>
       <div class="nav-item">

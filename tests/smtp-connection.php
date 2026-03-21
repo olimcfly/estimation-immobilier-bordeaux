@@ -8,13 +8,22 @@
  * Teste : connexion socket, SSL/TLS, EHLO, mécanismes AUTH, authentification.
  */
 
-require_once __DIR__ . '/../vendor/autoload.php';
-
-// Charger les variables d'environnement
+// Charger les variables d'environnement depuis .env (sans dépendance externe)
 $dotenvFile = __DIR__ . '/../.env';
 if (file_exists($dotenvFile)) {
-    $dotenv = Dotenv\Dotenv::createImmutable(dirname($dotenvFile));
-    $dotenv->load();
+    $lines = file($dotenvFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($lines as $line) {
+        $line = trim($line);
+        if ($line === '' || $line[0] === '#') {
+            continue;
+        }
+        if (strpos($line, '=') !== false) {
+            [$key, $value] = explode('=', $line, 2);
+            $key = trim($key);
+            $value = trim($value, " \t\n\r\0\x0B\"'");
+            $_ENV[$key] = $value;
+        }
+    }
 }
 
 // Récupérer la config SMTP

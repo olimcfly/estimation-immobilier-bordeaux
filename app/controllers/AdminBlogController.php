@@ -15,7 +15,10 @@ final class AdminBlogController
     {
         $articleModel = new Article();
 
-        View::render('admin/blog/index', [
+        View::renderAdmin('admin/blog/index', [
+            'page_title' => 'Blog - Admin',
+            'admin_page_title' => 'Blog / CMS',
+            'admin_current_page' => 'blog',
             'articles' => $articleModel->findAll(),
             'message' => (string) ($_GET['message'] ?? ''),
             'error' => (string) ($_GET['error'] ?? ''),
@@ -24,7 +27,9 @@ final class AdminBlogController
 
     public function create(): void
     {
-        View::render('admin/blog/form', [
+        View::renderAdmin('admin/blog/form', [
+            'admin_page_title' => 'Nouvel article',
+            'admin_current_page' => 'blog',
             'article' => null,
             'errors' => [],
             'action' => '/admin/blog/store',
@@ -40,7 +45,9 @@ final class AdminBlogController
             $articleModel->create($this->validatedPayload($_POST));
             $this->redirect('/admin/blog?message=' . urlencode('Article créé avec succès.'));
         } catch (\Throwable $throwable) {
-            View::render('admin/blog/form', [
+            View::renderAdmin('admin/blog/form', [
+                'admin_page_title' => 'Nouvel article',
+                'admin_current_page' => 'blog',
                 'article' => $_POST,
                 'errors' => [$throwable->getMessage()],
                 'action' => '/admin/blog/store',
@@ -58,7 +65,9 @@ final class AdminBlogController
             $this->redirect('/admin/blog?error=' . urlencode('Article introuvable.'));
         }
 
-        View::render('admin/blog/form', [
+        View::renderAdmin('admin/blog/form', [
+            'admin_page_title' => 'Modifier l\'article',
+            'admin_current_page' => 'blog',
             'article' => $article,
             'revisions' => $articleModel->findRevisionsByArticleId((int) $id),
             'errors' => [],
@@ -80,7 +89,9 @@ final class AdminBlogController
             $article = $_POST;
             $article['id'] = (int) $id;
 
-            View::render('admin/blog/form', [
+            View::renderAdmin('admin/blog/form', [
+                'admin_page_title' => 'Modifier l\'article',
+                'admin_current_page' => 'blog',
                 'article' => $article,
                 'revisions' => $articleModel->findRevisionsByArticleId((int) $id),
                 'errors' => [$throwable->getMessage()],
@@ -119,7 +130,9 @@ final class AdminBlogController
             $service = new AIService();
             $generated = $service->generateArticle($persona, $awarenessLevel, $topic);
 
-            View::render('admin/blog/form', [
+            View::renderAdmin('admin/blog/form', [
+                'admin_page_title' => 'Article généré par IA',
+                'admin_current_page' => 'blog',
                 'article' => [
                     'title' => $generated['title'],
                     'slug' => $this->slugify($generated['title']),

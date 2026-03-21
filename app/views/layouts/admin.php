@@ -1,322 +1,332 @@
-<?php
-/**
- * Admin CRM Layout - Sidebar + Content area
- * Variables: $page_title, $admin_page, $pageContent
- */
-$currentPage = $admin_page ?? '';
-$adminName = $_SESSION['admin_user_name'] ?? 'Admin';
-$adminEmail = $_SESSION['admin_user_email'] ?? '';
-?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex, nofollow">
-  <title><?= htmlspecialchars($page_title ?? 'Admin', ENT_QUOTES, 'UTF-8') ?></title>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  <title><?= isset($page_title) ? htmlspecialchars($page_title, ENT_QUOTES, 'UTF-8') : 'Admin - Estimation Immobilier Bordeaux' ?></title>
 
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- FontAwesome 6.4.0 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- CSS Principal -->
+  <link rel="stylesheet" href="/assets/css/app.css">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+  <style>
     :root {
-      --admin-sidebar-w: 260px;
-      --admin-bg: #f1f5f9;
-      --admin-sidebar-bg: #0f172a;
-      --admin-sidebar-hover: #1e293b;
-      --admin-sidebar-active: #8B1538;
-      --admin-sidebar-text: #94a3b8;
-      --admin-sidebar-text-active: #ffffff;
-      --admin-topbar-bg: #ffffff;
-      --admin-topbar-h: 60px;
-      --admin-text: #1e293b;
-      --admin-muted: #64748b;
-      --admin-border: #e2e8f0;
+      --admin-sidebar-width: 260px;
+      --admin-header-height: 60px;
+      --admin-bg: #f4f1ed;
+      --admin-sidebar-bg: #1a1410;
+      --admin-sidebar-text: #c8c0b8;
+      --admin-sidebar-hover: rgba(255,255,255,0.08);
+      --admin-sidebar-active: rgba(139, 21, 56, 0.4);
       --admin-primary: #8B1538;
-      --admin-primary-light: rgba(139, 21, 56, 0.1);
-      --admin-success: #22c55e;
-      --admin-warning: #f59e0b;
-      --admin-danger: #ef4444;
-      --admin-info: #3b82f6;
-      --admin-surface: #ffffff;
-      --admin-radius: 8px;
+      --admin-accent: #D4AF37;
     }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; height: 100%; }
 
     body {
       font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      color: #1a1410;
       background: var(--admin-bg);
-      color: var(--admin-text);
-      min-height: 100vh;
+      line-height: 1.6;
       display: flex;
+      min-height: 100vh;
     }
 
-    /* ========================= */
-    /* SIDEBAR                   */
-    /* ========================= */
+    /* ================================ */
+    /* SIDEBAR                          */
+    /* ================================ */
     .admin-sidebar {
       position: fixed;
       top: 0;
       left: 0;
       bottom: 0;
-      width: var(--admin-sidebar-w);
+      width: var(--admin-sidebar-width);
       background: var(--admin-sidebar-bg);
+      color: var(--admin-sidebar-text);
       display: flex;
       flex-direction: column;
-      z-index: 100;
+      z-index: 1000;
       transition: transform 0.3s ease;
+      overflow-y: auto;
     }
 
-    .sidebar-brand {
+    .admin-sidebar-brand {
       display: flex;
       align-items: center;
       gap: 0.75rem;
       padding: 1.25rem 1.5rem;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
       text-decoration: none;
+      color: #fff;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      flex-shrink: 0;
     }
 
-    .sidebar-brand-icon {
+    .admin-sidebar-brand-icon {
       width: 36px;
       height: 36px;
-      background: linear-gradient(135deg, var(--admin-primary), #C41E3A);
-      border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
+      background: linear-gradient(135deg, var(--admin-primary), #C41E3A);
+      border-radius: 8px;
       color: #fff;
       font-size: 1rem;
       flex-shrink: 0;
     }
 
-    .sidebar-brand-text {
-      color: #fff;
+    .admin-sidebar-brand-text {
+      font-family: 'Playfair Display', serif;
       font-weight: 700;
-      font-size: 0.95rem;
+      font-size: 1rem;
       line-height: 1.2;
     }
 
-    .sidebar-brand-text small {
+    .admin-sidebar-brand-text small {
       display: block;
-      color: var(--admin-sidebar-text);
+      font-family: 'DM Sans', sans-serif;
       font-weight: 400;
       font-size: 0.7rem;
-      text-transform: uppercase;
+      color: var(--admin-sidebar-text);
+      opacity: 0.7;
       letter-spacing: 0.05em;
+      text-transform: uppercase;
       margin-top: 2px;
     }
 
-    .sidebar-nav {
+    /* Sidebar navigation */
+    .admin-sidebar-nav {
       flex: 1;
       padding: 1rem 0;
-      overflow-y: auto;
     }
 
-    .sidebar-section {
-      padding: 0 1rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .sidebar-section-title {
-      color: var(--admin-sidebar-text);
+    .admin-sidebar-section {
+      padding: 0.5rem 1.5rem 0.4rem;
       font-size: 0.65rem;
-      font-weight: 600;
+      font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
-      padding: 0.75rem 0.75rem 0.5rem;
+      letter-spacing: 0.1em;
+      color: rgba(255,255,255,0.3);
+      margin-top: 0.5rem;
     }
 
-    .sidebar-link {
+    .admin-sidebar-link {
       display: flex;
       align-items: center;
       gap: 0.75rem;
-      padding: 0.65rem 0.75rem;
+      padding: 0.7rem 1.5rem;
       color: var(--admin-sidebar-text);
       text-decoration: none;
-      border-radius: 6px;
-      font-size: 0.88rem;
+      font-size: 0.9rem;
       font-weight: 500;
+      border-left: 3px solid transparent;
       transition: all 0.15s ease;
-      margin-bottom: 2px;
     }
 
-    .sidebar-link:hover {
+    .admin-sidebar-link:hover {
       background: var(--admin-sidebar-hover);
       color: #fff;
     }
 
-    .sidebar-link.active {
+    .admin-sidebar-link.active {
       background: var(--admin-sidebar-active);
       color: #fff;
+      border-left-color: var(--admin-primary);
     }
 
-    .sidebar-link i {
+    .admin-sidebar-link i {
       width: 20px;
       text-align: center;
-      font-size: 0.9rem;
+      font-size: 0.95rem;
+      opacity: 0.8;
     }
 
-    .sidebar-link .badge {
+    .admin-sidebar-link.active i {
+      opacity: 1;
+      color: var(--admin-accent);
+    }
+
+    .admin-sidebar-link .badge {
       margin-left: auto;
       background: var(--admin-primary);
       color: #fff;
       font-size: 0.7rem;
-      font-weight: 600;
-      padding: 2px 7px;
+      font-weight: 700;
+      padding: 0.15rem 0.5rem;
       border-radius: 10px;
+      min-width: 20px;
+      text-align: center;
     }
 
-    .sidebar-link.active .badge {
-      background: rgba(255,255,255,0.2);
-    }
-
-    .sidebar-footer {
+    /* Sidebar footer */
+    .admin-sidebar-footer {
       padding: 1rem 1.5rem;
       border-top: 1px solid rgba(255,255,255,0.08);
+      flex-shrink: 0;
     }
 
-    .sidebar-user {
+    .admin-sidebar-user {
       display: flex;
       align-items: center;
       gap: 0.75rem;
+      margin-bottom: 0.75rem;
     }
 
-    .sidebar-user-avatar {
-      width: 34px;
-      height: 34px;
-      background: var(--admin-sidebar-hover);
-      border-radius: 8px;
+    .admin-sidebar-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--admin-primary), #C41E3A);
       display: flex;
       align-items: center;
       justify-content: center;
-      color: var(--admin-sidebar-text);
-      font-size: 0.85rem;
-    }
-
-    .sidebar-user-info {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .sidebar-user-name {
       color: #fff;
+      font-size: 0.8rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .admin-sidebar-user-info {
+      overflow: hidden;
+    }
+
+    .admin-sidebar-user-name {
       font-size: 0.85rem;
       font-weight: 600;
+      color: #fff;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
-    .sidebar-user-role {
-      color: var(--admin-sidebar-text);
+    .admin-sidebar-user-email {
       font-size: 0.7rem;
+      color: var(--admin-sidebar-text);
+      opacity: 0.7;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
-    /* ========================= */
-    /* MAIN CONTENT              */
-    /* ========================= */
+    .admin-sidebar-logout {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 0.75rem;
+      color: var(--admin-sidebar-text);
+      text-decoration: none;
+      font-size: 0.8rem;
+      border-radius: 6px;
+      transition: all 0.15s ease;
+    }
+
+    .admin-sidebar-logout:hover {
+      background: rgba(226, 75, 74, 0.15);
+      color: #e24b4a;
+    }
+
+    /* ================================ */
+    /* MAIN CONTENT AREA                */
+    /* ================================ */
     .admin-main {
-      margin-left: var(--admin-sidebar-w);
       flex: 1;
+      margin-left: var(--admin-sidebar-width);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
     }
 
+    /* Top bar */
     .admin-topbar {
       position: sticky;
       top: 0;
-      z-index: 50;
-      background: var(--admin-topbar-bg);
-      height: var(--admin-topbar-h);
-      border-bottom: 1px solid var(--admin-border);
+      z-index: 500;
+      height: var(--admin-header-height);
+      background: rgba(244, 241, 237, 0.95);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid #e8dfd7;
       display: flex;
       align-items: center;
       justify-content: space-between;
       padding: 0 2rem;
     }
 
-    .topbar-left {
+    .admin-topbar-left {
       display: flex;
       align-items: center;
       gap: 1rem;
     }
 
-    .topbar-toggle {
+    .admin-topbar-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #1a1410;
+    }
+
+    .admin-topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .admin-topbar-link {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.45rem 0.9rem;
+      color: #6b6459;
+      text-decoration: none;
+      font-size: 0.85rem;
+      border-radius: 6px;
+      transition: all 0.15s ease;
+    }
+
+    .admin-topbar-link:hover {
+      background: rgba(139, 21, 56, 0.06);
+      color: var(--admin-primary);
+    }
+
+    /* Mobile toggle */
+    .admin-sidebar-toggle {
       display: none;
       background: none;
       border: none;
       cursor: pointer;
       padding: 0.5rem;
-      color: var(--admin-muted);
-      font-size: 1.2rem;
+      color: #1a1410;
+      font-size: 1.25rem;
     }
 
-    .topbar-breadcrumb {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 0.85rem;
-      color: var(--admin-muted);
-    }
-
-    .topbar-breadcrumb a {
-      color: var(--admin-muted);
-      text-decoration: none;
-    }
-
-    .topbar-breadcrumb a:hover {
-      color: var(--admin-primary);
-    }
-
-    .topbar-breadcrumb .separator {
-      color: var(--admin-border);
-    }
-
-    .topbar-breadcrumb .current {
-      color: var(--admin-text);
-      font-weight: 600;
-    }
-
-    .topbar-right {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .topbar-link {
-      color: var(--admin-muted);
-      text-decoration: none;
-      font-size: 0.85rem;
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      transition: color 0.15s;
-    }
-
-    .topbar-link:hover {
-      color: var(--admin-primary);
-    }
-
+    /* Admin content */
     .admin-content {
       flex: 1;
       padding: 2rem;
     }
 
-    /* ========================= */
-    /* MOBILE OVERLAY            */
-    /* ========================= */
-    .admin-overlay {
+    .admin-content .container {
+      width: min(1120px, 100%);
+      margin-inline: auto;
+    }
+
+    /* Mobile overlay */
+    .admin-sidebar-overlay {
       display: none;
       position: fixed;
       inset: 0;
       background: rgba(0,0,0,0.5);
-      z-index: 99;
+      z-index: 999;
     }
 
-    /* ========================= */
-    /* RESPONSIVE                */
-    /* ========================= */
+    /* ================================ */
+    /* RESPONSIVE                       */
+    /* ================================ */
     @media (max-width: 1024px) {
       .admin-sidebar {
         transform: translateX(-100%);
@@ -326,7 +336,7 @@ $adminEmail = $_SESSION['admin_user_email'] ?? '';
         transform: translateX(0);
       }
 
-      .admin-overlay.open {
+      .admin-sidebar-overlay.open {
         display: block;
       }
 
@@ -334,32 +344,43 @@ $adminEmail = $_SESSION['admin_user_email'] ?? '';
         margin-left: 0;
       }
 
-      .topbar-toggle {
+      .admin-sidebar-toggle {
         display: block;
       }
 
       .admin-content {
-        padding: 1.5rem 1rem;
+        padding: 1.25rem;
       }
     }
 
     @media (max-width: 640px) {
+      .admin-topbar {
+        padding: 0 1rem;
+      }
+
       .admin-content {
-        padding: 1rem 0.75rem;
+        padding: 1rem;
+      }
+
+      .admin-topbar-title {
+        font-size: 1rem;
       }
     }
   </style>
 </head>
 <body>
 
+<!-- SIDEBAR OVERLAY (mobile) -->
+<div class="admin-sidebar-overlay" id="sidebar-overlay"></div>
+
 <!-- SIDEBAR -->
-<aside class="admin-sidebar" id="adminSidebar">
-  <a href="/admin/leads" class="sidebar-brand">
-    <div class="sidebar-brand-icon"><i class="fas fa-building"></i></div>
-    <div class="sidebar-brand-text">
-      EIB Admin
-      <small>Back-office CRM</small>
-    </div>
+<aside class="admin-sidebar" id="admin-sidebar">
+  <a href="/admin" class="admin-sidebar-brand">
+    <span class="admin-sidebar-brand-icon"><i class="fas fa-home"></i></span>
+    <span class="admin-sidebar-brand-text">
+      Estimation Bordeaux
+      <small>Administration</small>
+    </span>
   </a>
 
   <nav class="sidebar-nav">
@@ -403,59 +424,61 @@ $adminEmail = $_SESSION['admin_user_email'] ?? '';
     </div>
   </nav>
 
-  <div class="sidebar-footer">
-    <div class="sidebar-user">
-      <div class="sidebar-user-avatar"><i class="fas fa-user"></i></div>
-      <div class="sidebar-user-info">
-        <div class="sidebar-user-name"><?= htmlspecialchars($adminName, ENT_QUOTES, 'UTF-8') ?></div>
-        <div class="sidebar-user-role">Administrateur</div>
+  <div class="admin-sidebar-footer">
+    <div class="admin-sidebar-user">
+      <div class="admin-sidebar-avatar">
+        <?= strtoupper(mb_substr((string) ($_SESSION['admin_user_name'] ?? 'A'), 0, 1)) ?>
+      </div>
+      <div class="admin-sidebar-user-info">
+        <div class="admin-sidebar-user-name"><?= htmlspecialchars((string) ($_SESSION['admin_user_name'] ?? 'Admin'), ENT_QUOTES, 'UTF-8') ?></div>
+        <div class="admin-sidebar-user-email"><?= htmlspecialchars((string) ($_SESSION['admin_user_email'] ?? ''), ENT_QUOTES, 'UTF-8') ?></div>
       </div>
     </div>
+    <a href="/admin/logout" class="admin-sidebar-logout">
+      <i class="fas fa-sign-out-alt"></i> Deconnexion
+    </a>
   </div>
 </aside>
-
-<!-- OVERLAY MOBILE -->
-<div class="admin-overlay" id="adminOverlay"></div>
 
 <!-- MAIN -->
 <div class="admin-main">
   <header class="admin-topbar">
-    <div class="topbar-left">
-      <button class="topbar-toggle" id="sidebarToggle" aria-label="Menu">
+    <div class="admin-topbar-left">
+      <button class="admin-sidebar-toggle" id="sidebar-toggle" aria-label="Menu">
         <i class="fas fa-bars"></i>
       </button>
-      <div class="topbar-breadcrumb">
-        <a href="/admin/leads">Admin</a>
-        <span class="separator">/</span>
-        <span class="current"><?= htmlspecialchars($breadcrumb ?? 'Dashboard', ENT_QUOTES, 'UTF-8') ?></span>
-      </div>
+      <span class="admin-topbar-title"><?= htmlspecialchars((string) ($admin_page_title ?? 'Administration'), ENT_QUOTES, 'UTF-8') ?></span>
     </div>
-    <div class="topbar-right">
-      <a href="/" class="topbar-link" target="_blank"><i class="fas fa-external-link-alt"></i> Site</a>
+    <div class="admin-topbar-right">
+      <a href="/" class="admin-topbar-link" target="_blank">
+        <i class="fas fa-external-link-alt"></i> <span>Voir le site</span>
+      </a>
     </div>
   </header>
 
   <div class="admin-content">
-    <?= $pageContent ?? '' ?>
+    %%ADMIN_CONTENT%%
   </div>
 </div>
 
 <script>
 (function() {
-  var toggle = document.getElementById('sidebarToggle');
-  var sidebar = document.getElementById('adminSidebar');
-  var overlay = document.getElementById('adminOverlay');
+  var toggle = document.getElementById('sidebar-toggle');
+  var sidebar = document.getElementById('admin-sidebar');
+  var overlay = document.getElementById('sidebar-overlay');
 
   if (!toggle || !sidebar || !overlay) return;
 
   function openSidebar() {
     sidebar.classList.add('open');
     overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
   }
 
   function closeSidebar() {
     sidebar.classList.remove('open');
     overlay.classList.remove('open');
+    document.body.style.overflow = '';
   }
 
   toggle.addEventListener('click', function() {
@@ -463,7 +486,12 @@ $adminEmail = $_SESSION['admin_user_email'] ?? '';
   });
 
   overlay.addEventListener('click', closeSidebar);
+
+  window.addEventListener('resize', function() {
+    if (window.innerWidth > 1024) closeSidebar();
+  });
 })();
 </script>
+
 </body>
 </html>

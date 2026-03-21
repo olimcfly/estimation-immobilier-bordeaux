@@ -10,6 +10,7 @@ use App\Core\View;
 use App\Models\DesignTemplate;
 use App\Models\Lead;
 use App\Services\EstimationService;
+use App\Services\LeadNotificationService;
 use App\Services\LeadScoringService;
 use App\Services\PerplexityService;
 
@@ -38,21 +39,43 @@ final class EstimationController
 
         $leads = [];
         $dbError = null;
+        $statutCounts = [];
+
+        $filterScore = isset($_GET['score']) ? trim((string) $_GET['score']) : null;
+        $filterStatut = isset($_GET['statut']) ? trim((string) $_GET['statut']) : null;
+        $filterType = isset($_GET['type']) ? trim((string) $_GET['type']) : null;
 
         try {
             $leadModel = new Lead();
-            $leads = $leadModel->findAllLeads();
+            $hasFilters = ($filterScore !== null && $filterScore !== '')
+                       || ($filterStatut !== null && $filterStatut !== '')
+                       || ($filterType !== null && $filterType !== '');
+
+            if ($hasFilters) {
+                $leads = $leadModel->findAllLeadsFiltered(
+                    $filterScore ?: null,
+                    $filterStatut ?: null,
+                    $filterType ?: null
+                );
+            } else {
+                $leads = $leadModel->findAllLeads();
+            }
+            $statutCounts = $leadModel->countByStatut();
         } catch (\Throwable $e) {
             $dbError = 'Base de données indisponible : les leads ne peuvent pas être chargés.';
         }
 
         View::renderAdmin('admin/leads', [
-            'page_title' => 'Leads - Admin CRM',
-            'admin_page' => 'leads',
-            'breadcrumb' => 'Leads',
+            'page_title' => 'Gestion des Leads - Admin',
+            'admin_page_title' => 'Leads',
+            'admin_current_page' => 'leads',
             'leads' => $leads,
             'leadCount' => count($leads),
             'dbError' => $dbError,
+            'statutCounts' => $statutCounts,
+            'filterScore' => $filterScore,
+            'filterStatut' => $filterStatut,
+            'filterType' => $filterType,
         ]);
     }
 
@@ -194,6 +217,19 @@ final class EstimationController
                 'submitted_at' => time(),
             ];
 
+            LeadNotificationService::notify($leadId, $temperature, [
+                'nom' => $nom,
+                'email' => $email,
+                'telephone' => $telephone,
+                'adresse' => $adresse,
+                'ville' => $ville,
+                'estimation' => $estimation,
+                'urgence' => $urgence,
+                'motivation' => $motivation,
+                'notes' => $notes,
+                'statut' => 'nouveau',
+            ]);
+
             View::render('estimation/lead_saved', [
                 'leadId' => $leadId,
                 'temperature' => $temperature,
@@ -217,6 +253,100 @@ final class EstimationController
         }
     }
 
+
+    public function updateLeadStatut(): void
+    {
+        AuthController::requireAuth();
+        AuthController::verifyCsrfToken();
+
+        $id = isset($_POST['id']) ? (int) $_POST['id'] : 0;
+        $statut = trim((string) ($_POST['statut'] ?? ''));
+
+        if ($id > 0 && $statut !== '') {
+            $leadModel = new Lead();
+            $leadModel->updateStatut($id, $statut);
+        }
+
+        header('Location: /admin/leads');
+        exit;
+    }
+
+    public function updateLeadInline(): void
+    {
+        AuthController::requireAuth();
+        AuthController::verifyCsrfToken();
+
+        header('Content-Type: application/json; charset=utf-8');
+
+        $id = isset($_POST['id']) ? (int) $_POST['id'] : 0;
+        $field = trim((string) ($_POST['field'] ?? ''));
+        $value = trim((string) ($_POST['value'] ?? ''));
+
+        if ($id <= 0 || $field === '' || $value === '') {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'error' => 'Paramètres manquants'], JSON_UNESCAPED_UNICODE);
+            return;
+        }
+
+        $leadModel = new Lead();
+        $ok = false;
+
+        if ($field === 'statut') {
+            $ok = $leadModel->updateStatut($id, $value);
+        } elseif ($field === 'score') {
+            $ok = $leadModel->updateScore($id, $value);
+        } else {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'error' => 'Champ non supporté'], JSON_UNESCAPED_UNICODE);
+            return;
+        }
+
+        echo json_encode(['success' => $ok], JSON_UNESCAPED_UNICODE);
+    }
+
+    public function pipeline(): void
+    {
+        AuthController::requireAuth();
+
+        $leadModel = new Lead();
+
+        try {
+            $statutCounts = $leadModel->countByStatut();
+            $totalLeads = array_sum($statutCounts);
+
+            $allStatuts = [
+                'nouveau', 'contacte', 'rdv_pris', 'visite_realisee',
+                'mandat_simple', 'mandat_exclusif', 'compromis_vente',
+                'signe', 'co_signature_partenaire', 'assigne_autre',
+            ];
+
+            $leadsByStatut = [];
+            foreach ($allStatuts as $s) {
+                $leadsByStatut[$s] = $leadModel->findByStatut($s);
+            }
+
+            $pdo = \App\Core\Database::connection();
+            $websiteId = (int) \App\Core\Config::get('website.id', 1);
+            $stmt = $pdo->prepare('SELECT score, COUNT(*) as cnt FROM leads WHERE website_id = :wid AND lead_type = :lt GROUP BY score');
+            $stmt->execute([':wid' => $websiteId, ':lt' => 'qualifie']);
+            $scoreData = $stmt->fetchAll(\PDO::FETCH_KEY_PAIR) ?: [];
+        } catch (\Throwable $e) {
+            $statutCounts = [];
+            $leadsByStatut = [];
+            $scoreData = [];
+            $totalLeads = 0;
+        }
+
+        View::renderAdmin('admin/pipeline', [
+            'page_title' => 'Pipeline - Admin CRM',
+            'admin_page' => 'pipeline',
+            'breadcrumb' => 'Pipeline',
+            'statutCounts' => $statutCounts,
+            'leadsByStatut' => $leadsByStatut,
+            'scoreData' => $scoreData,
+            'totalLeads' => $totalLeads,
+        ]);
+    }
 
     private function assertLeadRequestAllowed(): void
     {

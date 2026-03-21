@@ -1,7 +1,6 @@
-<section class="section">
-  <div class="container">
-    <a href="/admin/blog" class="btn btn-small btn-ghost">← Retour CMS</a>
-    <h1><?= e($submitLabel) ?></h1>
+<div class="container">
+    <a href="/admin/blog" class="btn btn-small btn-ghost" style="margin-bottom: 1rem; display: inline-block;">&larr; Retour CMS</a>
+    <h1 style="font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 700; margin: 0 0 1rem;"><?= e($submitLabel) ?></h1>
 
     <?php if (($message ?? '') !== ''): ?><p class="success"><?= e((string) $message) ?></p><?php endif; ?>
     <?php if (($error ?? '') !== ''): ?><p class="alert"><?= e((string) $error) ?></p><?php endif; ?>
@@ -82,5 +81,4 @@
         </div>
       </section>
     <?php endif; ?>
-  </div>
-</section>
+</div>
