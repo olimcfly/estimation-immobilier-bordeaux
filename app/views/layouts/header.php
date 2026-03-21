@@ -414,14 +414,17 @@
         transform: translateX(0);
       }
 
-      .nav-item {
+      .top-nav > .nav-item {
         width: 100%;
+        border-bottom: 1px solid var(--border);
       }
 
       .nav-link {
         padding: 1rem 1.5rem;
         border-radius: 0;
         justify-content: space-between;
+        width: 100%;
+        font-size: 1.05rem;
       }
 
       .dropdown-menu {
@@ -583,8 +586,12 @@
         </ul>
       </div>
 
-      <a href="/a-propos" class="nav-link">À propos</a>
-      <a href="/contact" class="nav-link">Contact</a>
+      <div class="nav-item">
+        <a href="/a-propos" class="nav-link">À propos</a>
+      </div>
+      <div class="nav-item">
+        <a href="/contact" class="nav-link">Contact</a>
+      </div>
 
       <div class="nav-item has-dropdown">
         <a href="/guides" class="nav-link">Ressources</a>
