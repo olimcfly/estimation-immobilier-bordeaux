@@ -15,7 +15,7 @@ final class AuthController
     public function loginForm(): void
     {
         if ($this->isLoggedIn()) {
-            header('Location: /admin/leads');
+            header('Location: /admin');
             exit;
         }
 
@@ -157,7 +157,7 @@ final class AuthController
         $_SESSION['admin_user_name'] = (string) $user['name'];
         $_SESSION['admin_logged_in'] = true;
 
-        header('Location: /admin/leads');
+        header('Location: /admin');
         exit;
     }
 

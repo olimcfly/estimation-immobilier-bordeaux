@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Controllers\AdminBlogController;
+use App\Controllers\AdminController;
 use App\Controllers\AdminImageController;
 use App\Controllers\AuthController;
 use App\Controllers\BlogController;
@@ -25,6 +26,7 @@ $router->get('/admin/diagnostic', [AuthController::class, 'diagnostic']);
 $router->get('/admin/test-smtp', [AuthController::class, 'testSmtp']);
 
 // Protected admin routes
+$router->get('/admin', [AdminController::class, 'dashboard']);
 $router->get('/admin/leads', [EstimationController::class, 'leads']);
 
 $router->get('/services', [PageController::class, 'services']);

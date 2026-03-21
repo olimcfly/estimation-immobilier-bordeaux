@@ -13,7 +13,9 @@ final class AdminImageController
     {
         $service = new ImageGeneratorService();
 
-        View::render('admin/images/index', [
+        View::renderAdmin('admin/images/index', [
+            'admin_page_title' => 'Images IA',
+            'admin_current_page' => 'images',
             'images' => $service->listGeneratedImages(),
             'promptTypes' => $this->promptTypes(),
             'message' => (string) ($_GET['message'] ?? ''),
@@ -46,7 +48,9 @@ final class AdminImageController
         $result = $service->generate($prompt, $size, $quality);
 
         if (!$result['success']) {
-            View::render('admin/images/index', [
+            View::renderAdmin('admin/images/index', [
+                'admin_page_title' => 'Images IA',
+                'admin_current_page' => 'images',
                 'images' => $service->listGeneratedImages(),
                 'promptTypes' => $this->promptTypes(),
                 'error' => $result['error'],
@@ -58,7 +62,9 @@ final class AdminImageController
             return;
         }
 
-        View::render('admin/images/index', [
+        View::renderAdmin('admin/images/index', [
+            'admin_page_title' => 'Images IA',
+            'admin_current_page' => 'images',
             'images' => $service->listGeneratedImages(),
             'promptTypes' => $this->promptTypes(),
             'message' => 'Image générée avec succès !',

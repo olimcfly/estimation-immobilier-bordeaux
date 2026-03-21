@@ -30,6 +30,30 @@ final class View
     }
 
     /**
+     * Render a template inside the admin layout with sidebar navigation.
+     */
+    public static function renderAdmin(string $template, array $data = []): void
+    {
+        $templatePath = __DIR__ . '/../views/' . $template . '.php';
+
+        if (!is_file($templatePath)) {
+            http_response_code(500);
+            echo 'Template not found.';
+            return;
+        }
+
+        $pageContent = self::renderTemplate($templatePath, $data);
+
+        $layoutPath = __DIR__ . '/../views/layouts/admin.php';
+        ob_start();
+        extract($data, EXTR_SKIP);
+        include $layoutPath;
+        $layoutHtml = (string) ob_get_clean();
+
+        echo str_replace('%%ADMIN_CONTENT%%', $pageContent, $layoutHtml);
+    }
+
+    /**
      * Render a template without the site header and footer (bare layout).
      */
     public static function renderBare(string $template, array $data = []): void
