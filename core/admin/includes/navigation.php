@@ -41,6 +41,7 @@ $adminMenu = [
             ['label' => 'Rapports', 'href' => '/admin/export.php'],
         ],
     ],
+    ['key' => 'users', 'label' => 'Utilisateurs', 'href' => '/admin/users.php', 'icon' => '👥', 'badge' => null],
     [
         'key' => 'settings',
         'label' => 'Paramètres',
