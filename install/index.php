@@ -231,7 +231,10 @@ $siteSession = $_SESSION['install_site'] ?? [
     <style>
         body { background: #0f172a; color: #e2e8f0; }
         .card { background: #111827; border: 1px solid #334155; }
-        .text-muted { color: #94a3b8 !important; }
+        .text-muted { color: #cbd5e1 !important; }
+        .form-label { color: #ffffff; font-weight: 600; }
+        .step-title { color: #ffffff; font-size: 1.25rem; font-weight: 700; }
+        .help-text { color: #cbd5e1; }
         .step-pill { border: 1px solid #334155; color: #94a3b8; padding: .35rem .75rem; border-radius: 999px; font-size: .85rem; }
         .step-pill.active { background: #1d4ed8; color: #fff; border-color: #1d4ed8; }
     </style>
@@ -239,7 +242,7 @@ $siteSession = $_SESSION['install_site'] ?? [
 <body>
 <div class="container py-5" style="max-width: 900px;">
     <h1 class="h3 mb-3">Wizard d'installation EstimIA</h1>
-    <p class="text-muted mb-4">Assistant en 4 étapes.</p>
+    <p class="help-text mb-4">Assistant en 4 étapes.</p>
 
     <div class="d-flex flex-wrap gap-2 mb-4">
         <?php for ($i = 1; $i <= 4; $i++): ?>
@@ -266,7 +269,7 @@ $siteSession = $_SESSION['install_site'] ?? [
 
     <?php if (!$alreadyInstalled && empty($installCompleted) && $step === 1): ?>
         <div class="card p-4">
-            <h2 class="h5 mb-3">Étape 1 — Vérification pré-requis</h2>
+            <h2 class="step-title mb-3">Étape 1 — Vérification pré-requis</h2>
             <ul class="list-group">
                 <?php foreach ($requirements as $label => $ok): ?>
                     <li class="list-group-item d-flex justify-content-between align-items-center bg-dark text-light border-secondary">
@@ -283,7 +286,7 @@ $siteSession = $_SESSION['install_site'] ?? [
 
     <?php if (!$alreadyInstalled && empty($installCompleted) && $step === 2): ?>
         <div class="card p-4">
-            <h2 class="h5 mb-3">Étape 2 — Configuration base de données</h2>
+            <h2 class="step-title mb-3">Étape 2 — Configuration base de données</h2>
             <form id="dbForm" class="row g-3">
                 <div class="col-md-6">
                     <label class="form-label">Host</label>
@@ -313,7 +316,7 @@ $siteSession = $_SESSION['install_site'] ?? [
 
     <?php if (!$alreadyInstalled && empty($installCompleted) && $step === 3): ?>
         <div class="card p-4">
-            <h2 class="h5 mb-3">Étape 3 — Configuration site</h2>
+            <h2 class="step-title mb-3">Étape 3 — Configuration site</h2>
             <form method="post" class="row g-3">
                 <div class="col-md-6">
                     <label class="form-label">Nom du site</label>
@@ -349,8 +352,8 @@ $siteSession = $_SESSION['install_site'] ?? [
 
     <?php if (!$alreadyInstalled && empty($installCompleted) && $step === 4): ?>
         <div class="card p-4">
-            <h2 class="h5 mb-3">Étape 4 — Finalisation</h2>
-            <p>Cette étape va :</p>
+            <h2 class="step-title mb-3">Étape 4 — Finalisation</h2>
+            <p class="help-text">Cette étape va :</p>
             <ul>
                 <li>Générer <code>config/config.php</code>.</li>
                 <li>Générer <code>config/database.php</code>.</li>
