@@ -51,15 +51,21 @@ estimation-immobilier-bordeaux/
 2. Vérifier `core/config/config.php` et `core/config/database.php`.
 3. Accéder à `/install/` pour compléter l'installation si nécessaire.
 
-## 💾 Sauvegardes automatiques
+## 📅 ÉTAPE 7 : DÉPLOIEMENT
 
-### Configuration du cron
+### 7.1 Pour une nouvelle installation
 
-Ajoutez cette ligne à votre crontab (`crontab -e`) pour une sauvegarde quotidienne à 2h du matin :
+1. Exécuter `core/database/install.sql`.
+2. Configurer les permissions pour `core/cron/backups/` :
+   ```bash
+   chmod 755 core/cron/backups/
+   ```
 
-```bash
-0 2 * * * /usr/bin/php /chemin/vers/skyline/cron/backup_db.php >> /var/log/skyline_backup.log 2>&1
-```
+### 7.2 Pour une installation existante
+
+1. Exécuter `sql/admin_security_upgrade.sql`.
+2. Mettre à jour les fichiers PHP concernés (`security.php`, `admin-auth.php`, etc.).
+3. Configurer le cron pour les sauvegardes.
 
 ## Onboarding admin
 
