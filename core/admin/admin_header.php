@@ -34,7 +34,7 @@ if (!isset($pageTitle) || !is_string($pageTitle) || $pageTitle === '') {
         <a href="/" class="font-semibold text-lg"><?= admin_h(SITE_NAME) ?></a>
         <nav class="flex gap-4 text-sm">
             <a href="/admin/settings.php" class="hover:underline">Paramètres</a>
-            <a href="/admin/google-ads.php" class="hover:underline">Google Ads</a>
+            <a href="/admin/google-ads/index.php" class="hover:underline">Google Ads</a>
             <a href="/admin/export.php?type=leads_csv" class="hover:underline">Exports</a>
         </nav>
     </div>
