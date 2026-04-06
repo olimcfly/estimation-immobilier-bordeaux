@@ -20,6 +20,8 @@ try {
     $db = Database::getConnection();
     adminEnsureTables($db);
 
+    // Le verrouillage de l'onboarding dépend uniquement de la table `admins`.
+    // Aucun fichier setup.lock n'est utilisé dans ce projet.
     $adminCount = (int) $db->query('SELECT COUNT(*) FROM admins')->fetchColumn();
     if ($adminCount > 0) {
         header('Location: /admin/login.php');
