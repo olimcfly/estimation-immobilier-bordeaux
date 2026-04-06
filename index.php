@@ -273,23 +273,50 @@ if (!is_array($villes) || $villes === []) {
         </section>
 
         <section class="bg-white px-4 py-16 sm:px-6 lg:px-8">
-            <div class="mx-auto max-w-5xl text-center">
-                <h2 class="text-3xl font-bold text-slate-900">Déjà 500+ estimations à Bordeaux</h2>
-                <div class="mt-8 grid gap-6 md:grid-cols-3">
+            <div class="mx-auto max-w-6xl">
+                <div class="text-center">
+                    <h2 class="text-3xl font-bold text-slate-900">Preuve locale : estimations récentes en Gironde</h2>
+                    <p class="mt-3 text-sm text-slate-600">Des fourchettes observées sur des biens comparables pour vous situer rapidement.</p>
+                </div>
+
+                <div class="mt-10 grid gap-6 md:grid-cols-3">
+                    <article class="rounded-2xl border border-blue-100 bg-blue-50/40 p-5 text-left">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-blue-700">Exemple local · Bordeaux Chartrons</p>
+                        <h3 class="mt-2 text-lg font-bold text-slate-900">Appartement T3 · 67 m² · balcon</h3>
+                        <p class="mt-3 text-sm text-slate-600">Fourchette estimative obtenue : <span class="font-semibold text-slate-900">335 000 € à 368 000 €</span></p>
+                        <p class="mt-2 text-xs text-slate-500">Soit environ 5 000 à 5 490 €/m² selon l'étage, l'état intérieur et le stationnement.</p>
+                    </article>
+
+                    <article class="rounded-2xl border border-blue-100 bg-blue-50/40 p-5 text-left">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-blue-700">Exemple local · Pessac Alouette</p>
+                        <h3 class="mt-2 text-lg font-bold text-slate-900">Maison 5 pièces · 118 m² · jardin 420 m²</h3>
+                        <p class="mt-3 text-sm text-slate-600">Fourchette estimative obtenue : <span class="font-semibold text-slate-900">452 000 € à 510 000 €</span></p>
+                        <p class="mt-2 text-xs text-slate-500">Soit environ 3 830 à 4 320 €/m², avec impact notable de la rénovation énergétique.</p>
+                    </article>
+
+                    <article class="rounded-2xl border border-blue-100 bg-blue-50/40 p-5 text-left">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-blue-700">Exemple local · Talence Forum</p>
+                        <h3 class="mt-2 text-lg font-bold text-slate-900">Studio · 24 m² · résidence étudiante</h3>
+                        <p class="mt-3 text-sm text-slate-600">Fourchette estimative obtenue : <span class="font-semibold text-slate-900">118 000 € à 136 000 €</span></p>
+                        <p class="mt-2 text-xs text-slate-500">Soit environ 4 920 à 5 670 €/m², selon la demande locative et les charges de copropriété.</p>
+                    </article>
+                </div>
+
+                <div class="mt-10 grid gap-6 md:grid-cols-3">
                     <blockquote class="rounded-2xl border border-slate-200 p-5 text-left">
                         <p class="text-amber-500">★★★★★</p>
-                        <p class="mt-3 text-sm text-slate-600">"Très rapide et cohérent avec les prix que j'avais repérés dans mon quartier."</p>
-                        <footer class="mt-3 text-xs font-semibold text-slate-500">— Claire, Bordeaux Centre</footer>
+                        <p class="mt-3 text-sm text-slate-600">« Estimation reçue en 40 secondes pour mon T3 aux Chartrons. La fourchette était proche de l'avis de valeur signé ensuite en agence. »</p>
+                        <footer class="mt-3 text-xs font-semibold text-slate-500">— Julie M., vendeuse · Chartrons (Bordeaux)</footer>
                     </blockquote>
                     <blockquote class="rounded-2xl border border-slate-200 p-5 text-left">
                         <p class="text-amber-500">★★★★★</p>
-                        <p class="mt-3 text-sm text-slate-600">"J'ai eu une fourchette réaliste en moins d'une minute, super pratique."</p>
-                        <footer class="mt-3 text-xs font-semibold text-slate-500">— Thomas, Mérignac</footer>
+                        <p class="mt-3 text-sm text-slate-600">« Pour notre maison à Pessac, on a enfin eu un prix cohérent avant de lancer les visites. Clair, rapide et sans appel commercial insistant. »</p>
+                        <footer class="mt-3 text-xs font-semibold text-slate-500">— Marc et Élodie R., propriétaires · Pessac</footer>
                     </blockquote>
                     <blockquote class="rounded-2xl border border-slate-200 p-5 text-left">
                         <p class="text-amber-500">★★★★★</p>
-                        <p class="mt-3 text-sm text-slate-600">"Interface simple et claire, parfait pour une première idée de prix."</p>
-                        <footer class="mt-3 text-xs font-semibold text-slate-500">— Nadia, Pessac</footer>
+                        <p class="mt-3 text-sm text-slate-600">« J'hésitais pour vendre mon studio à Talence : la fourchette m'a aidée à fixer un prix réaliste, puis j'ai vendu en moins de 3 semaines. »</p>
+                        <footer class="mt-3 text-xs font-semibold text-slate-500">— Sarah L., investisseuse · Talence</footer>
                     </blockquote>
                 </div>
             </div>
