@@ -51,6 +51,16 @@ estimation-immobilier-bordeaux/
 2. Vérifier `core/config/config.php` et `core/config/database.php`.
 3. Accéder à `/install/` pour compléter l'installation si nécessaire.
 
+## 💾 Sauvegardes automatiques
+
+### Configuration du cron
+
+Ajoutez cette ligne à votre crontab (`crontab -e`) pour une sauvegarde quotidienne à 2h du matin :
+
+```bash
+0 2 * * * /usr/bin/php /chemin/vers/skyline/cron/backup_db.php >> /var/log/skyline_backup.log 2>&1
+```
+
 ## Onboarding admin
 
 - L'accès à `/admin/onboarding.php` est piloté par la session admin et le nombre d'entrées dans `admins`.
