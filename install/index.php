@@ -10,171 +10,32 @@ $configFile = $configDir . '/config.php';
 $databaseFile = $configDir . '/database.php';
 $installSqlPath = $rootDir . '/install.sql';
 
-/**
- * @return list<string>
- */
-function extractInstallTables(string $sqlPath): array
+function installRenderEmailTemplate(string $rootDir, string $template, array $data = []): string
 {
-    if (!is_file($sqlPath)) {
-        return [];
+    $templatePath = $rootDir . '/templates/emails/' . $template . '.php';
+    if (!is_file($templatePath)) {
+        return '';
     }
 
-    $sql = (string) file_get_contents($sqlPath);
-    if ($sql === '') {
-        return [];
-    }
+    extract($data, EXTR_SKIP);
 
-    preg_match_all('/CREATE TABLE IF NOT EXISTS\s+`?([a-zA-Z0-9_]+)`?/i', $sql, $matches);
-    $tables = array_values(array_unique($matches[1] ?? []));
-    sort($tables);
+    ob_start();
+    require $templatePath;
 
-    return $tables;
+    return (string) ob_get_clean();
 }
 
-/**
- * @param list<string> $expectedTables
- * @return array<string,bool>
- */
-function getTablesChecklist(array $dbConfig, array $expectedTables): array
+function installSendEmail(string $to, string $subject, string $html, string $fromName): bool
 {
-    $checklist = [];
-    foreach ($expectedTables as $table) {
-        $checklist[$table] = false;
-    }
+    $headers = [
+        'MIME-Version: 1.0',
+        'Content-type: text/html; charset=UTF-8',
+        sprintf('From: %s <%s>', $fromName, 'contact@estimia-bordeaux.fr'),
+        'Reply-To: contact@estimia-bordeaux.fr',
+        'X-Mailer: PHP/' . phpversion(),
+    ];
 
-    if ($expectedTables === []) {
-        return $checklist;
-    }
-
-    try {
-        $pdo = new PDO(
-            sprintf('mysql:host=%s;dbname=%s;charset=utf8mb4', $dbConfig['host'], $dbConfig['db_name']),
-            (string) $dbConfig['db_user'],
-            (string) $dbConfig['db_pass'],
-            [
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                PDO::ATTR_EMULATE_PREPARES => false,
-            ]
-        );
-
-        $rows = $pdo->query('SHOW TABLES')->fetchAll(PDO::FETCH_NUM);
-        $existingTables = [];
-        foreach ($rows as $row) {
-            if (isset($row[0])) {
-                $existingTables[(string) $row[0]] = true;
-            }
-        }
-
-        foreach ($expectedTables as $table) {
-            $checklist[$table] = isset($existingTables[$table]);
-        }
-    } catch (Throwable $e) {
-        // Ignore: checklist remains false if DB cannot be reached.
-    }
-
-    return $checklist;
-}
-
-/**
- * @return array{success: bool, message: string, smtp_warning?: string}
- */
-function smtpHandshakeAndOptionalMail(array $payload): array
-{
-    $host = trim((string) ($payload['smtp_host'] ?? ''));
-    $port = (int) ($payload['smtp_port'] ?? 587);
-    $user = trim((string) ($payload['smtp_user'] ?? ''));
-    $pass = (string) ($payload['smtp_pass'] ?? '');
-    $adminEmail = trim((string) ($payload['admin_email'] ?? ''));
-
-    if ($host === '' || $port <= 0 || $user === '') {
-        return ['success' => false, 'message' => 'Host, port et utilisateur SMTP requis.'];
-    }
-
-    $errno = 0;
-    $errstr = '';
-    $socket = @fsockopen($host, $port, $errno, $errstr, 5.0);
-    if (!$socket) {
-        return ['success' => false, 'message' => sprintf('Impossible de se connecter (%s).', $errstr !== '' ? $errstr : $errno)];
-    }
-
-    stream_set_timeout($socket, 5);
-    $response = (string) fgets($socket, 512);
-    if (!str_starts_with($response, '220')) {
-        fclose($socket);
-        return ['success' => false, 'message' => 'Le serveur SMTP ne répond pas correctement (code 220 attendu).'];
-    }
-
-    fwrite($socket, "EHLO estimia.local\r\n");
-    $ehloResponse = '';
-    while (($line = fgets($socket, 512)) !== false) {
-        $ehloResponse .= $line;
-        if (preg_match('/^250\s/i', $line) === 1) {
-            break;
-        }
-    }
-    if (strpos($ehloResponse, '250') !== 0) {
-        fclose($socket);
-        return ['success' => false, 'message' => 'EHLO refusé par le serveur SMTP.'];
-    }
-
-    fwrite($socket, "AUTH LOGIN\r\n");
-    $authChallengeUser = (string) fgets($socket, 512);
-    if (!str_starts_with($authChallengeUser, '334')) {
-        fclose($socket);
-        return ['success' => false, 'message' => 'AUTH LOGIN non accepté par le serveur.'];
-    }
-
-    fwrite($socket, base64_encode($user) . "\r\n");
-    $authChallengePass = (string) fgets($socket, 512);
-    if (!str_starts_with($authChallengePass, '334')) {
-        fclose($socket);
-        return ['success' => false, 'message' => 'Identifiant SMTP refusé.'];
-    }
-
-    fwrite($socket, base64_encode($pass) . "\r\n");
-    $authResult = (string) fgets($socket, 512);
-    if (!str_starts_with($authResult, '235')) {
-        fclose($socket);
-        return ['success' => false, 'message' => 'Authentification SMTP échouée.'];
-    }
-
-    $smtpWarning = null;
-    if ($adminEmail !== '' && filter_var($adminEmail, FILTER_VALIDATE_EMAIL)) {
-        $fromEmail = $user;
-        fwrite($socket, sprintf("MAIL FROM:<%s>\r\n", $fromEmail));
-        $mailFromRes = (string) fgets($socket, 512);
-        fwrite($socket, sprintf("RCPT TO:<%s>\r\n", $adminEmail));
-        $rcptRes = (string) fgets($socket, 512);
-        fwrite($socket, "DATA\r\n");
-        $dataRes = (string) fgets($socket, 512);
-
-        if (str_starts_with($mailFromRes, '250') && (str_starts_with($rcptRes, '250') || str_starts_with($rcptRes, '251')) && str_starts_with($dataRes, '354')) {
-            $body = "Subject: Test SMTP EstimIA\r\n"
-                . sprintf("To: %s\r\n", $adminEmail)
-                . sprintf("From: %s\r\n", $fromEmail)
-                . "Content-Type: text/plain; charset=utf-8\r\n"
-                . "\r\n"
-                . "Votre configuration SMTP fonctionne !\r\n.\r\n";
-            fwrite($socket, $body);
-            $sendRes = (string) fgets($socket, 512);
-            if (!str_starts_with($sendRes, '250')) {
-                $smtpWarning = 'Connexion OK, mais l\'email test n\'a pas pu être confirmé.';
-            }
-        } else {
-            $smtpWarning = 'Connexion OK, mais le serveur a refusé l\'envoi du mail test.';
-        }
-    }
-
-    fwrite($socket, "QUIT\r\n");
-    fclose($socket);
-
-    $result = ['success' => true, 'message' => '✅ Connexion SMTP réussie'];
-    if ($smtpWarning !== null) {
-        $result['smtp_warning'] = $smtpWarning;
-    }
-
-    return $result;
+    return mail($to, $subject, $html, implode("\r\n", $headers));
 }
 
 if (isset($_GET['action']) && $_GET['action'] === 'test_db') {
@@ -388,7 +249,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$alreadyInstalled) {
                     'actif' => 1,
                 ]);
 
-                $tableChecklist = getTablesChecklist($db, $expectedTables);
+                $nameParts = preg_split('/\s+/', trim((string) $site['site_name'])) ?: [];
+                $defaultPrenom = isset($nameParts[0]) && $nameParts[0] !== '' ? $nameParts[0] : 'Admin';
+                $defaultNom = count($nameParts) > 1 ? implode(' ', array_slice($nameParts, 1)) : 'EstimIA';
+
+                $adminStmt = $pdo->prepare(
+                    'INSERT INTO admins (prenom, nom, email) VALUES (:prenom, :nom, :email)
+                     ON DUPLICATE KEY UPDATE prenom = VALUES(prenom), nom = VALUES(nom)'
+                );
+                $adminStmt->execute([
+                    'prenom' => $defaultPrenom,
+                    'nom' => $defaultNom,
+                    'email' => (string) $site['admin_email'],
+                ]);
+
+                $emailHtml = installRenderEmailTemplate($rootDir, 'install-success', [
+                    'prenom' => $defaultPrenom,
+                    'nom' => $defaultNom,
+                    'siteName' => (string) $site['site_name'],
+                    'cityName' => (string) $site['city_name'],
+                    'baseUrl' => (string) $site['base_url'],
+                ]);
+
+                installSendEmail(
+                    (string) $site['admin_email'],
+                    'Installation terminée - Accès administration',
+                    $emailHtml,
+                    (string) $site['site_name']
+                );
+
                 $installCompleted = true;
                 unset($_SESSION['install_db'], $_SESSION['install_site']);
             } catch (Throwable $e) {

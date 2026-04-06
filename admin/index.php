@@ -7,7 +7,7 @@ require_once __DIR__ . '/../config/database.php';
 
 session_start();
 
-if (empty($_SESSION['admin_logged'])) {
+if (empty($_SESSION['admin_logged']) || empty($_SESSION['admin_id'])) {
     header('Location: /admin/login.php');
     exit;
 }
@@ -41,7 +41,7 @@ $lastEstimations = $lastEstimationsStmt->fetchAll();
             <a href="/admin/lead.php" class="block rounded-md px-4 py-2 hover:bg-blue-800">Leads</a>
             <a href="/admin/settings.php" class="block rounded-md px-4 py-2 hover:bg-blue-800">Paramètres</a>
             <a href="/admin/webhooks.php" class="block rounded-md px-4 py-2 hover:bg-blue-800">Webhooks</a>
-            <a href="/admin/login.php?logout=1" class="block rounded-md px-4 py-2 hover:bg-blue-800">Déconnexion</a>
+            <a href="/admin/logout.php" class="block rounded-md px-4 py-2 hover:bg-blue-800">Déconnexion</a>
         </nav>
     </aside>
 
