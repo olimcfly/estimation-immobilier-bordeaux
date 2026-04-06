@@ -4,14 +4,22 @@ declare(strict_types=1);
 
 $configPath = __DIR__ . '/config/config.php';
 $config = [];
+$installed = false;
+
 if (is_file($configPath)) {
     $loaded = require $configPath;
+
     if (is_array($loaded)) {
         $config = $loaded;
+        $installed = !empty($config['installed']);
+    } else {
+        // Ancien format de configuration basé sur des constantes.
+        // Dans ce cas, la présence du fichier signifie que l'installation est faite.
+        $installed = true;
     }
 }
 
-if (empty($config['installed'])) {
+if (!$installed) {
     header('Location: /install/index.php');
     exit;
 }
