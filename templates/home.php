@@ -85,28 +85,34 @@ if (defined('CITIES_LIST')) {
 
         <section class="mx-auto mt-10 max-w-5xl">
             <div class="rounded-2xl bg-blue-900 px-6 py-8 text-white shadow-lg">
-                <p class="text-sm font-semibold uppercase tracking-wider text-blue-200">Pourquoi nous sommes différents à Bordeaux</p>
-                <h2 class="mt-2 text-2xl font-bold">3 preuves concrètes face aux gros portails</h2>
+                <p class="text-sm font-semibold uppercase tracking-wider text-blue-200">Méthode locale, données vérifiables</p>
+                <h2 class="mt-2 text-2xl font-bold">Une estimation crédible pour Bordeaux Métropole</h2>
+                <p class="mt-3 max-w-3xl text-sm text-blue-100">Notre estimation ne repose pas sur une simple moyenne. Elle combine des ventes réellement enregistrées, des références notariales et une lecture fine des quartiers bordelais.</p>
             </div>
 
             <div class="mt-6 grid gap-5 md:grid-cols-3">
                 <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                    <p class="text-xs font-bold uppercase tracking-wide text-blue-700">UX locale</p>
-                    <h3 class="mt-2 text-lg font-semibold text-slate-900">Parcours en 2 minutes + version quartier</h3>
-                    <p class="mt-3 text-sm leading-relaxed text-slate-600">Texte prêt à intégrer : <strong>"Estimez votre bien en 2 minutes puis découvrez immédiatement l'analyse de votre micro-quartier (Chartrons, Caudéran, Saint-Michel, Bastide...)."</strong></p>
+                    <p class="text-xs font-bold uppercase tracking-wide text-blue-700">Sources de données</p>
+                    <h3 class="mt-2 text-lg font-semibold text-slate-900">DVF + notaires + ventes locales récentes</h3>
+                    <p class="mt-3 text-sm leading-relaxed text-slate-600">Nous croisons la base DVF (Demandes de Valeurs Foncières), les tendances notariales et les transactions récentes observées à Bordeaux, Talence, Mérignac, Pessac, Bègles et Le Bouscat.</p>
                 </article>
 
                 <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                    <p class="text-xs font-bold uppercase tracking-wide text-emerald-700">Données propriétaires</p>
-                    <h3 class="mt-2 text-lg font-semibold text-slate-900">Comparables ultra-locaux à 500 m</h3>
-                    <p class="mt-3 text-sm leading-relaxed text-slate-600">Texte prêt à intégrer : <strong>"Notre estimation s'appuie sur les ventes réellement signées autour de votre adresse (rayon 500 m), avec ajustement selon étage, extérieur, parking et état du bien."</strong></p>
+                    <p class="text-xs font-bold uppercase tracking-wide text-emerald-700">Lecture micro-locale</p>
+                    <h3 class="mt-2 text-lg font-semibold text-slate-900">Le quartier fait la différence</h3>
+                    <p class="mt-3 text-sm leading-relaxed text-slate-600">Les écarts de prix peuvent être significatifs entre Chartrons, Caudéran, Bastide ou Saint-Michel. Nous tenons compte de la demande locale, de la proximité tram/commerces et des spécificités de votre rue.</p>
                 </article>
 
                 <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                    <p class="text-xs font-bold uppercase tracking-wide text-purple-700">Promesse claire</p>
-                    <h3 class="mt-2 text-lg font-semibold text-slate-900">Fourchette précise + plan d'action 30 jours</h3>
-                    <p class="mt-3 text-sm leading-relaxed text-slate-600">Texte prêt à intégrer : <strong>"Recevez une fourchette de prix réaliste, un délai de vente estimé à Bordeaux et 3 actions concrètes pour maximiser votre prix sous 30 jours."</strong></p>
+                    <p class="text-xs font-bold uppercase tracking-wide text-purple-700">Méthode transparente</p>
+                    <h3 class="mt-2 text-lg font-semibold text-slate-900">Comparables + ajustements concrets</h3>
+                    <p class="mt-3 text-sm leading-relaxed text-slate-600">Chaque estimation est calculée à partir de biens comparables puis ajustée selon la surface, l'état, l'étage, l'extérieur, le stationnement et la performance énergétique du bien.</p>
                 </article>
+            </div>
+
+            <div class="mt-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h3 class="text-lg font-semibold text-slate-900">Une expertise locale orientée résultat</h3>
+                <p class="mt-3 text-sm leading-relaxed text-slate-600">Le marché bordelais reste exigeant : forte demande sur certains secteurs, mais délais de vente variables selon le positionnement prix. Notre objectif est de vous donner une fourchette réaliste et compréhensible pour vendre dans de bonnes conditions, sans sous-valoriser votre bien.</p>
             </div>
         </section>
     </section>
