@@ -23,6 +23,13 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
     exit;
 }
 
+$csrfToken = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
+if (!verifyCSRFToken(is_string($csrfToken) ? $csrfToken : null)) {
+    http_response_code(403);
+    echo json_encode(['success' => false, 'message' => 'Token CSRF invalide']);
+    exit;
+}
+
 $payload = json_decode((string) file_get_contents('php://input'), true);
 if (!is_array($payload)) {
     http_response_code(400);

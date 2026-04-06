@@ -21,13 +21,13 @@ define('ADMIN_EMAIL', '{ADMIN_EMAIL}');
 
 // === LOCALISATION ===
 define('CITY_NAME', '{CITY_NAME}');
-define('CITY_LAT', {CITY_LAT});
-define('CITY_LNG', {CITY_LNG});
-define('CITY_RADIUS_KM', {CITY_RADIUS});
+define('CITY_LAT', (float) '{CITY_LAT}');
+define('CITY_LNG', (float) '{CITY_LNG}');
+define('CITY_RADIUS_KM', (int) '{CITY_RADIUS}');
 
 // === SMTP ===
 define('SMTP_HOST', '{SMTP_HOST}');
-define('SMTP_PORT', {SMTP_PORT});
+define('SMTP_PORT', (int) '{SMTP_PORT}');
 define('SMTP_USER', '{SMTP_USER}');
 define('SMTP_PASS', '{SMTP_PASS}');
 define('SMTP_FROM', '{SMTP_FROM}');

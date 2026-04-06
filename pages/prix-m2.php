@@ -149,7 +149,7 @@ require_once __DIR__ . '/../header.php';
     <section class="max-w-4xl mx-auto py-12 px-4">
         <nav class="text-sm text-gray-500 mb-6">
             <a href="/" class="hover:text-primary">Accueil</a> /
-            <a href="/prix-m2" class="hover:text-primary">Prix au m²</a> /
+            <a href="/pages/prix-m2.php" class="hover:text-primary">Prix au m²</a> /
             <span class="text-gray-900"><?= htmlspecialchars($villeData['ville'], ENT_QUOTES, 'UTF-8') ?></span>
         </nav>
 

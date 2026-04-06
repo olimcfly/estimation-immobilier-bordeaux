@@ -19,6 +19,11 @@ if (!isPost()) {
     redirect('estimations.php');
 }
 
+if (!verifyCSRFToken($_POST['csrf_token'] ?? null)) {
+    $_SESSION['flash_message'] = 'Token CSRF invalide.';
+    redirect('estimations.php');
+}
+
 $action = sanitize($_POST['action'] ?? '');
 $idsRaw = $_POST['ids'] ?? [];
 $redirectQuery = sanitize($_POST['redirect_query'] ?? '');

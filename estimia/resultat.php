@@ -23,7 +23,8 @@ if (!verifyCSRFToken(is_string($csrfToken) ? $csrfToken : null)) {
 $adresse = sanitize($_POST['adresse'] ?? '');
 $type_bien = sanitize($_POST['type_bien'] ?? '');
 $surface = (int) ($_POST['surface'] ?? 0);
-$budget = sanitize($_POST['budget'] ?? '');
+$budgetRaw = sanitize($_POST['budget'] ?? '');
+$budget = $budgetRaw;
 $adresseComplete = sanitize($_POST['adresse_complete'] ?? '');
 $latitude = ($_POST['latitude'] ?? '') !== '' ? (float) $_POST['latitude'] : null;
 $longitude = ($_POST['longitude'] ?? '') !== '' ? (float) $_POST['longitude'] : null;
@@ -34,6 +35,16 @@ $placeId = sanitize($_POST['place_id'] ?? '');
 
 $typesAutorises = ['appartement', 'maison', 'studio', 'terrain'];
 $budgetsAutorises = ['moins_150k', '150k_300k', '300k_500k', 'plus_500k'];
+
+if (!in_array($budget, $budgetsAutorises, true) && is_numeric($budgetRaw)) {
+    $budgetValeur = (int) $budgetRaw;
+    $budget = match (true) {
+        $budgetValeur < 150000 => 'moins_150k',
+        $budgetValeur <= 300000 => '150k_300k',
+        $budgetValeur <= 500000 => '300k_500k',
+        default => 'plus_500k',
+    };
+}
 
 if ($surface <= 0 || $adresse === '' || !in_array($type_bien, $typesAutorises, true) || !in_array($budget, $budgetsAutorises, true)) {
     redirect('index.php');
@@ -60,6 +71,7 @@ $fiabilite = (string) ($estimation['fiabilite'] ?? 'Élevée');
 $messageZone = (string) ($estimation['message_zone'] ?? '');
 
 $estimationId = null;
+$saveWarning = '';
 
 try {
     $pdo = Database::getConnection();
@@ -128,6 +140,7 @@ try {
     }
 } catch (Throwable $e) {
     $estimationId = 0;
+    $saveWarning = 'Estimation calculée, mais impossible de sauvegarder vos données pour le moment.';
 }
 
 $_SESSION['estimation_id'] = $estimationId;
@@ -159,6 +172,11 @@ include __DIR__ . '/includes/header.php';
 <section class="min-h-screen bg-gradient-to-b from-gray-50 to-white pb-20 pt-28">
     <div class="mx-auto max-w-2xl px-6">
         <div class="animate-fade-in-up text-center">
+            <?php if ($saveWarning !== ''): ?>
+                <div class="mx-auto mb-4 max-w-xl rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                    <?php echo htmlspecialchars($saveWarning, ENT_QUOTES, 'UTF-8'); ?>
+                </div>
+            <?php endif; ?>
             <div class="inline-flex items-center gap-2 rounded-full bg-green-50 px-4 py-1.5 text-green-700">
                 <i data-lucide="check" class="h-4 w-4"></i>
                 <span>Estimation terminée</span>

@@ -625,7 +625,7 @@ function completeGuide() {
     localStorage.setItem(STORAGE_PREFIX + 'completed', '1');
     const msg = document.getElementById('completionMessage');
     msg.classList.remove('hidden');
-    msg.innerHTML = '🎉 Bravo ! Vos campagnes vont commencer à générer des leads. <a class="underline" href="dashboard.php">Voir le dashboard admin</a>';
+    msg.innerHTML = '🎉 Bravo ! Vos campagnes vont commencer à générer des leads. <a class="underline" href="settings.php">Voir l\\'admin</a>';
     for (let i = 0; i < 70; i++) {
         const c = document.createElement('span');
         c.textContent = ['🎉','✨','🎊'][i%3];

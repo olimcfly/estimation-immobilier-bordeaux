@@ -12,6 +12,11 @@ RewriteRule ^ https://%1%{REQUEST_URI} [L,R=301]
 # Bloquer l'accès direct aux dossiers sensibles
 RewriteRule ^(config|sql|includes)/ - [F,L,NC]
 
+# Bloquer l'installateur après installation
+RewriteCond %{DOCUMENT_ROOT}/installed.lock -f [OR]
+RewriteCond %{DOCUMENT_ROOT}/estimia/installed.lock -f
+RewriteRule ^install/ - [F,L,NC]
+
 # Compression Gzip
 <IfModule mod_deflate.c>
     AddOutputFilterByType DEFLATE text/plain text/html text/xml text/css application/javascript application/json application/xml

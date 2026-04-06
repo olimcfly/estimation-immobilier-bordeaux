@@ -1,5 +1,7 @@
 <?php
 $pageTitle = "Générateur d'annonces";
+require_once __DIR__ . '/../includes/security.php';
+initSecureSession();
 
 if (defined('CITY_NAME')) {
     $ville = CITY_NAME;
@@ -132,6 +134,10 @@ $flashType = 'success';
 $loadedDraft = null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!validateCsrfToken()) {
+        $flashType = 'error';
+        $flash = 'Session expirée (CSRF). Rechargez la page.';
+    } else {
     $action = $_POST['action'] ?? '';
 
     if ($action === 'save' && $pdo instanceof PDO) {
@@ -165,6 +171,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->execute([':id' => $id]);
             $flash = "Brouillon supprimé.";
         }
+    }
     }
 }
 
@@ -285,6 +292,7 @@ if (file_exists($headerPath)) {
 
                 <div class="toolbar">
                     <form method="post" id="saveForm" style="display:inline-flex; gap:8px;">
+                        <?= csrfField() ?>
                         <input type="hidden" name="action" value="save" />
                         <input type="hidden" name="campaign_type" id="campaignTypeField" value="hot" />
                         <input type="hidden" name="campaign_payload" id="campaignPayloadField" />
@@ -326,6 +334,7 @@ if (file_exists($headerPath)) {
                                     <a href="#" class="duplicate-link" data-draft='<?= htmlspecialchars(json_encode($draft, JSON_UNESCAPED_UNICODE), ENT_QUOTES, 'UTF-8'); ?>'>dupliquer</a>
                                     |
                                     <form method="post" style="display:inline;" onsubmit="return confirm('Supprimer ce brouillon ?');">
+                                        <?= csrfField() ?>
                                         <input type="hidden" name="action" value="delete" />
                                         <input type="hidden" name="id" value="<?= (int)$draft['id']; ?>" />
                                         <button type="submit" style="border:0;background:none;color:#b91c1c;cursor:pointer;">supprimer</button>

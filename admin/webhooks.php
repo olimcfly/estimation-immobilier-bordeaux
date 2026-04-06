@@ -2,11 +2,18 @@
 
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../classes/Webhook.php';
+require_once __DIR__ . '/../includes/security.php';
+require_once __DIR__ . '/../includes/admin-auth.php';
+
+initSecureSession();
 
 $db = Database::getConnection();
 $message = null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!validateCsrfToken()) {
+        $message = 'Session expirée (CSRF). Rechargez la page.';
+    } else {
     $action = $_POST['action'] ?? '';
 
     if ($action === 'test') {
@@ -27,6 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $ok = Webhook::fire((string) $log['event'], (array) ($payload['data'] ?? []));
             $message = $ok ? 'Webhook renvoyé avec succès.' : 'Échec du renvoi du webhook.';
         }
+    }
     }
 }
 
@@ -54,6 +62,7 @@ include __DIR__ . '/../includes/header.php';
             <p class="text-gray-600">Suivi des envois webhook et relances manuelles.</p>
         </div>
         <form method="post">
+            <?= csrfField() ?>
             <input type="hidden" name="action" value="test">
             <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
                 Tester le webhook
@@ -115,6 +124,7 @@ include __DIR__ . '/../includes/header.php';
                             <td class="px-4 py-3 text-right">
                                 <?php if ($row['status'] === 'failed'): ?>
                                     <form method="post" class="inline">
+                                        <?= csrfField() ?>
                                         <input type="hidden" name="action" value="retry">
                                         <input type="hidden" name="log_id" value="<?= (int) $row['id'] ?>">
                                         <button class="text-blue-600 hover:text-blue-800 font-semibold">Renvoyer</button>

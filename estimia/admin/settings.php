@@ -41,18 +41,37 @@ if (isPost()) {
             break;
 
         case 'smtp':
-            $updated = updateConfig('SMTP_HOST', sanitize($_POST['smtp_host'] ?? '')) || $updated;
-            $updated = updateConfig('SMTP_PORT', (int) ($_POST['smtp_port'] ?? 465)) || $updated;
+            $smtpHost = sanitize($_POST['smtp_host'] ?? '');
+            $smtpPort = (int) ($_POST['smtp_port'] ?? 465);
+            $smtpSecure = sanitize($_POST['smtp_secure'] ?? 'ssl');
+            $smtpFromEmail = sanitize($_POST['smtp_from_email'] ?? '');
+            if (!in_array($smtpSecure, ['ssl', 'tls', ''], true)) {
+                $smtpSecure = 'ssl';
+            }
+            if ($smtpPort < 1 || $smtpPort > 65535) {
+                $smtpPort = 465;
+            }
+            if ($smtpFromEmail !== '' && !filter_var($smtpFromEmail, FILTER_VALIDATE_EMAIL)) {
+                $_SESSION['flash_error'] = 'Email expéditeur invalide.';
+                redirect('settings.php#smtp');
+            }
+            $updated = updateConfig('SMTP_HOST', $smtpHost) || $updated;
+            $updated = updateConfig('SMTP_PORT', $smtpPort) || $updated;
             $updated = updateConfig('SMTP_USER', sanitize($_POST['smtp_user'] ?? '')) || $updated;
             $updated = updateConfig('SMTP_PASS', (string) ($_POST['smtp_pass'] ?? '')) || $updated;
-            $updated = updateConfig('SMTP_SECURE', sanitize($_POST['smtp_secure'] ?? 'ssl')) || $updated;
-            $updated = updateConfig('SMTP_FROM_EMAIL', sanitize($_POST['smtp_from_email'] ?? '')) || $updated;
+            $updated = updateConfig('SMTP_SECURE', $smtpSecure) || $updated;
+            $updated = updateConfig('SMTP_FROM_EMAIL', $smtpFromEmail) || $updated;
             $updated = updateConfig('SMTP_FROM_NAME', sanitize($_POST['smtp_from_name'] ?? siteConfig('name', 'EstimIA'))) || $updated;
 
             if (!empty($_POST['smtp_test_email'])) {
+                $testEmail = sanitize((string) $_POST['smtp_test_email']);
+                if (!filter_var($testEmail, FILTER_VALIDATE_EMAIL)) {
+                    $_SESSION['flash_error'] = 'Email de test invalide.';
+                    redirect('settings.php#smtp');
+                }
                 $mailer = new Mailer();
                 $sent = $mailer->send(
-                    sanitize((string) $_POST['smtp_test_email']),
+                    $testEmail,
                     '[' . siteConfig('name', 'EstimIA') . '] Test SMTP',
                     '<p>Test SMTP réussi.</p>',
                     'Test SMTP réussi.'
@@ -63,14 +82,28 @@ if (isPost()) {
             break;
 
         case 'notifications':
+            $adminEmail = sanitize($_POST['admin_email'] ?? '');
+            if ($adminEmail !== '' && !filter_var($adminEmail, FILTER_VALIDATE_EMAIL)) {
+                $_SESSION['flash_error'] = 'Email admin invalide.';
+                redirect('settings.php#notifications');
+            }
+            $weeklyDay = sanitize($_POST['weekly_day'] ?? 'monday');
+            $allowedDays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+            if (!in_array($weeklyDay, $allowedDays, true)) {
+                $weeklyDay = 'monday';
+            }
+            $weeklyHour = (int) ($_POST['weekly_hour'] ?? 8);
+            if ($weeklyHour < 0 || $weeklyHour > 23) {
+                $weeklyHour = 8;
+            }
             $updated = updateConfig('NOTIF_NEW_ESTIMATION', $asBool((string) ($_POST['notif_new_estimation'] ?? '0'))) || $updated;
             $updated = updateConfig('NOTIF_NEW_RDV', $asBool((string) ($_POST['notif_new_rdv'] ?? '0'))) || $updated;
             $updated = updateConfig('NOTIF_HOT_LEAD', $asBool((string) ($_POST['notif_hot_lead'] ?? '0'))) || $updated;
             $updated = updateConfig('NOTIF_WEEKLY_REPORT', $asBool((string) ($_POST['notif_weekly'] ?? '0'))) || $updated;
-            $updated = updateConfig('ADMIN_EMAIL', sanitize($_POST['admin_email'] ?? '')) || $updated;
+            $updated = updateConfig('ADMIN_EMAIL', $adminEmail) || $updated;
             $updated = updateConfig('HOT_LEAD_THRESHOLD', (int) ($_POST['hot_lead_threshold'] ?? 70)) || $updated;
-            $updated = updateConfig('WEEKLY_REPORT_DAY', sanitize($_POST['weekly_day'] ?? 'monday')) || $updated;
-            $updated = updateConfig('WEEKLY_REPORT_HOUR', (int) ($_POST['weekly_hour'] ?? 8)) || $updated;
+            $updated = updateConfig('WEEKLY_REPORT_DAY', $weeklyDay) || $updated;
+            $updated = updateConfig('WEEKLY_REPORT_HOUR', $weeklyHour) || $updated;
             break;
 
         case 'maps':
@@ -97,11 +130,17 @@ if (isPost()) {
         case 'agents':
             $agentAction = sanitize($_POST['agent_action'] ?? '');
             if ($agentAction === 'add') {
+                $agentNom = sanitize($_POST['agent_nom'] ?? '');
+                $agentEmail = sanitize($_POST['agent_email'] ?? '');
+                if ($agentNom === '' || !filter_var($agentEmail, FILTER_VALIDATE_EMAIL)) {
+                    $_SESSION['flash_error'] = 'Nom et email agent sont obligatoires et doivent être valides.';
+                    redirect('settings.php#agents');
+                }
                 $stmt = $pdo->prepare('INSERT INTO agents (nom, prenom, email, telephone, secteur_geographique, actif) VALUES (:nom, :prenom, :email, :telephone, :secteur, 1)');
                 $stmt->execute([
-                    'nom' => sanitize($_POST['agent_nom'] ?? ''),
+                    'nom' => $agentNom,
                     'prenom' => sanitize($_POST['agent_prenom'] ?? ''),
-                    'email' => sanitize($_POST['agent_email'] ?? ''),
+                    'email' => $agentEmail,
                     'telephone' => sanitize($_POST['agent_telephone'] ?? ''),
                     'secteur' => json_encode($_POST['agent_secteur'] ?? [], JSON_UNESCAPED_UNICODE),
                 ]);
@@ -138,6 +177,10 @@ if (isPost()) {
             }
 
             if (!empty($_POST['old_password']) && !empty($_POST['new_password'])) {
+                if ((string) ($_POST['new_password'] ?? '') !== (string) ($_POST['new_password_confirm'] ?? '')) {
+                    $_SESSION['flash_error'] = 'Les mots de passe ne correspondent pas.';
+                    redirect('settings.php#security');
+                }
                 $stmt = $pdo->query('SELECT id, password_hash FROM admin_users ORDER BY id ASC LIMIT 1');
                 $admin = $stmt->fetch();
                 if ($admin && password_verify((string) $_POST['old_password'], (string) $admin['password_hash'])) {
@@ -219,8 +262,8 @@ require_once __DIR__ . '/includes/admin_header.php';
             <form method="POST" class="space-y-3">
                 <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrfToken, ENT_QUOTES, 'UTF-8'); ?>"><input type="hidden" name="section" value="general">
                 <input name="site_name" class="w-full rounded border px-3 py-2" value="<?php echo htmlspecialchars((string) siteConfig('name', 'EstimIA'), ENT_QUOTES, 'UTF-8'); ?>" placeholder="Nom du site">
-                <input name="site_url" class="w-full rounded border px-3 py-2" value="<?php echo htmlspecialchars((string) siteConfig('url', ''), ENT_QUOTES, 'UTF-8'); ?>" placeholder="URL">
-                <input name="site_phone" class="w-full rounded border px-3 py-2" value="<?php echo htmlspecialchars((string) siteConfig('phone', ''), ENT_QUOTES, 'UTF-8'); ?>" placeholder="Téléphone">
+                <input type="url" name="site_url" class="w-full rounded border px-3 py-2" value="<?php echo htmlspecialchars((string) siteConfig('url', ''), ENT_QUOTES, 'UTF-8'); ?>" placeholder="URL">
+                <input type="tel" name="site_phone" class="w-full rounded border px-3 py-2" value="<?php echo htmlspecialchars((string) siteConfig('phone', ''), ENT_QUOTES, 'UTF-8'); ?>" placeholder="Téléphone">
                 <label class="inline-flex items-center gap-2"><input type="checkbox" name="debug_mode" value="1" <?php echo (defined('DEBUG_MODE') && DEBUG_MODE) ? 'checked' : ''; ?>> Mode debug</label>
                 <button class="rounded bg-primary px-4 py-2 text-white font-semibold">Enregistrer</button>
             </form>
@@ -257,13 +300,13 @@ require_once __DIR__ . '/includes/admin_header.php';
             <form method="POST" class="space-y-3">
                 <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrfToken, ENT_QUOTES, 'UTF-8'); ?>"><input type="hidden" name="section" value="smtp">
                 <input name="smtp_host" class="w-full rounded border px-3 py-2" value="<?php echo htmlspecialchars((string) (defined('SMTP_HOST') ? SMTP_HOST : ''), ENT_QUOTES, 'UTF-8'); ?>" placeholder="SMTP host">
-                <input name="smtp_port" class="w-full rounded border px-3 py-2" value="<?php echo (int) (defined('SMTP_PORT') ? SMTP_PORT : 465); ?>" placeholder="Port">
+                <input type="number" min="1" max="65535" name="smtp_port" class="w-full rounded border px-3 py-2" value="<?php echo (int) (defined('SMTP_PORT') ? SMTP_PORT : 465); ?>" placeholder="Port">
                 <input name="smtp_user" class="w-full rounded border px-3 py-2" value="<?php echo htmlspecialchars((string) (defined('SMTP_USER') ? SMTP_USER : ''), ENT_QUOTES, 'UTF-8'); ?>" placeholder="SMTP user">
                 <input type="password" name="smtp_pass" class="w-full rounded border px-3 py-2" value="<?php echo htmlspecialchars((string) (defined('SMTP_PASS') ? SMTP_PASS : ''), ENT_QUOTES, 'UTF-8'); ?>" placeholder="SMTP pass">
                 <select name="smtp_secure" class="w-full rounded border px-3 py-2"><option value="ssl" <?php echo (defined('SMTP_SECURE') && SMTP_SECURE === 'ssl') ? 'selected' : ''; ?>>SSL</option><option value="tls" <?php echo (defined('SMTP_SECURE') && SMTP_SECURE === 'tls') ? 'selected' : ''; ?>>TLS</option><option value="" <?php echo (defined('SMTP_SECURE') && SMTP_SECURE === '') ? 'selected' : ''; ?>>Aucune</option></select>
-                <input name="smtp_from_email" class="w-full rounded border px-3 py-2" value="<?php echo htmlspecialchars((string) (defined('SMTP_FROM_EMAIL') ? SMTP_FROM_EMAIL : ''), ENT_QUOTES, 'UTF-8'); ?>" placeholder="Expéditeur email">
+                <input type="email" name="smtp_from_email" class="w-full rounded border px-3 py-2" value="<?php echo htmlspecialchars((string) (defined('SMTP_FROM_EMAIL') ? SMTP_FROM_EMAIL : ''), ENT_QUOTES, 'UTF-8'); ?>" placeholder="Expéditeur email">
                 <input name="smtp_from_name" class="w-full rounded border px-3 py-2" value="<?php echo htmlspecialchars((string) (defined('SMTP_FROM_NAME') ? SMTP_FROM_NAME : siteConfig('name', 'EstimIA')), ENT_QUOTES, 'UTF-8'); ?>" placeholder="Nom expéditeur">
-                <input name="smtp_test_email" class="w-full rounded border px-3 py-2" placeholder="Email de test">
+                <input type="email" name="smtp_test_email" class="w-full rounded border px-3 py-2" placeholder="Email de test">
                 <button class="rounded bg-primary px-4 py-2 text-white font-semibold">Enregistrer / Tester</button>
             </form>
         </section>
@@ -276,9 +319,9 @@ require_once __DIR__ . '/includes/admin_header.php';
                 <label><input type="checkbox" name="notif_new_rdv" value="1" <?php echo (defined('NOTIF_NEW_RDV') && NOTIF_NEW_RDV) ? 'checked' : ''; ?>> Nouveau RDV</label><br>
                 <label><input type="checkbox" name="notif_hot_lead" value="1" <?php echo (defined('NOTIF_HOT_LEAD') && NOTIF_HOT_LEAD) ? 'checked' : ''; ?>> Lead chaud</label><br>
                 <label><input type="checkbox" name="notif_weekly" value="1" <?php echo (defined('NOTIF_WEEKLY_REPORT') && NOTIF_WEEKLY_REPORT) ? 'checked' : ''; ?>> Rapport hebdo</label>
-                <input name="admin_email" class="w-full rounded border px-3 py-2" value="<?php echo htmlspecialchars((string) siteConfig('admin_email', ''), ENT_QUOTES, 'UTF-8'); ?>" placeholder="Email de réception">
+                <input type="email" name="admin_email" class="w-full rounded border px-3 py-2" value="<?php echo htmlspecialchars((string) siteConfig('admin_email', ''), ENT_QUOTES, 'UTF-8'); ?>" placeholder="Email de réception">
                 <label>Seuil lead chaud: <input type="range" min="50" max="100" name="hot_lead_threshold" value="<?php echo (int) (defined('HOT_LEAD_THRESHOLD') ? HOT_LEAD_THRESHOLD : 70); ?>"></label>
-                <div class="grid grid-cols-2 gap-2"><select name="weekly_day" class="rounded border px-3 py-2"><?php foreach (['monday'=>'Lundi','tuesday'=>'Mardi','wednesday'=>'Mercredi','thursday'=>'Jeudi','friday'=>'Vendredi','saturday'=>'Samedi','sunday'=>'Dimanche'] as $k=>$v): ?><option value="<?php echo $k; ?>"><?php echo $v; ?></option><?php endforeach; ?></select><select name="weekly_hour" class="rounded border px-3 py-2"><?php for($i=0;$i<24;$i++): ?><option value="<?php echo $i; ?>"><?php echo str_pad((string)$i,2,'0',STR_PAD_LEFT); ?>h</option><?php endfor; ?></select></div>
+                <div class="grid grid-cols-2 gap-2"><select name="weekly_day" class="rounded border px-3 py-2"><?php $weeklyDayValue = (string) siteConfig('weekly_day', 'monday'); foreach (['monday'=>'Lundi','tuesday'=>'Mardi','wednesday'=>'Mercredi','thursday'=>'Jeudi','friday'=>'Vendredi','saturday'=>'Samedi','sunday'=>'Dimanche'] as $k=>$v): ?><option value="<?php echo $k; ?>" <?php echo $weeklyDayValue === $k ? 'selected' : ''; ?>><?php echo $v; ?></option><?php endforeach; ?></select><select name="weekly_hour" class="rounded border px-3 py-2"><?php $weeklyHourValue = (int) siteConfig('weekly_hour', 8); for($i=0;$i<24;$i++): ?><option value="<?php echo $i; ?>" <?php echo $weeklyHourValue === $i ? 'selected' : ''; ?>><?php echo str_pad((string)$i,2,'0',STR_PAD_LEFT); ?>h</option><?php endfor; ?></select></div>
                 <p class="text-xs text-gray-500">Cron conseillé : 0 8 * * 1 /usr/bin/php /home/user/public_html/estimia/cron/weekly_report.php</p>
                 <button class="rounded bg-primary px-4 py-2 text-white font-semibold">Enregistrer</button>
             </form>
@@ -303,8 +346,8 @@ require_once __DIR__ . '/includes/admin_header.php';
                 <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrfToken, ENT_QUOTES, 'UTF-8'); ?>"><input type="hidden" name="section" value="agents"><input type="hidden" name="agent_action" value="add">
                 <input name="agent_nom" class="rounded border px-3 py-2" placeholder="Nom" required>
                 <input name="agent_prenom" class="rounded border px-3 py-2" placeholder="Prénom">
-                <input name="agent_email" class="rounded border px-3 py-2" placeholder="Email" required>
-                <input name="agent_telephone" class="rounded border px-3 py-2" placeholder="Téléphone">
+                <input type="email" name="agent_email" class="rounded border px-3 py-2" placeholder="Email" required>
+                <input type="tel" name="agent_telephone" class="rounded border px-3 py-2" placeholder="Téléphone">
                 <select name="agent_secteur[]" multiple class="rounded border px-3 py-2 md:col-span-2"><?php foreach ($cityPrices as $city): ?><option value="<?php echo htmlspecialchars((string) $city['ville'], ENT_QUOTES, 'UTF-8'); ?>"><?php echo sanitize((string) $city['ville']); ?></option><?php endforeach; ?></select>
                 <button class="rounded bg-primary px-4 py-2 text-white font-semibold md:col-span-2">Ajouter</button>
             </form>

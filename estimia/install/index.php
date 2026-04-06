@@ -328,6 +328,7 @@ async function runChecks(){
 async function testDb(){
     const params = new URLSearchParams();
     params.set('action','test_db');
+    params.set('csrf_token', csrfToken);
     params.set('host',document.getElementById('db_host').value);
     params.set('db_name',fullDbName());
     params.set('db_user',fullDbUser());
@@ -381,6 +382,7 @@ document.querySelectorAll('.smtp-tab').forEach(tab=>tab.addEventListener('click'
 async function testEmail(){
     const params = new URLSearchParams();
     params.set('action','test_email');
+    params.set('csrf_token', csrfToken);
     params.set('notification_email', document.getElementById('notification_email').value.trim());
     params.set('site_name', document.getElementById('site_name').value.trim());
     const res = await fetch('process.php',{method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:params});
@@ -496,6 +498,7 @@ async function postInstallStep(step){
     const payload = getPayloadForInstall();
     const params = new URLSearchParams();
     params.set('action','install_step');
+    params.set('csrf_token', csrfToken);
     params.set('step',step);
     Object.keys(payload).forEach(k=>params.set(k,payload[k] ?? ''));
 

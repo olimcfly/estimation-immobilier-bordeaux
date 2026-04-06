@@ -23,7 +23,7 @@ include __DIR__ . '/../includes/header.php';
                 hover:bg-primary/90 transition">
         Estimer mon bien
       </a>
-      <a href="/prix-m2"
+      <a href="/pages/prix-m2.php"
          class="bg-gray-100 text-gray-700 px-6 py-3 rounded-xl font-semibold
                 hover:bg-gray-200 transition">
         Prix au m²
