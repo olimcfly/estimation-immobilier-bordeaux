@@ -1,12 +1,11 @@
-ErrorDocument 404 /pages/404.php
-
 RewriteEngine On
 
-# Bloquer l'accès aux fichiers/dossiers sensibles
-RewriteRule ^config\.php$ - [F,L,NC]
-RewriteRule ^config/ - [F,L,NC]
-RewriteRule ^sql/ - [F,L,NC]
+# Core routing
+RewriteRule ^admin/(.*)$ core/admin/$1 [L,QSA]
+RewriteRule ^api/(.*)$ core/api/$1 [L,QSA]
+RewriteRule ^pages/(.*)$ core/pages/$1 [L,QSA]
+RewriteRule ^install/(.*)$ core/install/$1 [L,QSA]
+RewriteRule ^resultat\.php$ core/resultat.php [L,QSA]
 
-# Bloquer l'installateur EstimIA une fois l'installation effectuée
-RewriteCond %{DOCUMENT_ROOT}/estimia/installed.lock -f
-RewriteRule ^estimia/install/ - [F,L,NC]
+# Site-specific pages
+RewriteRule ^prix-m2-bordeaux\.php$ site-specific/pages/prix-m2-bordeaux.php [L,QSA]
