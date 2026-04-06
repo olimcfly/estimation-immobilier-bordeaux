@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /config/
+Disallow: /sql/
+Disallow: /api/
+Sitemap: https://www.estimia.fr/sitemap.php
