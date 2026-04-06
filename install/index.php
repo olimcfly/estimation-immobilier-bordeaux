@@ -10,6 +10,34 @@ $configFile = $configDir . '/config.php';
 $databaseFile = $configDir . '/database.php';
 $installSqlPath = $rootDir . '/install.sql';
 
+function installRenderEmailTemplate(string $rootDir, string $template, array $data = []): string
+{
+    $templatePath = $rootDir . '/templates/emails/' . $template . '.php';
+    if (!is_file($templatePath)) {
+        return '';
+    }
+
+    extract($data, EXTR_SKIP);
+
+    ob_start();
+    require $templatePath;
+
+    return (string) ob_get_clean();
+}
+
+function installSendEmail(string $to, string $subject, string $html, string $fromName): bool
+{
+    $headers = [
+        'MIME-Version: 1.0',
+        'Content-type: text/html; charset=UTF-8',
+        sprintf('From: %s <%s>', $fromName, 'contact@estimia-bordeaux.fr'),
+        'Reply-To: contact@estimia-bordeaux.fr',
+        'X-Mailer: PHP/' . phpversion(),
+    ];
+
+    return mail($to, $subject, $html, implode("\r\n", $headers));
+}
+
 if (isset($_GET['action']) && $_GET['action'] === 'test_db') {
     header('Content-Type: application/json; charset=utf-8');
 
@@ -190,6 +218,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$alreadyInstalled) {
                     'role' => 'admin',
                     'actif' => 1,
                 ]);
+
+                $nameParts = preg_split('/\s+/', trim((string) $site['site_name'])) ?: [];
+                $defaultPrenom = isset($nameParts[0]) && $nameParts[0] !== '' ? $nameParts[0] : 'Admin';
+                $defaultNom = count($nameParts) > 1 ? implode(' ', array_slice($nameParts, 1)) : 'EstimIA';
+
+                $adminStmt = $pdo->prepare(
+                    'INSERT INTO admins (prenom, nom, email) VALUES (:prenom, :nom, :email)
+                     ON DUPLICATE KEY UPDATE prenom = VALUES(prenom), nom = VALUES(nom)'
+                );
+                $adminStmt->execute([
+                    'prenom' => $defaultPrenom,
+                    'nom' => $defaultNom,
+                    'email' => (string) $site['admin_email'],
+                ]);
+
+                $emailHtml = installRenderEmailTemplate($rootDir, 'install-success', [
+                    'prenom' => $defaultPrenom,
+                    'nom' => $defaultNom,
+                    'siteName' => (string) $site['site_name'],
+                    'cityName' => (string) $site['city_name'],
+                    'baseUrl' => (string) $site['base_url'],
+                ]);
+
+                installSendEmail(
+                    (string) $site['admin_email'],
+                    'Installation terminée - Accès administration',
+                    $emailHtml,
+                    (string) $site['site_name']
+                );
 
                 $installCompleted = true;
                 unset($_SESSION['install_db'], $_SESSION['install_site']);
