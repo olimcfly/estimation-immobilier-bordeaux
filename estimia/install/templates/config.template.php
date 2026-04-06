@@ -18,13 +18,13 @@ define('SECRET_KEY', '{{SECRET_KEY}}');
 
 // ===== ZONE GÉOGRAPHIQUE =====
 define('CITY_NAME', '{{CITY_NAME}}');
-define('CITY_LAT', {{CITY_LAT}});
-define('CITY_LNG', {{CITY_LNG}});
-define('CITY_RADIUS_KM', {{CITY_RADIUS}});
+define('CITY_LAT', '{{CITY_LAT}}');
+define('CITY_LNG', '{{CITY_LNG}}');
+define('CITY_RADIUS_KM', '{{CITY_RADIUS}}');
 
 // ===== SMTP =====
 define('SMTP_HOST', '{{SMTP_HOST}}');
-define('SMTP_PORT', {{SMTP_PORT}});
+define('SMTP_PORT', '{{SMTP_PORT}}');
 define('SMTP_USER', '{{SMTP_USER}}');
 define('SMTP_PASS', '{{SMTP_PASS}}');
 define('SMTP_SECURE', '{{SMTP_SECURE}}');
@@ -33,10 +33,10 @@ define('SMTP_FROM_NAME', '{{SITE_NAME}}');
 
 // ===== NOTIFICATIONS =====
 define('ADMIN_EMAIL', '{{ADMIN_EMAIL}}');
-define('NOTIF_NEW_ESTIMATION', {{NOTIF_NEW_ESTIMATION}});
-define('NOTIF_NEW_RDV', {{NOTIF_NEW_RDV}});
-define('NOTIF_HOT_LEAD', {{NOTIF_HOT_LEAD}});
-define('NOTIF_WEEKLY_REPORT', {{NOTIF_WEEKLY}});
+define('NOTIF_NEW_ESTIMATION', '{{NOTIF_NEW_ESTIMATION}}');
+define('NOTIF_NEW_RDV', '{{NOTIF_NEW_RDV}}');
+define('NOTIF_HOT_LEAD', '{{NOTIF_HOT_LEAD}}');
+define('NOTIF_WEEKLY_REPORT', '{{NOTIF_WEEKLY}}');
 
 // ===== GOOGLE MAPS =====
 define('GOOGLE_MAPS_API_KEY', '');  // À renseigner dans l'admin

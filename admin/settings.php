@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 $pageTitle = 'Paramètres';
 
-require_once __DIR__ . '/../classes/Database.php';
+require_once __DIR__ . '/../includes/database.php';
 require_once __DIR__ . '/../classes/Settings.php';
 require_once __DIR__ . '/admin_header.php';
 
@@ -182,7 +182,13 @@ try {
 } catch (Throwable $error) {
     try {
         $db = Database::getConnection();
-        $users = $db->query('SELECT name, email, role, last_login_at FROM admin_users ORDER BY id DESC')->fetchAll();
+        $users = $db->query("SELECT
+                SUBSTRING_INDEX(email, '@', 1) AS name,
+                email,
+                'admin' AS role,
+                created_at AS last_login_at
+            FROM admin_users
+            ORDER BY id DESC")->fetchAll();
     } catch (Throwable $ignored) {
         $users = [];
     }
