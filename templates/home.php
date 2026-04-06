@@ -1,6 +1,8 @@
 <?php
-$homeTitle = defined('HOME_H1') && HOME_H1 !== '' ? HOME_H1 : (defined('SITE_NAME') ? SITE_NAME : '');
-$homeSubtitle = defined('HOME_SOUS_TITRE') ? HOME_SOUS_TITRE : '';
+$homeTitle = defined('HOME_H1') && HOME_H1 !== '' ? HOME_H1 : 'À Bordeaux, un bon prix se joue parfois en quelques semaines';
+$homeSubtitle = defined('HOME_SOUS_TITRE') && HOME_SOUS_TITRE !== ''
+    ? HOME_SOUS_TITRE
+    : 'Recevez une estimation précise en moins de 2 minutes et évitez de sous-estimer (ou surévaluer) votre bien dans un marché qui évolue vite.';
 $logoPath = defined('LOGO_PATH') ? LOGO_PATH : 'assets/images/logo.png';
 $cities = [];
 if (defined('CITIES_LIST')) {
@@ -16,6 +18,24 @@ if (defined('CITIES_LIST')) {
             <img src="<?= htmlspecialchars($logoPath, ENT_QUOTES, 'UTF-8') ?>" alt="Logo" style="max-height:84px;max-width:220px;object-fit:contain; margin: 0 auto 12px auto;">
             <h1 class="mt-4 text-4xl font-extrabold tracking-tight text-blue-900"><?= htmlspecialchars($homeTitle, ENT_QUOTES, 'UTF-8') ?></h1>
             <p class="mt-3 text-lg text-slate-600"><?= htmlspecialchars($homeSubtitle, ENT_QUOTES, 'UTF-8') ?></p>
+            <p class="mt-4 inline-flex items-center rounded-full bg-amber-100 px-4 py-1.5 text-sm font-semibold text-amber-900">
+                Forte demande sur Bordeaux Métropole : un positionnement juste peut faire la différence dès la mise en vente.
+            </p>
+        </div>
+
+        <div class="mx-auto mb-8 grid max-w-3xl gap-4 md:grid-cols-3">
+            <div class="rounded-xl bg-white p-4 text-sm text-slate-700 shadow ring-1 ring-slate-200">
+                <p class="font-semibold text-slate-900">Rapide</p>
+                <p class="mt-1">Estimation immédiate, sans rendez-vous.</p>
+            </div>
+            <div class="rounded-xl bg-white p-4 text-sm text-slate-700 shadow ring-1 ring-slate-200">
+                <p class="font-semibold text-slate-900">Précise</p>
+                <p class="mt-1">Analyse croisée : secteur, surface, type de bien et dynamique locale.</p>
+            </div>
+            <div class="rounded-xl bg-white p-4 text-sm text-slate-700 shadow ring-1 ring-slate-200">
+                <p class="font-semibold text-slate-900">Pensée pour vendeurs et investisseurs</p>
+                <p class="mt-1">Résidence principale ou investissement locatif : obtenez une base de prix claire.</p>
+            </div>
         </div>
 
         <div class="mx-auto max-w-3xl rounded-2xl bg-white p-8 shadow-xl ring-1 ring-slate-200">
@@ -57,7 +77,8 @@ if (defined('CITIES_LIST')) {
                     </select>
                 </div>
                 <div class="md:col-span-2">
-                    <button type="submit" class="w-full rounded-lg bg-blue-600 px-5 py-3 text-base font-semibold text-white">Recevoir mon estimation</button>
+                    <button type="submit" class="w-full rounded-lg bg-blue-600 px-5 py-3 text-base font-semibold text-white">Recevoir mon estimation premium</button>
+                    <p class="mt-3 text-center text-xs text-slate-500">Gratuit • Sans engagement • Résultat en moins de 2 minutes</p>
                 </div>
             </form>
         </div>
