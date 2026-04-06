@@ -1,29 +1,58 @@
 <?php
 
 declare(strict_types=1);
+
+$configPath = __DIR__ . '/config/config.php';
+$config = [];
+if (is_file($configPath)) {
+    $loaded = require $configPath;
+    if (is_array($loaded)) {
+        $config = $loaded;
+    }
+}
+
+if (empty($config['installed'])) {
+    header('Location: /install/index.php');
+    exit;
+}
+
+$agenceNom = (string) ($config['agence_nom'] ?? 'Votre agence');
+$villePrincipale = (string) ($config['ville_principale'] ?? 'Bordeaux');
+$logo = (string) ($config['logo'] ?? '');
+$couleur = (string) ($config['couleur'] ?? '#1e3a5f');
+$h1 = (string) ($config['h1_titre'] ?? ('Combien vaut votre bien à ' . $villePrincipale . ' ?'));
+$sousTitre = (string) ($config['sous_titre'] ?? 'Obtenez une estimation instantanée basée sur les données du marché local.');
+$metaDescription = (string) ($config['meta_description'] ?? ('Estimation gratuite à ' . $villePrincipale));
+$villes = $config['villes'] ?? [$villePrincipale];
+if (!is_array($villes) || $villes === []) {
+    $villes = [$villePrincipale];
+}
 ?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Estimation immobilière instantanée à Bordeaux</title>
-    <meta name="description" content="Estimez gratuitement votre bien immobilier à Bordeaux en 30 secondes.">
+    <title><?= htmlspecialchars($agenceNom, ENT_QUOTES); ?> · Estimation immobilière</title>
+    <meta name="description" content="<?= htmlspecialchars($metaDescription, ENT_QUOTES); ?>">
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-white text-slate-900 antialiased">
     <main>
-        <section id="hero" class="bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-700 text-white">
+        <section id="hero" class="text-white" style="background: linear-gradient(135deg, <?= htmlspecialchars($couleur, ENT_QUOTES); ?>, #1d4ed8);">
             <div class="mx-auto max-w-7xl px-4 py-16 sm:px-6 md:py-20 lg:px-8">
                 <div class="mx-auto max-w-4xl text-center">
                     <p class="mx-auto inline-flex items-center rounded-full bg-white/15 px-4 py-2 text-sm font-semibold backdrop-blur">
                         ✨ Estimation gratuite en 30 secondes
                     </p>
+                    <?php if ($logo !== ''): ?>
+                        <img src="<?= htmlspecialchars('/' . ltrim($logo, '/'), ENT_QUOTES); ?>" alt="Logo <?= htmlspecialchars($agenceNom, ENT_QUOTES); ?>" class="mx-auto mt-4 h-16 w-auto rounded bg-white p-2">
+                    <?php endif; ?>
                     <h1 class="mt-6 text-4xl font-extrabold leading-tight md:text-5xl">
-                        Combien vaut votre bien immobilier à Bordeaux ?
+                        <?= htmlspecialchars(str_replace('{ville}', $villePrincipale, $h1), ENT_QUOTES); ?>
                     </h1>
                     <p class="mt-4 text-base text-blue-100 md:text-lg">
-                        Obtenez une estimation instantanée basée sur les données du marché local.
+                        <?= htmlspecialchars($sousTitre, ENT_QUOTES); ?>
                     </p>
                 </div>
 
@@ -44,16 +73,9 @@ declare(strict_types=1);
                             <label for="ville" class="mb-1 block text-sm font-medium text-blue-100">📍 Ville</label>
                             <select id="ville" name="ville" required class="w-full rounded-xl border-0 bg-gray-50 px-4 py-4 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-300">
                                 <option value="">Choisir</option>
-                                <option value="Bordeaux">Bordeaux</option>
-                                <option value="Mérignac">Mérignac</option>
-                                <option value="Pessac">Pessac</option>
-                                <option value="Talence">Talence</option>
-                                <option value="Bègles">Bègles</option>
-                                <option value="Villenave-d'Ornon">Villenave-d'Ornon</option>
-                                <option value="Gradignan">Gradignan</option>
-                                <option value="Le Bouscat">Le Bouscat</option>
-                                <option value="Bruges">Bruges</option>
-                                <option value="Cenon">Cenon</option>
+                                <?php foreach ($villes as $ville): ?>
+                                    <option value="<?= htmlspecialchars((string) $ville, ENT_QUOTES); ?>"><?= htmlspecialchars((string) $ville, ENT_QUOTES); ?></option>
+                                <?php endforeach; ?>
                             </select>
                         </div>
 
@@ -267,7 +289,7 @@ declare(strict_types=1);
     </main>
 
     <footer class="border-t border-slate-200 bg-white px-4 py-6 text-center text-xs text-slate-400 sm:px-6 lg:px-8">
-        © 2025 · <a href="/pages/mentions-legales.php" class="hover:text-slate-600">Mentions légales</a> ·
+        © <?= date('Y'); ?> · <?= htmlspecialchars($agenceNom, ENT_QUOTES); ?> · <a href="/pages/mentions-legales.php" class="hover:text-slate-600">Mentions légales</a> ·
         <a href="/pages/politique-confidentialite.php" class="hover:text-slate-600">Politique de confidentialité</a>
     </footer>
 
