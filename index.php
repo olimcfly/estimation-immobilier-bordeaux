@@ -65,7 +65,8 @@ if (!is_array($villes) || $villes === []) {
                 </div>
 
                 <form id="estimation-form" class="mt-10 rounded-2xl bg-white/10 p-3 backdrop-blur-sm">
-                    <div class="flex flex-col gap-3 lg:flex-row lg:items-stretch">
+                    <p class="mb-3 text-center text-sm font-medium text-blue-100">⏱️ Rapide (30 sec) · Gratuit · Sans engagement</p>
+                    <div id="estimation-step-1" class="flex flex-col gap-3 lg:flex-row lg:items-stretch">
                         <div class="w-full lg:flex-1 lg:pr-3 lg:border-r lg:border-white/20">
                             <label for="type_bien" class="mb-1 block text-sm font-medium text-blue-100">🏠 Type de bien</label>
                             <select id="type_bien" name="type_bien" required class="w-full rounded-xl border-0 bg-gray-50 px-4 py-4 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-300">
@@ -78,7 +79,7 @@ if (!is_array($villes) || $villes === []) {
                         </div>
 
                         <div class="w-full lg:flex-1 lg:px-3 lg:border-r lg:border-white/20">
-                            <label for="ville" class="mb-1 block text-sm font-medium text-blue-100">📍 Ville</label>
+                            <label for="ville" class="mb-1 block text-sm font-medium text-blue-100">📍 Quartier / Ville</label>
                             <select id="ville" name="ville" required class="w-full rounded-xl border-0 bg-gray-50 px-4 py-4 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-300">
                                 <option value="">Choisir</option>
                                 <?php foreach ($villes as $ville): ?>
@@ -87,7 +88,15 @@ if (!is_array($villes) || $villes === []) {
                             </select>
                         </div>
 
-                        <div class="w-full lg:flex-1 lg:px-3 lg:border-r lg:border-white/20">
+                        <div class="w-full lg:w-auto lg:pl-3">
+                            <label class="mb-1 hidden text-sm font-medium text-blue-100 lg:block">&nbsp;</label>
+                            <button id="estimation-step-next" type="button" class="h-[56px] w-full rounded-xl bg-orange-500 px-8 text-base font-bold text-white transition hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-300 lg:w-auto">
+                                Continuer →
+                            </button>
+                        </div>
+                    </div>
+                    <div id="estimation-step-2" class="hidden flex-col gap-3 lg:flex-row lg:items-stretch">
+                        <div class="w-full lg:flex-1 lg:pr-3 lg:border-r lg:border-white/20">
                             <label for="surface_tranche" class="mb-1 block text-sm font-medium text-blue-100">📏 Surface</label>
                             <select id="surface_tranche" name="surface_tranche" required class="w-full rounded-xl border-0 bg-gray-50 px-4 py-4 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-300">
                                 <option value="">Choisir</option>
@@ -100,21 +109,17 @@ if (!is_array($villes) || $villes === []) {
                             </select>
                         </div>
 
-                        <div class="w-full lg:flex-1 lg:px-3">
-                            <label for="budget_tranche" class="mb-1 block text-sm font-medium text-blue-100">💶 Budget estimé</label>
-                            <select id="budget_tranche" name="budget_tranche" required class="w-full rounded-xl border-0 bg-gray-50 px-4 py-4 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-300">
-                                <option value="">Choisir</option>
-                                <option value="lt150">&lt; 150 000 €</option>
-                                <option value="150_300">150k-300k €</option>
-                                <option value="300_500">300k-500k €</option>
-                                <option value="gt500">&gt; 500 000 €</option>
-                            </select>
+                        <div class="w-full lg:w-auto lg:pl-3">
+                            <label class="mb-1 hidden text-sm font-medium text-blue-100 lg:block">&nbsp;</label>
+                            <button id="estimation-step-back" type="button" class="h-[56px] w-full rounded-xl border border-white/60 bg-white/10 px-6 text-base font-bold text-white transition hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-blue-300 lg:w-auto">
+                                ← Retour
+                            </button>
                         </div>
 
                         <div class="w-full lg:w-auto lg:pl-3">
                             <label class="mb-1 hidden text-sm font-medium text-blue-100 lg:block">&nbsp;</label>
-                            <button id="hero-cta-submit" type="submit" class="h-[56px] w-full rounded-xl bg-orange-500 px-8 text-base font-bold text-white transition hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-300 lg:w-auto">
-                                Obtenir mon estimation instantanée →
+                            <button type="submit" class="h-[56px] w-full rounded-xl bg-orange-500 px-8 text-base font-bold text-white transition hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-300 lg:w-auto">
+                                Obtenir mon estimation →
                             </button>
                         </div>
                     </div>
@@ -263,7 +268,7 @@ if (!is_array($villes) || $villes === []) {
                         <div class="mb-4 flex h-10 w-10 items-center justify-center rounded-full border-2 border-blue-600 text-sm font-bold text-blue-600">1</div>
                         <p class="text-2xl">📝</p>
                         <h3 class="mt-3 text-lg font-semibold">Décrivez votre bien</h3>
-                        <p class="mt-2 text-sm text-slate-600">Sélectionnez le type de bien, la ville, la surface et votre budget estimé.</p>
+                        <p class="mt-2 text-sm text-slate-600">Renseignez l’essentiel : type de bien, quartier/ville et surface.</p>
                     </article>
                     <article class="rounded-2xl bg-white p-6 shadow-sm">
                         <div class="mb-4 flex h-10 w-10 items-center justify-center rounded-full border-2 border-blue-600 text-sm font-bold text-blue-600">2</div>
@@ -379,7 +384,10 @@ if (!is_array($villes) || $villes === []) {
 
     <script>
         const form = document.getElementById('estimation-form');
-        const heroCtaSubmit = document.getElementById('hero-cta-submit');
+        const estimationStep1 = document.getElementById('estimation-step-1');
+        const estimationStep2 = document.getElementById('estimation-step-2');
+        const estimationStepNext = document.getElementById('estimation-step-next');
+        const estimationStepBack = document.getElementById('estimation-step-back');
         const feedback = document.getElementById('form-feedback');
         const resultSection = document.getElementById('result-section');
         const recap = document.getElementById('result-recap');
@@ -403,9 +411,13 @@ if (!is_array($villes) || $villes === []) {
         const raison = document.getElementById('raison');
         const budgetBant = document.getElementById('budget_bant');
         const delai = document.getElementById('delai');
+        const typeBienInput = document.getElementById('type_bien');
+        const villeInput = document.getElementById('ville');
+        const surfaceInput = document.getElementById('surface_tranche');
         const emailRadios = [...projetPills.querySelectorAll('input[type="radio"]')];
         const methodeRadios = [...methodePills.querySelectorAll('input[type="radio"]')];
         let wizardStep = 0;
+        let estimationStep = 1;
 
         let latestEstimation = null;
 
@@ -447,6 +459,13 @@ if (!is_array($villes) || $villes === []) {
         };
 
         const formatPrice = (value) => new Intl.NumberFormat('fr-FR').format(Math.round(value)) + ' €';
+        const setEstimationStep = (step) => {
+            estimationStep = Math.max(1, Math.min(2, step));
+            estimationStep1.classList.toggle('hidden', estimationStep !== 1);
+            estimationStep1.classList.toggle('flex', estimationStep === 1);
+            estimationStep2.classList.toggle('hidden', estimationStep !== 2);
+            estimationStep2.classList.toggle('flex', estimationStep === 2);
+        };
         const setWizardStep = (step) => {
             wizardStep = Math.max(0, Math.min(6, step));
             wizardTrack.style.transform = `translateX(-${wizardStep * 100}%)`;
@@ -455,6 +474,22 @@ if (!is_array($villes) || $villes === []) {
                 dot.classList.toggle('bg-slate-300', index > wizardStep);
             });
         };
+
+        estimationStepNext.addEventListener('click', () => {
+            if (typeBienInput.value === '' || villeInput.value === '') {
+                if (typeBienInput.value === '') {
+                    typeBienInput.reportValidity();
+                } else {
+                    villeInput.reportValidity();
+                }
+                return;
+            }
+            setEstimationStep(2);
+        });
+
+        estimationStepBack.addEventListener('click', () => {
+            setEstimationStep(1);
+        });
 
         projetPills.addEventListener('change', (event) => {
             const target = event.target;
@@ -537,6 +572,14 @@ if (!is_array($villes) || $villes === []) {
 
         form.addEventListener('submit', async (event) => {
             event.preventDefault();
+            if (estimationStep === 1) {
+                setEstimationStep(2);
+                return;
+            }
+            if (surfaceInput.value === '') {
+                surfaceInput.reportValidity();
+                return;
+            }
             feedback.classList.add('hidden');
             feedback.textContent = '';
             contactFeedback.classList.add('hidden');
@@ -644,6 +687,7 @@ if (!is_array($villes) || $villes === []) {
                 budgetBant.value = '';
                 delai.value = '';
                 setWizardStep(0);
+                setEstimationStep(1);
             } catch (error) {
                 contactFeedback.className = 'rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700';
                 contactFeedback.textContent = error.message || 'Le service est momentanément indisponible.';
@@ -664,6 +708,7 @@ if (!is_array($villes) || $villes === []) {
             raison.value = '';
             budgetBant.value = '';
             delai.value = '';
+            setEstimationStep(1);
             setWizardStep(0);
             contactFeedback.classList.add('hidden');
             contactFeedback.textContent = '';
