@@ -1,11 +1,13 @@
 <?php
 require_once __DIR__ . '/../includes/database.php';
 require_once __DIR__ . '/../includes/admin-auth.php';
+require_once __DIR__ . '/../admin/includes/activity-log.php';
 
 $action = $_GET['action'] ?? '';
 
 switch ($action) {
     case 'db_backup':
+        adminLogAction('admin_action: db_backup');
         $db = Database::getConnection();
         header('Content-Type: text/plain; charset=utf-8');
         header('Content-Disposition: attachment; filename="backup-' . date('Y-m-d-His') . '.sql"');
@@ -28,10 +30,12 @@ switch ($action) {
         exit;
 
     case 'export_leads':
+        adminLogAction('admin_action: export_leads');
         header('Location: /admin/export.php?type=leads_csv');
         exit;
 
     case 'purge_old_leads':
+        adminLogAction('admin_action: purge_old_leads');
         $db = Database::getConnection();
         $stmt = $db->prepare('DELETE FROM estimations WHERE created_at < DATE_SUB(NOW(), INTERVAL 36 MONTH)');
         $stmt->execute();
