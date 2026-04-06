@@ -7,468 +7,312 @@ session_start();
 $rootDir = dirname(__DIR__);
 $configDir = $rootDir . '/config';
 $configFile = $configDir . '/config.php';
-$lockFile = __DIR__ . '/INSTALLED.lock';
-$htaccessFile = __DIR__ . '/.htaccess';
-$logoDir = $rootDir . '/assets/images';
+$installHtaccess = __DIR__ . '/.htaccess';
+$uploadDir = $rootDir . '/assets';
 
-if (is_file($lockFile)) {
-    header('Location: /');
-    exit;
-}
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $step = (int) ($_POST['step'] ?? 1);
 
-function s(?string $value): string
-{
-    return htmlspecialchars(trim((string) $value), ENT_QUOTES, 'UTF-8');
-}
+    if ($step >= 1 && $step <= 4) {
+        $_SESSION['install_wizard'] = array_merge(
+            $_SESSION['install_wizard'] ?? [],
+            [
+                'agence_nom' => trim((string) ($_POST['agence_nom'] ?? ($_SESSION['install_wizard']['agence_nom'] ?? ''))),
+                'ville_principale' => trim((string) ($_POST['ville_principale'] ?? ($_SESSION['install_wizard']['ville_principale'] ?? ''))),
+                'couleur' => trim((string) ($_POST['couleur'] ?? ($_SESSION['install_wizard']['couleur'] ?? '#1e3a5f'))),
+                'email_reception' => trim((string) ($_POST['email_reception'] ?? ($_SESSION['install_wizard']['email_reception'] ?? ''))),
+                'smtp_host' => trim((string) ($_POST['smtp_host'] ?? ($_SESSION['install_wizard']['smtp_host'] ?? ''))),
+                'smtp_port' => (int) ($_POST['smtp_port'] ?? ($_SESSION['install_wizard']['smtp_port'] ?? 587)),
+                'smtp_user' => trim((string) ($_POST['smtp_user'] ?? ($_SESSION['install_wizard']['smtp_user'] ?? ''))),
+                'smtp_pass' => (string) ($_POST['smtp_pass'] ?? ($_SESSION['install_wizard']['smtp_pass'] ?? '')),
+                'email_expediteur' => trim((string) ($_POST['email_expediteur'] ?? ($_SESSION['install_wizard']['email_expediteur'] ?? ''))),
+                'h1_titre' => trim((string) ($_POST['h1_titre'] ?? ($_SESSION['install_wizard']['h1_titre'] ?? ''))),
+                'sous_titre' => trim((string) ($_POST['sous_titre'] ?? ($_SESSION['install_wizard']['sous_titre'] ?? ''))),
+                'meta_description' => trim((string) ($_POST['meta_description'] ?? ($_SESSION['install_wizard']['meta_description'] ?? ''))),
+            ]
+        );
 
-function baseUrlSanitized(string $url): string
-{
-    $clean = rtrim(trim($url), '/');
-    return htmlspecialchars($clean, ENT_QUOTES, 'UTF-8');
-}
+        if ($step === 1 && isset($_FILES['logo']) && is_uploaded_file($_FILES['logo']['tmp_name'])) {
+            if (!is_dir($uploadDir) && !mkdir($uploadDir, 0755, true) && !is_dir($uploadDir)) {
+                die('Impossible de créer le dossier assets/.');
+            }
 
-function normalizeColor(string $color): string
-{
-    $color = trim($color);
-    if (!preg_match('/^#[0-9A-Fa-f]{6}$/', $color)) {
-        return '#1e40af';
-    }
+            $finfo = new finfo(FILEINFO_MIME_TYPE);
+            $mime = (string) $finfo->file($_FILES['logo']['tmp_name']);
+            $allowed = [
+                'image/png' => 'png',
+                'image/jpeg' => 'jpg',
+                'image/webp' => 'webp',
+                'image/svg+xml' => 'svg',
+            ];
 
-    return strtoupper($color);
-}
-
-function normalizeCities(array $cities): array
-{
-    $out = [];
-    foreach ($cities as $city) {
-        $name = s((string) $city);
-        if ($name === '') {
-            continue;
+            if (isset($allowed[$mime])) {
+                $extension = $allowed[$mime];
+                $target = $uploadDir . '/logo.' . $extension;
+                if (!move_uploaded_file($_FILES['logo']['tmp_name'], $target)) {
+                    die('Impossible d\'enregistrer le logo uploadé.');
+                }
+                $_SESSION['install_wizard']['logo'] = 'assets/logo.' . $extension;
+            }
         }
-        $out[$name] = $name;
-    }
 
-    return array_values($out);
-}
-
-function configValue(string $value): string
-{
-    return str_replace(["\\", "'"], ["\\\\", "\\'"], $value);
-}
-
-$errors = [];
-$success = '';
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && (($_POST['action'] ?? '') === 'install')) {
-    $siteName = s($_POST['site_name'] ?? '');
-    $cityName = s($_POST['city_name'] ?? '');
-    $siteColor = normalizeColor((string) ($_POST['site_color'] ?? '#1e40af'));
-    $sitePhone = s($_POST['site_phone'] ?? '');
-
-    $cities = normalizeCities((array) ($_POST['cities'] ?? []));
-
-    $homeH1 = s($_POST['home_h1'] ?? '');
-    $homeSousTitre = s($_POST['home_sous_titre'] ?? '');
-    $homeMetaDesc = s($_POST['home_meta_desc'] ?? '');
-    $baseUrl = baseUrlSanitized((string) ($_POST['base_url'] ?? ''));
-
-    $dbHost = s($_POST['db_host'] ?? 'localhost');
-    $dbName = s($_POST['db_name'] ?? '');
-    $dbUser = s($_POST['db_user'] ?? '');
-    $dbPass = s($_POST['db_pass'] ?? '');
-
-    $smtpHost = s($_POST['smtp_host'] ?? '');
-    $smtpPort = (int) ($_POST['smtp_port'] ?? 465);
-    $smtpUser = s($_POST['smtp_user'] ?? '');
-    $smtpPass = s($_POST['smtp_pass'] ?? '');
-    $adminEmail = s($_POST['admin_email'] ?? '');
-
-    $dbTested = (($_POST['db_tested'] ?? '0') === '1');
-    $smtpTested = (($_POST['smtp_tested'] ?? '0') === '1');
-
-    if ($siteName === '' || $cityName === '' || $homeH1 === '' || $homeMetaDesc === '') {
-        $errors[] = 'Veuillez remplir les champs obligatoires (agence + textes).';
-    }
-
-    if (empty($cities)) {
-        $errors[] = 'Ajoutez au moins une ville desservie.';
-    }
-
-    if ($dbName === '' || $dbUser === '') {
-        $errors[] = 'Les informations DB sont incomplètes.';
-    }
-
-    if ($smtpHost === '' || $smtpUser === '' || $adminEmail === '') {
-        $errors[] = 'Les informations SMTP sont incomplètes.';
-    }
-
-    if (!$dbTested) {
-        $errors[] = 'Vous devez tester la connexion DB avant l\'installation.';
-    }
-
-    if (!$smtpTested) {
-        $errors[] = 'Vous devez tester SMTP avant l\'installation.';
-    }
-
-    if (!filter_var($adminEmail, FILTER_VALIDATE_EMAIL)) {
-        $errors[] = 'ADMIN_EMAIL est invalide.';
-    }
-
-    $logoExt = 'png';
-    if (isset($_FILES['logo']) && (int) ($_FILES['logo']['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_NO_FILE) {
-        $upload = $_FILES['logo'];
-        if ((int) $upload['error'] !== UPLOAD_ERR_OK) {
-            $errors[] = 'Erreur upload logo.';
-        } elseif ((int) $upload['size'] > 2 * 1024 * 1024) {
-            $errors[] = 'Logo trop volumineux (2MB max).';
-        } else {
-            $ext = strtolower(pathinfo((string) $upload['name'], PATHINFO_EXTENSION));
-            $allowed = ['png', 'jpg', 'jpeg', 'svg', 'webp'];
-            if (!in_array($ext, $allowed, true)) {
-                $errors[] = 'Format logo invalide (png/jpg/jpeg/svg/webp).';
-            } else {
-                if (!is_dir($logoDir) && !mkdir($logoDir, 0775, true) && !is_dir($logoDir)) {
-                    $errors[] = 'Impossible de créer assets/images.';
-                } else {
-                    $logoExt = $ext === 'jpeg' ? 'jpg' : $ext;
-                    $target = $logoDir . '/logo.' . $logoExt;
-                    foreach (['png', 'jpg', 'svg', 'webp'] as $oldExt) {
-                        $old = $logoDir . '/logo.' . $oldExt;
-                        if (is_file($old) && $old !== $target) {
-                            @unlink($old);
-                        }
-                    }
-                    if (!move_uploaded_file((string) $upload['tmp_name'], $target)) {
-                        $errors[] = 'Impossible de sauvegarder le logo.';
+        if ($step === 2) {
+            $rawCities = $_POST['villes'] ?? [];
+            $cities = [];
+            if (is_array($rawCities)) {
+                foreach ($rawCities as $city) {
+                    $city = trim((string) $city);
+                    if ($city !== '') {
+                        $cities[] = $city;
                     }
                 }
             }
+            $_SESSION['install_wizard']['villes'] = array_values(array_unique($cities));
         }
-    } else {
-        foreach (['png', 'jpg', 'svg', 'webp'] as $candidate) {
-            if (is_file($logoDir . '/logo.' . $candidate)) {
-                $logoExt = $candidate;
-                break;
-            }
-        }
+
+        header('Location: index.php?step=' . ($step + 1));
+        exit;
     }
 
-    if (empty($errors)) {
-        $secretKey = bin2hex(random_bytes(32));
-        $citiesJson = json_encode($cities, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    if ($step === 5) {
+        $wizard = $_SESSION['install_wizard'] ?? [];
 
-        $content = "<?php\n"
-            . "// ============================================\n"
-            . "// Configuration — généré par le wizard le " . date('Y-m-d H:i:s') . "\n"
-            . "// ============================================\n\n"
-            . "define('DEBUG_MODE', false);\n"
-            . "define('MAINTENANCE_MODE', false);\n\n"
-            . "// Site\n"
-            . "define('SITE_NAME',            '" . configValue($siteName) . "');\n"
-            . "define('CITY_NAME',            '" . configValue($cityName) . "');\n"
-            . "define('SITE_COLOR',           '" . configValue($siteColor) . "');\n"
-            . "define('SITE_PHONE',           '" . configValue($sitePhone) . "');\n"
-            . "define('OPERATION_RADIUS_KM',  30);\n\n"
-            . "// Villes desservies\n"
-            . "define('CITIES_LIST', '" . configValue((string) $citiesJson) . "');\n\n"
-            . "// Textes homepage\n"
-            . "define('HOME_H1',         '" . configValue($homeH1) . "');\n"
-            . "define('HOME_SOUS_TITRE', '" . configValue($homeSousTitre) . "');\n"
-            . "define('HOME_META_DESC',  '" . configValue($homeMetaDesc) . "');\n\n"
-            . "// Logo\n"
-            . "define('LOGO_PATH', 'assets/images/logo." . configValue($logoExt) . "');\n\n"
-            . "// Base de données\n"
-            . "define('DB_HOST', '" . configValue($dbHost) . "');\n"
-            . "define('DB_NAME', '" . configValue($dbName) . "');\n"
-            . "define('DB_USER', '" . configValue($dbUser) . "');\n"
-            . "define('DB_PASS', '" . configValue($dbPass) . "');\n\n"
-            . "// Email SMTP — ALWAYS keep SMTP_FROM = SMTP_USER\n"
-            . "define('SMTP_HOST',      '" . configValue($smtpHost) . "');\n"
-            . "define('SMTP_PORT',      " . max(1, $smtpPort) . ");\n"
-            . "define('SMTP_USER',      '" . configValue($smtpUser) . "');\n"
-            . "define('SMTP_PASS',      '" . configValue($smtpPass) . "');\n"
-            . "define('SMTP_FROM',      '" . configValue($smtpUser) . "');   // never change this line\n"
-            . "define('SMTP_FROM_NAME', '" . configValue($siteName) . "');   // never change this line\n"
-            . "define('MAIL_FROM',      SMTP_FROM);       // retrocompat alias\n"
-            . "define('MAIL_FROM_NAME', SMTP_FROM_NAME);  // retrocompat alias\n\n"
-            . "// Sécurité\n"
-            . "define('ADMIN_EMAIL', '" . configValue($adminEmail) . "');\n"
-            . "define('SECRET_KEY',  '" . $secretKey . "');     // auto-generated: bin2hex(random_bytes(32))\n\n"
-            . "// Chemins\n"
-            . "define('BASE_URL',  '" . configValue($baseUrl) . "');\n"
-            . "define('BASE_PATH', __DIR__ . '/..');\n\n"
-            . "require_once BASE_PATH . '/includes/error-handler.php';\n";
+        $agenceNom = trim((string) ($wizard['agence_nom'] ?? ''));
+        $villePrincipale = trim((string) ($wizard['ville_principale'] ?? ''));
+        $villes = $wizard['villes'] ?? [];
 
-        if (!is_dir($configDir) && !mkdir($configDir, 0775, true) && !is_dir($configDir)) {
-            $errors[] = 'Impossible de créer le dossier config.';
-        } elseif (file_put_contents($configFile, $content) === false) {
-            $errors[] = 'Impossible d\'écrire config/config.php.';
-        } else {
-            file_put_contents($lockFile, "Installed at " . date('c') . PHP_EOL);
-            file_put_contents($htaccessFile, "Deny from all\n");
-            $success = 'Installation terminée. Le fichier config/config.php a été généré.';
+        if ($agenceNom === '' || $villePrincipale === '' || empty($villes)) {
+            header('Location: index.php?step=1&error=missing_data');
+            exit;
         }
+
+        if (!is_dir($configDir) && !mkdir($configDir, 0755, true) && !is_dir($configDir)) {
+            die('Impossible de créer le dossier config/.');
+        }
+
+        $config = [
+            'installed' => true,
+            'agence_nom' => $agenceNom,
+            'ville_principale' => $villePrincipale,
+            'logo' => (string) ($wizard['logo'] ?? ''),
+            'couleur' => preg_match('/^#[0-9A-Fa-f]{6}$/', (string) ($wizard['couleur'] ?? '')) ? $wizard['couleur'] : '#1e3a5f',
+            'email_reception' => (string) ($wizard['email_reception'] ?? ''),
+            'smtp_host' => (string) ($wizard['smtp_host'] ?? ''),
+            'smtp_port' => (int) ($wizard['smtp_port'] ?? 587),
+            'smtp_user' => (string) ($wizard['smtp_user'] ?? ''),
+            'smtp_pass' => (string) ($wizard['smtp_pass'] ?? ''),
+            'email_expediteur' => (string) ($wizard['email_expediteur'] ?? ''),
+            'h1_titre' => (string) ($wizard['h1_titre'] ?: ('Combien vaut votre bien à ' . $villePrincipale . ' ?')),
+            'sous_titre' => (string) ($wizard['sous_titre'] ?: 'Obtenez une estimation instantanée basée sur les données du marché local.'),
+            'meta_description' => (string) ($wizard['meta_description'] ?: ('Estimation gratuite à ' . $villePrincipale)),
+            'villes' => array_values($villes),
+        ];
+
+        $content = "<?php\n\nreturn " . var_export($config, true) . ";\n";
+        file_put_contents($configFile, $content);
+
+        $htaccess = <<<HTACCESS
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteCond %{REQUEST_URI} ^/install/?$
+RewriteRule ^$ /index.php [R=302,L]
+</IfModule>
+
+<Files "index.php">
+Order allow,deny
+Deny from all
+</Files>
+HTACCESS;
+        file_put_contents($installHtaccess, $htaccess);
+
+        unset($_SESSION['install_wizard']);
+
+        header('Location: /index.php');
+        exit;
     }
 }
 
-$defaults = [
-    'site_name' => $_POST['site_name'] ?? 'Mon Agence',
-    'city_name' => $_POST['city_name'] ?? '',
-    'site_color' => $_POST['site_color'] ?? '#1e40af',
-    'site_phone' => $_POST['site_phone'] ?? '',
-    'home_h1' => $_POST['home_h1'] ?? '',
-    'home_sous_titre' => $_POST['home_sous_titre'] ?? '',
-    'home_meta_desc' => $_POST['home_meta_desc'] ?? '',
-    'base_url' => $_POST['base_url'] ?? '',
-    'db_host' => $_POST['db_host'] ?? 'localhost',
-    'db_name' => $_POST['db_name'] ?? '',
-    'db_user' => $_POST['db_user'] ?? '',
-    'db_pass' => $_POST['db_pass'] ?? '',
-    'smtp_host' => $_POST['smtp_host'] ?? '',
-    'smtp_port' => $_POST['smtp_port'] ?? '465',
-    'smtp_user' => $_POST['smtp_user'] ?? '',
-    'smtp_pass' => $_POST['smtp_pass'] ?? '',
-    'admin_email' => $_POST['admin_email'] ?? '',
-];
-$citiesInput = (array) ($_POST['cities'] ?? ['']);
+if (is_file($configFile)) {
+    $config = require $configFile;
+    if (is_array($config) && !empty($config['installed'])) {
+        header('Location: /index.php');
+        exit;
+    }
+}
+
+$step = max(1, min(5, (int) ($_GET['step'] ?? 1)));
+$data = $_SESSION['install_wizard'] ?? [];
+
+$villes = $data['villes'] ?? [''];
+if ($villes === []) {
+    $villes = [''];
+}
 ?>
 <!doctype html>
 <html lang="fr">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Installation - Estimation immobilière</title>
-    <style>
-        :root { --primary: #1e40af; }
-        * { box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; margin: 0; background: #f5f7fb; color: #1f2937; }
-        .wrap { max-width: 980px; margin: 24px auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,.08); overflow: hidden; }
-        header { padding: 20px; background: #111827; color: #fff; }
-        .progress { display: flex; gap: 8px; margin-top: 12px; }
-        .progress div { flex: 1; height: 8px; border-radius: 999px; background: #374151; opacity: .35; }
-        .progress div.active { background: #34d399; opacity: 1; }
-        .content { padding: 20px; }
-        .step { display: none; }
-        .step.active { display: block; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-        @media (max-width: 760px) { .grid { grid-template-columns: 1fr; } }
-        label { display: block; margin-bottom: 6px; font-weight: 700; font-size: 14px; }
-        input, button, textarea { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid #d1d5db; }
-        .btn { background: var(--primary); color: #fff; border: none; cursor: pointer; font-weight: 700; }
-        .btn.secondary { background: #4b5563; }
-        .btn.success { background: #059669; }
-        .actions { display: flex; justify-content: space-between; gap: 10px; margin-top: 16px; }
-        .city-row { display: flex; gap: 10px; margin-bottom: 10px; }
-        .city-row button { max-width: 130px; }
-        .alert { padding: 12px; border-radius: 10px; margin-bottom: 14px; }
-        .alert.error { background: #fee2e2; color: #991b1b; }
-        .alert.ok { background: #dcfce7; color: #065f46; }
-        .summary { background: #f9fafb; padding: 14px; border-radius: 12px; border: 1px solid #e5e7eb; }
-        .summary pre { white-space: pre-wrap; font-family: inherit; margin: 0; }
-        .small { font-size: 12px; color: #6b7280; }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Assistant d'installation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-<div class="wrap">
-    <header>
-        <h1 style="margin:0;">Wizard d'installation</h1>
-        <div class="progress" id="progressBar">
-            <div class="active"></div><div></div><div></div><div></div><div></div><div></div>
-        </div>
-    </header>
-    <div class="content">
-        <?php if (!empty($errors)): ?>
-            <div class="alert error"><?php echo implode('<br>', $errors); ?></div>
-        <?php endif; ?>
-        <?php if ($success !== ''): ?>
-            <div class="alert ok"><?php echo $success; ?></div>
-            <p><a href="/" class="btn success" style="display:inline-block;text-decoration:none;padding:10px 16px;width:auto;">Aller au site</a></p>
+<body class="bg-slate-100 text-slate-900">
+<div class="mx-auto max-w-3xl p-4 md:p-8">
+    <div class="rounded-2xl bg-white p-6 shadow-sm">
+        <h1 class="text-2xl font-bold">Installation de votre site d'estimation</h1>
+        <p class="mt-2 text-sm text-slate-600">Étape <?= $step; ?>/5</p>
+
+        <?php if (isset($_GET['error']) && $_GET['error'] === 'missing_data'): ?>
+            <p class="mt-4 rounded-lg bg-red-100 px-3 py-2 text-sm text-red-700">Merci de compléter toutes les données obligatoires avant de générer le site.</p>
         <?php endif; ?>
 
-        <form method="post" enctype="multipart/form-data" id="installForm">
-            <input type="hidden" name="action" value="install">
-            <input type="hidden" name="db_tested" id="db_tested" value="0">
-            <input type="hidden" name="smtp_tested" id="smtp_tested" value="0">
+        <?php if ($step === 1): ?>
+            <form class="mt-6 space-y-4" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="step" value="1">
+                <label class="block text-sm font-medium">Nom de l'agence
+                    <input name="agence_nom" value="<?= htmlspecialchars((string) ($data['agence_nom'] ?? ''), ENT_QUOTES); ?>" class="mt-1 w-full rounded-lg border px-3 py-2" required>
+                </label>
+                <label class="block text-sm font-medium">Ville principale ciblée
+                    <input name="ville_principale" value="<?= htmlspecialchars((string) ($data['ville_principale'] ?? ''), ENT_QUOTES); ?>" class="mt-1 w-full rounded-lg border px-3 py-2" required>
+                </label>
+                <label class="block text-sm font-medium">Logo
+                    <input type="file" name="logo" accept="image/png,image/jpeg,image/webp,image/svg+xml" class="mt-1 block w-full text-sm">
+                </label>
+                <label class="block text-sm font-medium">Couleur principale
+                    <input type="color" name="couleur" value="<?= htmlspecialchars((string) ($data['couleur'] ?? '#1e3a5f'), ENT_QUOTES); ?>" class="mt-1 h-10 w-20 rounded border">
+                </label>
+                <button class="rounded-lg bg-blue-700 px-4 py-2 text-white">Continuer</button>
+            </form>
+        <?php endif; ?>
 
-            <section class="step active" data-step="1">
-                <h2>Étape 1 — Agence</h2>
-                <div class="grid">
-                    <div><label>Nom de l'agence</label><input required name="site_name" value="<?php echo s($defaults['site_name']); ?>"></div>
-                    <div><label>Ville principale</label><input required name="city_name" value="<?php echo s($defaults['city_name']); ?>"></div>
-                    <div><label>Couleur principale (hex)</label><input name="site_color" value="<?php echo s($defaults['site_color']); ?>" placeholder="#1E40AF"></div>
-                    <div><label>Téléphone</label><input name="site_phone" value="<?php echo s($defaults['site_phone']); ?>"></div>
-                    <div style="grid-column: 1 / -1;"><label>Logo (png/jpg/jpeg/svg/webp, 2MB max)</label><input type="file" name="logo" accept=".png,.jpg,.jpeg,.svg,.webp,image/png,image/jpeg,image/svg+xml,image/webp"></div>
-                </div>
-            </section>
-
-            <section class="step" data-step="2">
-                <h2>Étape 2 — Villes desservies</h2>
-                <div id="citiesWrapper">
-                    <?php foreach ($citiesInput as $city): ?>
-                        <div class="city-row"><input name="cities[]" value="<?php echo s((string) $city); ?>" placeholder="Ville"><button type="button" class="btn secondary" onclick="removeCity(this)">Supprimer</button></div>
+        <?php if ($step === 2): ?>
+            <form class="mt-6" method="post" id="cities-form">
+                <input type="hidden" name="step" value="2">
+                <p class="text-sm text-slate-600">Ajoutez les villes desservies (elles alimenteront la liste "Ville" de la homepage).</p>
+                <div id="cities-wrapper" class="mt-4 space-y-2">
+                    <?php foreach ($villes as $ville): ?>
+                        <div class="flex gap-2 city-row">
+                            <input name="villes[]" value="<?= htmlspecialchars((string) $ville, ENT_QUOTES); ?>" class="flex-1 rounded-lg border px-3 py-2" placeholder="Ex: Mérignac" required>
+                            <button type="button" class="remove-city rounded-lg border px-3 py-2">Supprimer</button>
+                        </div>
                     <?php endforeach; ?>
                 </div>
-                <button type="button" class="btn" onclick="addCity()">Ajouter une ville</button>
-            </section>
-
-            <section class="step" data-step="3">
-                <h2>Étape 3 — Textes homepage</h2>
-                <div class="grid">
-                    <div><label>H1 principal</label><input required name="home_h1" value="<?php echo s($defaults['home_h1']); ?>"></div>
-                    <div><label>Sous-titre</label><input name="home_sous_titre" value="<?php echo s($defaults['home_sous_titre']); ?>"></div>
-                    <div style="grid-column: 1 / -1;"><label>Meta description</label><textarea required name="home_meta_desc"><?php echo s($defaults['home_meta_desc']); ?></textarea></div>
-                    <div style="grid-column: 1 / -1;"><label>URL du site (sans slash final)</label><input required name="base_url" value="<?php echo s($defaults['base_url']); ?>" placeholder="https://exemple.fr"></div>
+                <button type="button" id="add-city" class="mt-3 rounded-lg border px-3 py-2 text-sm">+ Ajouter une ville</button>
+                <div class="mt-5 flex gap-2">
+                    <a href="?step=1" class="rounded-lg border px-4 py-2">Retour</a>
+                    <button class="rounded-lg bg-blue-700 px-4 py-2 text-white">Continuer</button>
                 </div>
-            </section>
+            </form>
+        <?php endif; ?>
 
-            <section class="step" data-step="4">
-                <h2>Étape 4 — Base de données</h2>
-                <div class="grid">
-                    <div><label>DB_HOST</label><input name="db_host" value="<?php echo s($defaults['db_host']); ?>"></div>
-                    <div><label>DB_NAME</label><input required name="db_name" value="<?php echo s($defaults['db_name']); ?>"></div>
-                    <div><label>DB_USER</label><input required name="db_user" value="<?php echo s($defaults['db_user']); ?>"></div>
-                    <div><label>DB_PASS</label><input type="password" name="db_pass" value="<?php echo s($defaults['db_pass']); ?>"></div>
+        <?php if ($step === 3): ?>
+            <form class="mt-6 space-y-4" method="post">
+                <input type="hidden" name="step" value="3">
+                <label class="block text-sm font-medium">Email de réception des rapports
+                    <input type="email" name="email_reception" value="<?= htmlspecialchars((string) ($data['email_reception'] ?? ''), ENT_QUOTES); ?>" class="mt-1 w-full rounded-lg border px-3 py-2" required>
+                </label>
+                <div class="grid gap-3 md:grid-cols-2">
+                    <label class="block text-sm font-medium">SMTP host
+                        <input name="smtp_host" value="<?= htmlspecialchars((string) ($data['smtp_host'] ?? ''), ENT_QUOTES); ?>" class="mt-1 w-full rounded-lg border px-3 py-2" required>
+                    </label>
+                    <label class="block text-sm font-medium">SMTP port
+                        <input type="number" name="smtp_port" value="<?= htmlspecialchars((string) ($data['smtp_port'] ?? 587), ENT_QUOTES); ?>" class="mt-1 w-full rounded-lg border px-3 py-2" required>
+                    </label>
+                    <label class="block text-sm font-medium">SMTP user
+                        <input name="smtp_user" value="<?= htmlspecialchars((string) ($data['smtp_user'] ?? ''), ENT_QUOTES); ?>" class="mt-1 w-full rounded-lg border px-3 py-2" required>
+                    </label>
+                    <label class="block text-sm font-medium">SMTP password
+                        <input type="password" name="smtp_pass" value="<?= htmlspecialchars((string) ($data['smtp_pass'] ?? ''), ENT_QUOTES); ?>" class="mt-1 w-full rounded-lg border px-3 py-2" required>
+                    </label>
                 </div>
-                <button type="button" class="btn" onclick="testDb()">Tester la connexion</button>
-                <p id="dbResult" class="small"></p>
-            </section>
+                <label class="block text-sm font-medium">Email expéditeur
+                    <input type="email" name="email_expediteur" value="<?= htmlspecialchars((string) ($data['email_expediteur'] ?? ''), ENT_QUOTES); ?>" class="mt-1 w-full rounded-lg border px-3 py-2" required>
+                </label>
+                <div class="flex gap-2">
+                    <a href="?step=2" class="rounded-lg border px-4 py-2">Retour</a>
+                    <button class="rounded-lg bg-blue-700 px-4 py-2 text-white">Continuer</button>
+                </div>
+            </form>
+        <?php endif; ?>
 
-            <section class="step" data-step="5">
-                <h2>Étape 5 — Email SMTP</h2>
-                <div class="grid">
-                    <div><label>SMTP_HOST</label><input required name="smtp_host" value="<?php echo s($defaults['smtp_host']); ?>"></div>
-                    <div><label>SMTP_PORT</label><input name="smtp_port" value="<?php echo s($defaults['smtp_port']); ?>"></div>
-                    <div><label>SMTP_USER</label><input required name="smtp_user" value="<?php echo s($defaults['smtp_user']); ?>"></div>
-                    <div><label>SMTP_PASS</label><input type="password" name="smtp_pass" value="<?php echo s($defaults['smtp_pass']); ?>"></div>
-                    <div><label>ADMIN_EMAIL</label><input required name="admin_email" value="<?php echo s($defaults['admin_email']); ?>"></div>
-                    <div>
-                        <label>SMTP_FROM (auto)</label>
-                        <input id="smtp_from_preview" readonly>
-                        <p class="small">Toujours égal à SMTP_USER</p>
+        <?php if ($step === 4): ?>
+            <form class="mt-6 space-y-4" method="post">
+                <input type="hidden" name="step" value="4">
+                <label class="block text-sm font-medium">Titre H1
+                    <input name="h1_titre" value="<?= htmlspecialchars((string) ($data['h1_titre'] ?? ''), ENT_QUOTES); ?>" class="mt-1 w-full rounded-lg border px-3 py-2" placeholder="Combien vaut votre bien à {ville} ?" required>
+                </label>
+                <label class="block text-sm font-medium">Sous-titre
+                    <textarea name="sous_titre" class="mt-1 w-full rounded-lg border px-3 py-2" rows="3" required><?= htmlspecialchars((string) ($data['sous_titre'] ?? ''), ENT_QUOTES); ?></textarea>
+                </label>
+                <label class="block text-sm font-medium">Meta description
+                    <textarea name="meta_description" class="mt-1 w-full rounded-lg border px-3 py-2" rows="2" required><?= htmlspecialchars((string) ($data['meta_description'] ?? ''), ENT_QUOTES); ?></textarea>
+                </label>
+                <div class="flex gap-2">
+                    <a href="?step=3" class="rounded-lg border px-4 py-2">Retour</a>
+                    <button class="rounded-lg bg-blue-700 px-4 py-2 text-white">Continuer</button>
+                </div>
+            </form>
+        <?php endif; ?>
+
+        <?php if ($step === 5): ?>
+            <div class="mt-6 space-y-4 text-sm">
+                <p>Vérifiez les informations ci-dessous puis générez votre site.</p>
+                <ul class="list-disc space-y-1 pl-5 text-slate-700">
+                    <li><strong>Agence :</strong> <?= htmlspecialchars((string) ($data['agence_nom'] ?? ''), ENT_QUOTES); ?></li>
+                    <li><strong>Ville principale :</strong> <?= htmlspecialchars((string) ($data['ville_principale'] ?? ''), ENT_QUOTES); ?></li>
+                    <li><strong>Villes :</strong> <?= htmlspecialchars(implode(', ', $data['villes'] ?? []), ENT_QUOTES); ?></li>
+                    <li><strong>Email réception :</strong> <?= htmlspecialchars((string) ($data['email_reception'] ?? ''), ENT_QUOTES); ?></li>
+                </ul>
+                <form method="post">
+                    <input type="hidden" name="step" value="5">
+                    <div class="flex gap-2">
+                        <a href="?step=4" class="rounded-lg border px-4 py-2">Retour</a>
+                        <button class="rounded-lg bg-emerald-600 px-4 py-2 font-semibold text-white">Générer mon site</button>
                     </div>
-                </div>
-                <button type="button" class="btn" onclick="testSmtp()">Tester l'envoi SMTP</button>
-                <p id="smtpResult" class="small"></p>
-            </section>
-
-            <section class="step" data-step="6">
-                <h2>Étape 6 — Récapitulatif</h2>
-                <div class="summary"><pre id="summary"></pre></div>
-                <p class="small">Confirmez pour générer <code>config/config.php</code> et <code>install/INSTALLED.lock</code>.</p>
-            </section>
-
-            <div class="actions">
-                <button type="button" class="btn secondary" id="prevBtn" onclick="prevStep()">Précédent</button>
-                <button type="button" class="btn" id="nextBtn" onclick="nextStep()">Suivant</button>
-                <button type="submit" class="btn success" id="installBtn" style="display:none;">Installer</button>
+                </form>
             </div>
-        </form>
+        <?php endif; ?>
     </div>
 </div>
 
 <script>
-let currentStep = 1;
-const totalSteps = 6;
+    const addCityBtn = document.getElementById('add-city');
+    const wrapper = document.getElementById('cities-wrapper');
 
-function syncSmtpPreview() {
-    const user = document.querySelector('[name="smtp_user"]').value;
-    document.getElementById('smtp_from_preview').value = user;
-}
+    if (addCityBtn && wrapper) {
+        addCityBtn.addEventListener('click', () => {
+            const row = document.createElement('div');
+            row.className = 'flex gap-2 city-row';
+            row.innerHTML = `
+                <input name="villes[]" class="flex-1 rounded-lg border px-3 py-2" placeholder="Ex: Talence" required>
+                <button type="button" class="remove-city rounded-lg border px-3 py-2">Supprimer</button>
+            `;
+            wrapper.appendChild(row);
+        });
 
-document.querySelector('[name="smtp_user"]').addEventListener('input', syncSmtpPreview);
-syncSmtpPreview();
-
-function showStep(step) {
-    currentStep = step;
-    document.querySelectorAll('.step').forEach(section => {
-        section.classList.toggle('active', Number(section.dataset.step) === step);
-    });
-
-    const bars = document.querySelectorAll('#progressBar div');
-    bars.forEach((bar, idx) => bar.classList.toggle('active', idx < step));
-
-    document.getElementById('prevBtn').style.display = step === 1 ? 'none' : 'inline-block';
-    document.getElementById('nextBtn').style.display = step === totalSteps ? 'none' : 'inline-block';
-    document.getElementById('installBtn').style.display = step === totalSteps ? 'inline-block' : 'none';
-
-    if (step === 6) {
-        updateSummary();
+        wrapper.addEventListener('click', (event) => {
+            const target = event.target;
+            if (!(target instanceof HTMLElement)) {
+                return;
+            }
+            if (!target.classList.contains('remove-city')) {
+                return;
+            }
+            const rows = wrapper.querySelectorAll('.city-row');
+            if (rows.length <= 1) {
+                const input = wrapper.querySelector('input[name="villes[]"]');
+                if (input instanceof HTMLInputElement) {
+                    input.value = '';
+                    input.focus();
+                }
+                return;
+            }
+            const row = target.closest('.city-row');
+            if (row) {
+                row.remove();
+            }
+        });
     }
-}
-
-function nextStep() {
-    if (currentStep < totalSteps) showStep(currentStep + 1);
-}
-
-function prevStep() {
-    if (currentStep > 1) showStep(currentStep - 1);
-}
-
-function addCity() {
-    const wrapper = document.getElementById('citiesWrapper');
-    const row = document.createElement('div');
-    row.className = 'city-row';
-    row.innerHTML = '<input name="cities[]" placeholder="Ville"><button type="button" class="btn secondary" onclick="removeCity(this)">Supprimer</button>';
-    wrapper.appendChild(row);
-}
-
-function removeCity(button) {
-    const wrapper = document.getElementById('citiesWrapper');
-    if (wrapper.querySelectorAll('.city-row').length === 1) {
-        wrapper.querySelector('input').value = '';
-        return;
-    }
-    button.parentElement.remove();
-}
-
-async function testDb() {
-    const form = new FormData();
-    ['db_host', 'db_name', 'db_user', 'db_pass'].forEach(name => {
-        form.append(name, document.querySelector(`[name="${name}"]`).value);
-    });
-    const res = await fetch('test-db.php', { method: 'POST', body: form });
-    const data = await res.json();
-    document.getElementById('dbResult').textContent = data.message;
-    document.getElementById('db_tested').value = data.success ? '1' : '0';
-}
-
-async function testSmtp() {
-    const form = new FormData();
-    ['smtp_host', 'smtp_port', 'smtp_user', 'smtp_pass', 'admin_email'].forEach(name => {
-        form.append(name, document.querySelector(`[name="${name}"]`).value);
-    });
-    const res = await fetch('test-smtp.php', { method: 'POST', body: form });
-    const data = await res.json();
-    document.getElementById('smtpResult').textContent = data.message;
-    document.getElementById('smtp_tested').value = data.success ? '1' : '0';
-}
-
-function updateSummary() {
-    const cities = Array.from(document.querySelectorAll('[name="cities[]"]')).map(i => i.value.trim()).filter(Boolean);
-    const summary = {
-        site_name: document.querySelector('[name="site_name"]').value,
-        city_name: document.querySelector('[name="city_name"]').value,
-        site_color: document.querySelector('[name="site_color"]').value,
-        site_phone: document.querySelector('[name="site_phone"]').value,
-        cities,
-        home_h1: document.querySelector('[name="home_h1"]').value,
-        home_sous_titre: document.querySelector('[name="home_sous_titre"]').value,
-        home_meta_desc: document.querySelector('[name="home_meta_desc"]').value,
-        base_url: document.querySelector('[name="base_url"]').value,
-        db_host: document.querySelector('[name="db_host"]').value,
-        db_name: document.querySelector('[name="db_name"]').value,
-        db_user: document.querySelector('[name="db_user"]').value,
-        smtp_host: document.querySelector('[name="smtp_host"]').value,
-        smtp_port: document.querySelector('[name="smtp_port"]').value,
-        smtp_user: document.querySelector('[name="smtp_user"]').value,
-        smtp_from: document.querySelector('[name="smtp_user"]').value,
-        smtp_from_name: document.querySelector('[name="site_name"]').value,
-        admin_email: document.querySelector('[name="admin_email"]').value
-    };
-    document.getElementById('summary').textContent = JSON.stringify(summary, null, 2);
-}
-
-showStep(1);
 </script>
 </body>
 </html>
