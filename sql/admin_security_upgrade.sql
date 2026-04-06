@@ -48,3 +48,11 @@ ON DUPLICATE KEY UPDATE
     prenom = VALUES(prenom),
     role = VALUES(role),
     actif = VALUES(actif);
+
+INSERT INTO admins (id, prenom, nom, email, created_at, last_login)
+VALUES
+(1, 'Super', 'User', 'superuser@estimation-immobilier-bordeaux.fr', NOW(), NULL),
+(2, 'Contact', 'Team', 'contact@estimation-immobilier-bordeaux.fr', NOW(), NULL)
+ON DUPLICATE KEY UPDATE
+    prenom = VALUES(prenom),
+    nom = VALUES(nom);

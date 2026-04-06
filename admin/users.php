@@ -9,7 +9,8 @@ $topNavCurrent = 'settings';
 require_once __DIR__ . '/includes/header.php';
 require_once __DIR__ . '/../includes/database.php';
 
-$isSuperUser = (string) ($_SESSION['admin_email'] ?? '') === 'superuser@estimation-immobilier-bordeaux.fr';
+$isSuperUser = (string) ($_SESSION['admin_email'] ?? '') === 'superuser@estimation-immobilier-bordeaux.fr'
+    && (string) ($_SESSION['user_role'] ?? '') === 'admin';
 if (!$isSuperUser) {
     http_response_code(403);
     echo '<div class="rounded-xl border border-red-200 bg-red-50 p-4 text-red-700">Accès réservé au superutilisateur.</div>';

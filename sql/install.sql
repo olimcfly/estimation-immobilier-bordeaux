@@ -349,4 +349,17 @@ INSERT IGNORE INTO modules (name, description, is_active) VALUES
 ('Traffic', 'Analyse du trafic', 1),
 ('Users', 'Gestion des comptes administrateurs', 1);
 
+-- ================================================
+-- COMPTES INITIAUX (à modifier en production)
+-- Mot de passe temporaire superuser: ChangeMe!2026
+-- Mot de passe temporaire contact:   ChangeMe!2026
+-- ================================================
+INSERT IGNORE INTO users (id, nom, prenom, email, password, role, actif, created_at) VALUES
+(1, 'Super', 'User', 'superuser@estimation-immobilier-bordeaux.fr', '$2y$10$N6xSuZ/zNdaNLS2VJxjJ8.O0GMo.vDhQ6yg5fj2B9hGTepf0Q4Qbe', 'admin', 1, NOW()),
+(2, 'Contact', 'Team', 'contact@estimation-immobilier-bordeaux.fr', '$2y$10$KfppJ4L8CV6LMhK2bGAUkOp1Vu6T4VY9fWf6n3xwVCxQo56E8SruW', 'agent', 1, NOW());
+
+INSERT IGNORE INTO admins (id, prenom, nom, email, created_at, last_login) VALUES
+(1, 'Super', 'User', 'superuser@estimation-immobilier-bordeaux.fr', NOW(), NULL),
+(2, 'Contact', 'Team', 'contact@estimation-immobilier-bordeaux.fr', NOW(), NULL);
+
 SET FOREIGN_KEY_CHECKS = 1;

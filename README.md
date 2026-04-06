@@ -170,6 +170,7 @@ Pour toute question : [votre email]
 ### Comptes recommandés
 - Superutilisateur : `superuser@estimation-immobilier-bordeaux.fr`
 - Utilisateur standard : `contact@estimation-immobilier-bordeaux.fr`
+- Mot de passe temporaire (migration fournie) : `ChangeMe!2026` (à changer immédiatement)
 
 Exécutez la migration `sql/admin_security_upgrade.sql` pour créer les colonnes de suivi, la table de sessions, les modules activables et insérer ces comptes.
 

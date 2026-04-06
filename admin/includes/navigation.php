@@ -12,29 +12,6 @@ $moduleState = [
 
 try {
     $db = Database::getConnection();
-    $db->exec(
-        "CREATE TABLE IF NOT EXISTS modules (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            name VARCHAR(100) NOT NULL UNIQUE,
-            description TEXT NULL,
-            is_active TINYINT(1) DEFAULT 1,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
-    );
-
-    $seedModules = [
-        ['Google Ads', 'Gestion des campagnes Google Ads'],
-        ['Webhooks', 'Intégration des webhooks'],
-        ['Leads', 'Gestion des leads et estimations'],
-        ['Traffic', 'Analyse du trafic'],
-        ['Users', 'Gestion des comptes administrateurs'],
-    ];
-
-    $insertStmt = $db->prepare('INSERT IGNORE INTO modules (name, description, is_active) VALUES (:name, :description, 1)');
-    foreach ($seedModules as $module) {
-        $insertStmt->execute(['name' => $module[0], 'description' => $module[1]]);
-    }
-
     $rows = $db->query('SELECT name, is_active FROM modules')->fetchAll(PDO::FETCH_ASSOC);
     $map = [
         'Google Ads' => 'google-ads',

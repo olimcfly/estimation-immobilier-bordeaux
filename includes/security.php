@@ -199,10 +199,11 @@ function logoutUser(int $userId): void
 function refreshOnlineStatuses(int $inactiveThresholdMinutes = 15): void
 {
     $db = Database::getConnection();
-    $db->prepare(
+    $minutes = max(1, $inactiveThresholdMinutes);
+    $db->exec(
         'UPDATE users
          SET is_online = 0
          WHERE is_online = 1
-           AND (last_activity IS NULL OR last_activity < DATE_SUB(NOW(), INTERVAL :minutes MINUTE))'
-    )->execute(['minutes' => max(1, $inactiveThresholdMinutes)]);
+           AND (last_activity IS NULL OR last_activity < DATE_SUB(NOW(), INTERVAL ' . $minutes . ' MINUTE))'
+    );
 }

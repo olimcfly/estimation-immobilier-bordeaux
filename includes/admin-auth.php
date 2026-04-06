@@ -17,14 +17,22 @@ try {
 
     $adminEmail = (string) ($_SESSION['admin_email'] ?? '');
     if ($adminEmail !== '') {
-        $stmt = $db->prepare('SELECT id FROM users WHERE email = :email LIMIT 1');
+        $stmt = $db->prepare('SELECT id, role, actif FROM users WHERE email = :email LIMIT 1');
         $stmt->execute(['email' => $adminEmail]);
-        $linkedUserId = (int) $stmt->fetchColumn();
+        $linkedUser = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if ($linkedUserId > 0) {
+        if (is_array($linkedUser) && (int) ($linkedUser['id'] ?? 0) > 0) {
+            if ((int) ($linkedUser['actif'] ?? 0) !== 1) {
+                session_destroy();
+                http_response_code(403);
+                exit('Compte utilisateur désactivé.');
+            }
+
+            $linkedUserId = (int) $linkedUser['id'];
             $currentPage = (string) ($_SERVER['REQUEST_URI'] ?? '/admin/');
             trackUserActivity($linkedUserId, $currentPage);
             $_SESSION['linked_user_id'] = $linkedUserId;
+            $_SESSION['user_role'] = (string) ($linkedUser['role'] ?? 'agent');
         }
     }
 } catch (Throwable $exception) {
