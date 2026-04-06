@@ -57,3 +57,17 @@ function ensureDvfDataDirectory(): void
         throw new RuntimeException(sprintf('Impossible de créer le dossier DVF: %s', DVF_DATA_DIR));
     }
 }
+
+/**
+ * Retourne l'URL source DVF active.
+ * Permet une surcharge via variable d'environnement.
+ */
+function getDvfSourceUrl(): string
+{
+    $envUrl = getenv('DVF_SOURCE_URL');
+    if (is_string($envUrl) && $envUrl !== '') {
+        return $envUrl;
+    }
+
+    return DVF_SOURCE_URL;
+}

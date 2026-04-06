@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/dvf_estimator.php';
+require_once __DIR__ . '/../includes/database.php';
+require_once __DIR__ . '/../classes/Settings.php';
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -28,6 +30,11 @@ try {
 
     $estimator = new DVFEstimator();
     $result = $estimator->estimate($commune, $typeBien, $surface, $months);
+
+    if (($result['success'] ?? false) === true && isset($result['estimation']) && is_array($result['estimation'])) {
+        $sourceLabel = trim((string) Settings::get('dvf_source_label', 'DVF (Etalab)'));
+        $result['estimation']['source'] = $sourceLabel !== '' ? $sourceLabel : 'DVF (Etalab)';
+    }
 
     if (($result['success'] ?? false) === false) {
         http_response_code(404);

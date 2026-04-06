@@ -63,6 +63,8 @@ $sectionFields = [
         'webhook_url',
         'calendly_url',
         'whatsapp_number',
+        'dvf_source_url',
+        'dvf_source_label',
     ],
 ];
 
@@ -170,6 +172,8 @@ $keys = [
     'webhook_url',
     'calendly_url',
     'whatsapp_number',
+    'dvf_source_url',
+    'dvf_source_label',
 ];
 
 $settings = [];
@@ -432,9 +436,17 @@ try {
                         <div class="form-group full"><small>Si renseigné, un bouton WhatsApp apparaîtra sur le site.</small></div>
                     </div>
 
+                    <h3>DVF / Data.gouv</h3>
+                    <div class="form-grid">
+                        <label class="form-group full"><span>URL de la source DVF (ZIP/GZ)</span><input type="url" name="dvf_source_url" value="<?= h($settings['dvf_source_url']) ?>" placeholder="https://files.data.gouv.fr/.../valeursfoncieres-latest.txt.gz"></label>
+                        <label class="form-group full"><span>Libellé source (API/front)</span><input type="text" name="dvf_source_label" value="<?= h($settings['dvf_source_label']) ?>" placeholder="DVF 2025 (Etalab)"></label>
+                        <div class="form-group full"><small>Vous pouvez déclencher ici le téléchargement + parsing DVF pour mettre à jour la base locale sans accès serveur.</small></div>
+                    </div>
+
                     <div class="form-actions">
                         <button class="btn" type="submit">Enregistrer</button>
                         <button type="button" class="btn secondary" id="btn-test-webhook">Tester le webhook</button>
+                        <button type="button" class="btn secondary" id="btn-sync-dvf">Mettre à jour DVF maintenant</button>
                     </div>
                 </form>
             </section>
@@ -552,6 +564,36 @@ if (testEmailBtn) {
 const testWebhookBtn = document.getElementById('btn-test-webhook');
 if (testWebhookBtn) {
     testWebhookBtn.addEventListener('click', () => postTest('ajax/test_webhook.php', 'Webhook de test envoyé (si la route est disponible).'));
+}
+
+const syncDvfBtn = document.getElementById('btn-sync-dvf');
+if (syncDvfBtn) {
+    syncDvfBtn.addEventListener('click', async () => {
+        syncDvfBtn.disabled = true;
+        const originalText = syncDvfBtn.textContent;
+        syncDvfBtn.textContent = 'Synchronisation DVF...';
+
+        try {
+            const response = await fetch('/admin/ajax/dvf_sync.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-Token': '<?= h($_SESSION['csrf_token']) ?>'
+                },
+                body: JSON.stringify({ action: 'sync_dvf' })
+            });
+            const data = await response.json();
+            if (!response.ok || !data.success) {
+                throw new Error(data.message || 'Erreur DVF.');
+            }
+            alert(`${data.message}\nTransactions retenues: ${data.parse?.kept ?? 0}`);
+        } catch (error) {
+            alert(`Synchronisation DVF impossible: ${error.message}`);
+        } finally {
+            syncDvfBtn.disabled = false;
+            syncDvfBtn.textContent = originalText;
+        }
+    });
 }
 </script>
 

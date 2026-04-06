@@ -35,6 +35,7 @@ function parseDvfDate(string $rawDate): ?DateTimeImmutable
 /**
  * Valide et normalise une ligne DVF.
  *
+ * @param array<string, string> $row
  * @return array<string, int|float|string>|null
  */
 function normalizeRow(array $row): ?array
@@ -80,7 +81,13 @@ function normalizeRow(array $row): ?array
     ];
 }
 
-try {
+/**
+ * Parse le fichier TXT DVF en CSV+JSON.
+ *
+ * @return array{total:int,kept:int,csv_path:string,json_path:string}
+ */
+function parseDvfFile(): array
+{
     if (!is_file(DVF_TXT_PATH)) {
         throw new RuntimeException(sprintf('Fichier TXT introuvable: %s', DVF_TXT_PATH));
     }
@@ -132,11 +139,24 @@ try {
 
     @unlink(DVF_CACHE_PATH);
 
-    echo sprintf('Parsing terminé. Lignes lues: %d, transactions retenues: %d', $total, $kept) . PHP_EOL;
-    echo 'CSV: ' . DVF_CSV_PATH . PHP_EOL;
-    echo 'JSON: ' . DVF_JSON_PATH . PHP_EOL;
-    exit(0);
-} catch (Throwable $e) {
-    fwrite(STDERR, 'Erreur parsing DVF: ' . $e->getMessage() . PHP_EOL);
-    exit(1);
+    return [
+        'total' => $total,
+        'kept' => $kept,
+        'csv_path' => DVF_CSV_PATH,
+        'json_path' => DVF_JSON_PATH,
+    ];
+}
+
+if (PHP_SAPI === 'cli' && realpath((string) ($_SERVER['SCRIPT_FILENAME'] ?? '')) === __FILE__) {
+    try {
+        $result = parseDvfFile();
+
+        echo sprintf('Parsing terminé. Lignes lues: %d, transactions retenues: %d', $result['total'], $result['kept']) . PHP_EOL;
+        echo 'CSV: ' . $result['csv_path'] . PHP_EOL;
+        echo 'JSON: ' . $result['json_path'] . PHP_EOL;
+        exit(0);
+    } catch (Throwable $e) {
+        fwrite(STDERR, 'Erreur parsing DVF: ' . $e->getMessage() . PHP_EOL);
+        exit(1);
+    }
 }

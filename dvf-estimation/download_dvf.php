@@ -121,23 +121,49 @@ function extractGzToTxt(string $gzPath, string $targetTxtPath): void
     fclose($out);
 }
 
-try {
+/**
+ * Télécharge et extrait la source DVF.
+ *
+ * @return array{source_url:string,archive_path:string,txt_path:string}
+ */
+function syncDvfSource(?string $sourceUrl = null): array
+{
     ensureDvfDataDirectory();
 
-    echo "Téléchargement DVF depuis " . DVF_SOURCE_URL . PHP_EOL;
-    downloadFile(DVF_SOURCE_URL, DVF_ARCHIVE_PATH);
+    $sourceUrl = trim((string) ($sourceUrl ?? getDvfSourceUrl()));
+    if ($sourceUrl === '') {
+        throw new RuntimeException('URL DVF vide.');
+    }
 
-    if (str_ends_with(strtolower(DVF_ARCHIVE_PATH), '.zip')) {
+    downloadFile($sourceUrl, DVF_ARCHIVE_PATH);
+
+    $lowerUrl = strtolower($sourceUrl);
+    if (str_ends_with($lowerUrl, '.zip')) {
         extractZipToTxt(DVF_ARCHIVE_PATH, DVF_TXT_PATH);
-    } elseif (str_ends_with(strtolower(DVF_ARCHIVE_PATH), '.gz')) {
+    } elseif (str_ends_with($lowerUrl, '.gz') || str_ends_with(strtolower(DVF_ARCHIVE_PATH), '.gz')) {
         extractGzToTxt(DVF_ARCHIVE_PATH, DVF_TXT_PATH);
     } else {
         throw new RuntimeException('Format d\'archive non supporté (attendu: .zip ou .gz).');
     }
 
-    echo "Fichier extrait : " . DVF_TXT_PATH . PHP_EOL;
-    exit(0);
-} catch (Throwable $e) {
-    fwrite(STDERR, 'Erreur DVF: ' . $e->getMessage() . PHP_EOL);
-    exit(1);
+    return [
+        'source_url' => $sourceUrl,
+        'archive_path' => DVF_ARCHIVE_PATH,
+        'txt_path' => DVF_TXT_PATH,
+    ];
+}
+
+if (PHP_SAPI === 'cli' && realpath((string) ($_SERVER['SCRIPT_FILENAME'] ?? '')) === __FILE__) {
+    try {
+        $url = $argv[1] ?? null;
+        $result = syncDvfSource($url);
+
+        echo 'Téléchargement DVF depuis ' . $result['source_url'] . PHP_EOL;
+        echo 'Archive: ' . $result['archive_path'] . PHP_EOL;
+        echo 'Fichier extrait : ' . $result['txt_path'] . PHP_EOL;
+        exit(0);
+    } catch (Throwable $e) {
+        fwrite(STDERR, 'Erreur DVF: ' . $e->getMessage() . PHP_EOL);
+        exit(1);
+    }
 }
