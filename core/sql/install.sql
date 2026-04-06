@@ -149,8 +149,46 @@ CREATE TABLE IF NOT EXISTS admins (
     prenom VARCHAR(100) NOT NULL,
     nom VARCHAR(100) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NULL,
+    role ENUM('superadmin','admin') DEFAULT 'admin',
+    is_active TINYINT(1) DEFAULT 1,
+    is_online TINYINT(1) DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    last_login DATETIME NULL
+    last_login DATETIME NULL,
+    INDEX idx_role (role),
+    INDEX idx_is_online (is_online)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ================================================
+-- TABLE : MODULES ADMIN DYNAMIQUES
+-- ================================================
+CREATE TABLE IF NOT EXISTS modules (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50) NOT NULL,
+    slug VARCHAR(50) NOT NULL UNIQUE,
+    icon VARCHAR(30) DEFAULT 'fas fa-cog',
+    is_active TINYINT(1) DEFAULT 1,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_modules_active (is_active)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ================================================
+-- TABLE : SESSIONS UTILISATEURS ADMIN
+-- ================================================
+CREATE TABLE IF NOT EXISTS user_sessions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    session_id VARCHAR(255) NOT NULL,
+    ip_address VARCHAR(45),
+    user_agent TEXT,
+    is_online TINYINT(1) DEFAULT 1,
+    last_activity DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_user_sessions_user (user_id),
+    INDEX idx_user_sessions_session (session_id),
+    INDEX idx_user_sessions_online (is_online),
+    CONSTRAINT fk_user_sessions_admin FOREIGN KEY (user_id) REFERENCES admins(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS admin_codes (

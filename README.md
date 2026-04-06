@@ -51,10 +51,50 @@ estimation-immobilier-bordeaux/
 2. Vérifier `core/config/config.php` et `core/config/database.php`.
 3. Accéder à `/install/` pour compléter l'installation si nécessaire.
 
+## 💾 Sauvegardes automatiques
+
+### Configuration du cron
+
+Ajoutez cette ligne à votre crontab (`crontab -e`) pour une sauvegarde quotidienne à 2h du matin :
+
+```bash
+0 2 * * * /usr/bin/php /chemin/vers/skyline/cron/backup_db.php >> /var/log/skyline_backup.log 2>&1
+```
+
 ## Onboarding admin
 
 - L'accès à `/admin/onboarding.php` est piloté par la session admin et le nombre d'entrées dans `admins`.
 - Il n'existe pas de mécanisme `setup.lock` dans ce dépôt.
+
+## Sauvegarde et restauration de la base
+
+### Restaurer une sauvegarde SQL
+
+```bash
+mysql -u [utilisateur] -p [base_de_données] < /chemin/vers/backup/YYYY-MM-DD_HH-MM-SS.sql
+```
+
+## Tests et vérifications (admin + backup)
+
+### Vérifications de syntaxe PHP
+
+```bash
+php -l core/includes/security.php
+php -l core/includes/admin-auth.php
+php -l core/admin/users.php
+php -l core/admin/ajax/dvf_sync.php
+php -l core/cron/send-relances.php
+```
+
+### Tests manuels
+
+| Scénario | Résultat attendu |
+| --- | --- |
+| Connexion en tant qu'admin | Le statut `is_online` est mis à jour dans `admins` et `user_sessions`. |
+| Déconnexion | Le statut `is_online` passe à `FALSE`, la session est supprimée de `user_sessions`. |
+| Accès à `/admin/users.php` | Page accessible uniquement pour `superadmin`, liste des utilisateurs affichée. |
+| Synchronisation DVF depuis l'admin | Retour AJAX valide, aucune erreur PHP côté endpoint `core/admin/ajax/dvf_sync.php`. |
+| Exécution de `core/cron/send-relances.php` | Le script s'exécute sans erreur fatale et journalise les envois si des relances sont à traiter. |
 
 ## Ressources
 

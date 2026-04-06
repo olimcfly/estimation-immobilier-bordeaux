@@ -2,6 +2,11 @@
 
 require_once __DIR__ . '/database.php';
 
+// Démarrer la session si ce n'est pas déjà fait
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 // Démarrer session sécurisée
 function initSecureSession(): void
 {
@@ -136,4 +141,50 @@ function recordLoginAttempt(string $email, bool $success): void
         // Nettoyer les tentatives après un login réussi
         $db->prepare('DELETE FROM login_attempts WHERE email = ?')->execute([$email]);
     }
+}
+
+// Suivre l'activité de l'utilisateur
+function trackUserActivity(int $userId, string $action): void
+{
+    $db = Database::getConnection();
+    $stmt = $db->prepare(
+        'INSERT INTO user_activities (user_id, action, ip_address, user_agent) VALUES (?, ?, ?, ?)'
+    );
+    $stmt->execute([
+        $userId,
+        $action,
+        $_SERVER['REMOTE_ADDR'] ?? 'unknown',
+        $_SERVER['HTTP_USER_AGENT'] ?? 'unknown',
+    ]);
+}
+
+// Déconnecter un utilisateur
+function logoutUser(int $userId): void
+{
+    $db = Database::getConnection();
+
+    // Mettre à jour le statut en ligne
+    $db->prepare('UPDATE admins SET is_online = FALSE WHERE id = ?')->execute([$userId]);
+
+    // Supprimer la session
+    $db->prepare('DELETE FROM user_sessions WHERE user_id = ?')->execute([$userId]);
+
+    // Détruire la session PHP
+    $_SESSION = [];
+    if (session_status() === PHP_SESSION_ACTIVE) {
+        session_destroy();
+    }
+}
+
+// Rafraîchir le statut en ligne
+function refreshOnlineStatuses(): void
+{
+    $db = Database::getConnection();
+    $db->exec(
+        'UPDATE admins a
+         SET is_online = EXISTS (
+             SELECT 1 FROM user_sessions s
+             WHERE s.user_id = a.id AND s.is_online = TRUE
+         )'
+    );
 }
