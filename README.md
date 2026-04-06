@@ -50,3 +50,7 @@ estimation-immobilier-bordeaux/
 1. Configurer `site-specific/config/site.php`.
 2. Vérifier `core/config/config.php` et `core/config/database.php`.
 3. Accéder à `/install/` pour compléter l'installation si nécessaire.
+
+## Ressources
+
+- Plan SEO/SEA + automatisation: `docs/plan-seo-ads-automation-bordeaux.md`
