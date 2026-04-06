@@ -7,12 +7,13 @@ CREATE TABLE IF NOT EXISTS admin_users (
 
 CREATE TABLE ads_checklist_progress (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    admin_id INT NOT NULL,
-    step_key VARCHAR(100) NOT NULL UNIQUE,
-    completed TINYINT(1) DEFAULT 0,
-    completed_at DATETIME NULL,
-    notes TEXT NULL,
-    FOREIGN KEY (admin_id) REFERENCES admin_users(id)
+    recipient VARCHAR(255) NOT NULL,
+    subject VARCHAR(500),
+    template VARCHAR(100),
+    status ENUM('sent','failed','bounced') DEFAULT 'sent',
+    sent_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_recipient (recipient),
+    INDEX idx_template (template)
 );
 
 CREATE TABLE IF NOT EXISTS google_ads_drafts (
