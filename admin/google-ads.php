@@ -159,24 +159,23 @@ $sections = [
 ];
 ?>
 
-<div class="min-h-screen bg-slate-50" style="--accent: <?= htmlspecialchars($siteColor) ?>">
-    <div class="flex">
-        <aside class="w-64 sticky top-0 h-screen bg-white border-r border-slate-200 p-4 overflow-y-auto hidden lg:block">
-            <div class="flex items-center gap-2 text-lg font-bold text-slate-800 mb-4">
-                <span>📈</span>
-                <span>Google Ads</span>
-            </div>
-            <nav class="space-y-1 text-sm">
-                <?php foreach ($sections as $id => $label): ?>
-                    <a href="#<?= $id ?>" class="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-slate-100 nav-link" data-section="<?= $id ?>">
-                        <span><?= $label ?></span>
-                        <span class="w-2.5 h-2.5 rounded-full bg-slate-300 completion-dot" data-dot="<?= $id ?>"></span>
-                    </a>
-                <?php endforeach; ?>
-            </nav>
-        </aside>
+<div class="space-y-6" style="--accent: <?= htmlspecialchars($siteColor) ?>">
+    <section class="rounded-2xl border border-slate-200 bg-white p-4">
+        <div class="mb-3 flex items-center gap-2 text-lg font-bold text-slate-800">
+            <span>📈</span>
+            <span>Google Ads</span>
+        </div>
+        <nav class="grid gap-2 text-sm sm:grid-cols-2 lg:grid-cols-3" aria-label="Navigation Google Ads">
+            <?php foreach ($sections as $id => $label): ?>
+                <a href="#<?= $id ?>" class="focus-visible-ring flex items-center justify-between rounded-lg px-3 py-2 hover:bg-slate-100 nav-link" data-section="<?= $id ?>">
+                    <span><?= $label ?></span>
+                    <span class="h-2.5 w-2.5 rounded-full bg-slate-300 completion-dot" data-dot="<?= $id ?>"></span>
+                </a>
+            <?php endforeach; ?>
+        </nav>
+    </section>
 
-        <main class="flex-1 p-4 lg:p-8 space-y-8">
+    <section class="space-y-8">
             <section id="overview" class="space-y-6">
                 <div class="rounded-2xl p-8 text-white bg-gradient-to-r from-blue-600 to-indigo-700 shadow-lg">
                     <h1 class="text-3xl font-bold mb-2">Votre stratégie Google Ads pour <?= htmlspecialchars($ville) ?></h1>
@@ -485,8 +484,7 @@ gtag('config', 'AW-XXXXXXXXX');
                 <button class="px-5 py-3 rounded-xl text-white font-bold" style="background: var(--accent)" onclick="completeGuide()">🎯 J'ai tout configuré !</button>
                 <div id="completionMessage" class="hidden p-4 rounded-xl bg-green-50 border border-green-200 text-green-800"></div>
             </section>
-        </main>
-    </div>
+    </section>
 </div>
 
 <script>

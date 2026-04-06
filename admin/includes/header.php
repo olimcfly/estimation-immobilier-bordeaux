@@ -6,6 +6,7 @@ require_once __DIR__ . '/../../includes/config.php';
 require_once __DIR__ . '/../../includes/database.php';
 require_once __DIR__ . '/../../includes/security.php';
 require_once __DIR__ . '/../../includes/admin-auth.php';
+require_once __DIR__ . '/navigation.php';
 
 initSecureSession();
 
@@ -19,11 +20,6 @@ if (!function_exists('admin_h')) {
 if (!isset($pageTitle) || !is_string($pageTitle) || $pageTitle === '') {
     $pageTitle = 'Administration';
 }
-
-$topNav = [
-    'settings' => ['label' => 'Paramètres', 'href' => '/admin/settings.php'],
-    'logout' => ['label' => 'Déconnexion', 'href' => '/admin/logout.php'],
-];
 ?>
 <!doctype html>
 <html lang="fr">
@@ -33,29 +29,55 @@ $topNav = [
     <title><?= admin_h($pageTitle) ?> · <?= admin_h(SITE_NAME) ?></title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        :root {
+        :root,
+        [data-theme="light"] {
             --admin-sidebar-bg: #111827;
             --admin-sidebar-text: #f8fafc;
             --admin-sidebar-muted: #cbd5e1;
             --admin-sidebar-active-bg: #1d4ed8;
             --admin-content-bg: #f8fafc;
+            --admin-header-bg: #ffffff;
+            --admin-header-text: #0f172a;
+            --admin-border: #e2e8f0;
+        }
+
+        [data-theme="dark"] {
+            --admin-sidebar-bg: #020617;
+            --admin-sidebar-text: #e2e8f0;
+            --admin-sidebar-muted: #94a3b8;
+            --admin-sidebar-active-bg: #1e40af;
+            --admin-content-bg: #0f172a;
+            --admin-header-bg: #0b1220;
+            --admin-header-text: #f8fafc;
+            --admin-border: #334155;
+        }
+
+        .focus-visible-ring:focus-visible {
+            outline: 3px solid #facc15;
+            outline-offset: 2px;
         }
     </style>
 </head>
-<body class="bg-[var(--admin-content-bg)] text-slate-900">
-<header class="fixed inset-x-0 top-0 z-50 h-16 border-b border-slate-200 bg-white">
+<body class="bg-[var(--admin-content-bg)] text-slate-900 transition-colors duration-200" data-theme="light">
+<header class="fixed inset-x-0 top-0 z-50 h-16 border-b bg-[var(--admin-header-bg)] text-[var(--admin-header-text)]" style="border-color: var(--admin-border)">
     <div class="mx-auto flex h-full max-w-[1600px] items-center justify-between px-6">
         <div class="flex items-center gap-3">
-            <button type="button" id="sidebar-toggle" class="inline-flex items-center justify-center rounded-md border border-slate-300 p-2 text-slate-700 transition hover:bg-slate-100 lg:hidden" aria-controls="admin-sidebar" aria-expanded="false" aria-label="Ouvrir le menu latéral">
+            <button type="button" id="sidebar-toggle" class="focus-visible-ring inline-flex items-center justify-center rounded-md border p-2 text-inherit transition hover:bg-slate-100/20 lg:hidden" style="border-color: var(--admin-border)" aria-controls="admin-sidebar" aria-expanded="false" aria-label="Ouvrir le menu latéral">
                 ☰
             </button>
-            <a href="/admin/index.php" class="text-xl font-bold tracking-tight text-slate-900">EstimIA</a>
+            <a href="/admin/index.php" class="focus-visible-ring text-xl font-bold tracking-tight">EstimIA</a>
         </div>
-        <nav class="flex items-center gap-1 text-sm font-medium text-slate-600">
-            <?php foreach ($topNav as $key => $item): ?>
-                <a href="<?= admin_h($item['href']) ?>" class="rounded-md px-3 py-2 transition hover:bg-slate-100 hover:text-slate-900">
-                    <?= admin_h($item['label']) ?>
-                </a>
+        <nav class="flex items-center gap-1 text-sm font-medium">
+            <?php foreach ($adminTopNav as $item): ?>
+                <?php if (!empty($item['isToggle'])): ?>
+                    <button type="button" id="theme-toggle" class="focus-visible-ring rounded-md px-3 py-2 transition hover:bg-slate-100/20" aria-pressed="false">
+                        <?= admin_h($item['label']) ?>
+                    </button>
+                <?php else: ?>
+                    <a href="<?= admin_h($item['href']) ?>" class="focus-visible-ring rounded-md px-3 py-2 transition hover:bg-slate-100/20">
+                        <?= admin_h($item['label']) ?>
+                    </a>
+                <?php endif; ?>
             <?php endforeach; ?>
         </nav>
     </div>
