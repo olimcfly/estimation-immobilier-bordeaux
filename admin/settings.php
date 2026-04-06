@@ -184,7 +184,7 @@ foreach ($keys as $key) {
 $users = [];
 try {
     $db = Database::getConnection();
-    $usersQuery = "SELECT name, email, role, last_login_at FROM users ORDER BY id DESC";
+    $usersQuery = "SELECT CONCAT(COALESCE(prenom, ''), ' ', COALESCE(nom, '')) AS name, email, role, last_login AS last_login_at FROM users ORDER BY id DESC";
     $users = $db->query($usersQuery)->fetchAll();
 } catch (Throwable $error) {
     try {

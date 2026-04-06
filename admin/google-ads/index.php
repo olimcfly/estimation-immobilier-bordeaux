@@ -6,11 +6,11 @@ require_once __DIR__ . '/../includes/header.php';
 require_once __DIR__ . '/../includes/sidebar.php';
 require_once __DIR__ . '/_bootstrap.php';
 
-$db = Database::getConnection();
 $strategies = [];
 $error = null;
 
 try {
+    $db = Database::getConnection();
     $strategies = gaFetchStrategies($db);
 } catch (Throwable $e) {
     error_log('Erreur stratégies Google Ads: ' . $e->getMessage());

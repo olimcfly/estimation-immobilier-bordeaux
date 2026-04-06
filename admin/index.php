@@ -12,12 +12,12 @@ if (empty($_SESSION['admin_logged']) || empty($_SESSION['admin_id'])) {
     exit;
 }
 
-$db = Database::getConnection();
 $totalEstimations = 0;
 $lastEstimations = [];
 $dashboardError = null;
 
 try {
+    $db = Database::getConnection();
     $totalEstimations = (int) $db->query('SELECT COUNT(*) FROM estimations')->fetchColumn();
     $lastEstimationsStmt = $db->query(
         'SELECT id, prenom, email, type_bien, surface, ville, created_at

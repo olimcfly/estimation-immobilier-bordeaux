@@ -7,51 +7,60 @@ require_once __DIR__ . '/../includes/admin-auth.php';
 
 initSecureSession();
 
-$db = Database::getConnection();
 $message = null;
+$dbError = null;
+$stats = ['total' => 0, 'success_count' => 0, 'last_success' => null];
+$rows = [];
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!validateCsrfToken()) {
-        $message = 'Session expirée (CSRF). Rechargez la page.';
-    } else {
-    $action = $_POST['action'] ?? '';
+try {
+    $db = Database::getConnection();
 
-    if ($action === 'test') {
-        $ok = Webhook::fire('webhook.test', [
-            'message' => 'Ping depuis l\'interface admin',
-            'admin_time' => date('Y-m-d H:i:s'),
-        ]);
-        $message = $ok ? 'Webhook de test envoyé avec succès.' : 'Échec de l\'envoi du webhook de test.';
-    }
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        if (!validateCsrfToken()) {
+            $message = 'Session expirée (CSRF). Rechargez la page.';
+        } else {
+            $action = (string) ($_POST['action'] ?? '');
 
-    if ($action === 'retry' && !empty($_POST['log_id'])) {
-        $stmt = $db->prepare('SELECT * FROM webhook_logs WHERE id = ? LIMIT 1');
-        $stmt->execute([(int) $_POST['log_id']]);
-        $log = $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($action === 'test') {
+                $ok = Webhook::fire('webhook.test', [
+                    'message' => 'Ping depuis l\'interface admin',
+                    'admin_time' => date('Y-m-d H:i:s'),
+                ]);
+                $message = $ok ? 'Webhook de test envoyé avec succès.' : 'Échec de l\'envoi du webhook de test.';
+            }
 
-        if ($log) {
-            $payload = json_decode((string) $log['payload'], true);
-            $ok = Webhook::fire((string) $log['event'], (array) ($payload['data'] ?? []));
-            $message = $ok ? 'Webhook renvoyé avec succès.' : 'Échec du renvoi du webhook.';
+            if ($action === 'retry' && !empty($_POST['log_id'])) {
+                $stmt = $db->prepare('SELECT * FROM webhook_logs WHERE id = ? LIMIT 1');
+                $stmt->execute([(int) $_POST['log_id']]);
+                $log = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                if ($log) {
+                    $payload = json_decode((string) $log['payload'], true);
+                    $ok = Webhook::fire((string) $log['event'], (array) ($payload['data'] ?? []));
+                    $message = $ok ? 'Webhook renvoyé avec succès.' : 'Échec du renvoi du webhook.';
+                }
+            }
         }
     }
-    }
-}
 
-$stats = $db->query(
-    "SELECT
-        COUNT(*) AS total,
-        SUM(CASE WHEN status = 'success' THEN 1 ELSE 0 END) AS success_count,
-        MAX(CASE WHEN status = 'success' THEN created_at ELSE NULL END) AS last_success
-     FROM webhook_logs"
-)->fetch(PDO::FETCH_ASSOC) ?: ['total' => 0, 'success_count' => 0, 'last_success' => null];
+    $stats = $db->query(
+        "SELECT
+            COUNT(*) AS total,
+            SUM(CASE WHEN status = 'success' THEN 1 ELSE 0 END) AS success_count,
+            MAX(CASE WHEN status = 'success' THEN created_at ELSE NULL END) AS last_success
+         FROM webhook_logs"
+    )->fetch(PDO::FETCH_ASSOC) ?: ['total' => 0, 'success_count' => 0, 'last_success' => null];
+
+    $rows = $db->query('SELECT * FROM webhook_logs ORDER BY id DESC LIMIT 100')->fetchAll(PDO::FETCH_ASSOC);
+} catch (Throwable $e) {
+    $dbError = 'La page webhooks est temporairement indisponible. Vérifiez la base de données.';
+    error_log('Erreur admin/webhooks.php: ' . $e->getMessage());
+}
 
 $total = (int) ($stats['total'] ?? 0);
 $successCount = (int) ($stats['success_count'] ?? 0);
 $successRate = $total > 0 ? round(($successCount / $total) * 100, 1) : 0;
 $lastSuccess = $stats['last_success'] ?? 'Aucun envoi réussi';
-
-$rows = $db->query('SELECT * FROM webhook_logs ORDER BY id DESC LIMIT 100')->fetchAll(PDO::FETCH_ASSOC);
 
 $pageTitle = 'Webhooks';
 $currentPage = 'webhooks';
@@ -77,6 +86,11 @@ require_once __DIR__ . '/includes/sidebar.php';
     <?php if ($message): ?>
         <div class="rounded-lg border border-blue-200 bg-blue-50 text-blue-800 px-4 py-3">
             <?= htmlspecialchars($message, ENT_QUOTES, 'UTF-8') ?>
+        </div>
+    <?php endif; ?>
+    <?php if ($dbError): ?>
+        <div class="rounded-lg border border-amber-200 bg-amber-50 text-amber-800 px-4 py-3">
+            <?= htmlspecialchars($dbError, ENT_QUOTES, 'UTF-8') ?>
         </div>
     <?php endif; ?>
 

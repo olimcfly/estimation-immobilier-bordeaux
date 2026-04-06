@@ -44,6 +44,12 @@ function verifyCsrf(): bool
     return hash_equals($_SESSION['csrf_token'] ?? '', (string) $token);
 }
 
+// Alias rétro-compatible utilisé dans plusieurs pages admin historiques
+function validateCsrfToken(): bool
+{
+    return verifyCsrf();
+}
+
 // Rate limiting par IP (table rate_limits en DB)
 function checkRateLimit(string $action, int $maxPerHour = 10): bool
 {
