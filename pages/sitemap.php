@@ -1,7 +1,7 @@
 <?php
 header('Content-Type: application/xml; charset=utf-8');
 require_once __DIR__ . '/../config/config.php';
-require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../includes/database.php';
 
 $db = Database::getConnection();
 $villes = $db->query('SELECT ville, updated_at FROM villes_prix ORDER BY updated_at DESC')->fetchAll(PDO::FETCH_ASSOC);
