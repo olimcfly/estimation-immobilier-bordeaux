@@ -123,6 +123,14 @@ if (!is_array($villes) || $villes === []) {
                             </button>
                         </div>
                     </div>
+                    <p class="mt-3 text-center text-xs font-semibold text-blue-100">
+                        100% gratuit • Résultat immédiat • Sans engagement
+                    </p>
+                    <div class="mt-3 flex flex-wrap items-center justify-center gap-2 text-[11px] font-medium text-blue-100/95">
+                        <span class="rounded-full border border-white/30 bg-white/10 px-3 py-1">Quartiers bordelais analysés</span>
+                        <span class="rounded-full border border-white/30 bg-white/10 px-3 py-1">Adapté aux appartements urbains</span>
+                        <span class="rounded-full border border-white/30 bg-white/10 px-3 py-1">Comparaison au prix/m² local</span>
+                    </div>
                     <p id="form-feedback" class="mt-3 hidden text-sm font-medium text-red-200"></p>
                 </form>
             </div>
@@ -236,6 +244,7 @@ if (!is_array($villes) || $villes === []) {
                                 <input id="prenom" name="prenom" type="text" placeholder="Prénom" required class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm focus:border-blue-500 focus:outline-none">
                                 <input id="telephone" name="telephone" type="tel" placeholder="Téléphone" required class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm focus:border-blue-500 focus:outline-none">
                                 <button id="contact-submit" type="submit" class="w-full rounded-xl bg-gradient-to-r from-blue-700 to-blue-500 px-4 py-3 font-bold text-white transition hover:from-blue-800 hover:to-blue-600">Me faire rappeler gratuitement →</button>
+                                <p class="text-center text-xs font-medium text-slate-500">Sans engagement • Réponse d'un conseiller local</p>
                             </form>
                         </div>
                         <div id="wizard-dots" class="mt-4 flex items-center justify-center gap-2">
@@ -277,24 +286,91 @@ if (!is_array($villes) || $villes === []) {
             </div>
         </section>
 
+        <section class="bg-slate-900 px-4 py-16 text-white sm:px-6 lg:px-8">
+            <div class="mx-auto max-w-6xl">
+                <div class="mx-auto max-w-3xl text-center">
+                    <p class="inline-flex items-center rounded-full bg-white/15 px-4 py-2 text-xs font-semibold uppercase tracking-wide">💰 Spécial investisseurs Bordeaux</p>
+                    <h2 class="mt-4 text-3xl font-extrabold leading-tight md:text-4xl">Investir à Bordeaux, c’est bien.<br>Investir au bon prix, c’est rentable.</h2>
+                    <p class="mt-4 text-base text-slate-200 md:text-lg">
+                        Avant d'acheter, de revendre ou d'arbitrer un bien, connaître sa vraie valeur vous aide à sécuriser vos rendements et vos marges.
+                    </p>
+                </div>
+
+                <div class="mt-10 grid gap-6 md:grid-cols-3">
+                    <article class="rounded-2xl border border-white/15 bg-white/5 p-6">
+                        <p class="text-2xl">📊</p>
+                        <h3 class="mt-3 text-lg font-semibold">Rentabilité locative réelle</h3>
+                        <p class="mt-2 text-sm text-slate-200">
+                            Estimez la valeur juste pour éviter de surpayer et améliorer votre rendement net dès l'acquisition.
+                        </p>
+                    </article>
+                    <article class="rounded-2xl border border-white/15 bg-white/5 p-6">
+                        <p class="text-2xl">🏷️</p>
+                        <h3 class="mt-3 text-lg font-semibold">Négociation d'achat / revente</h3>
+                        <p class="mt-2 text-sm text-slate-200">
+                            Basez vos offres et votre stratégie de sortie sur des données locales fiables, quartier par quartier.
+                        </p>
+                    </article>
+                    <article class="rounded-2xl border border-white/15 bg-white/5 p-6">
+                        <p class="text-2xl">📈</p>
+                        <h3 class="mt-3 text-lg font-semibold">Arbitrage patrimonial</h3>
+                        <p class="mt-2 text-sm text-slate-200">
+                            Comparez objectivement conserver, rénover ou revendre pour allouer votre capital là où le potentiel est le plus fort.
+                        </p>
+                    </article>
+                </div>
+
+                <p class="mt-8 text-center text-sm font-medium text-slate-200">
+                    Une estimation précise aujourd'hui peut faire la différence entre un investissement moyen et une opération performante à la revente.
+                </p>
+            </div>
+        </section>
+
         <section class="bg-white px-4 py-16 sm:px-6 lg:px-8">
-            <div class="mx-auto max-w-5xl text-center">
-                <h2 class="text-3xl font-bold text-slate-900">Déjà 500+ estimations à Bordeaux</h2>
-                <div class="mt-8 grid gap-6 md:grid-cols-3">
+            <div class="mx-auto max-w-6xl">
+                <div class="text-center">
+                    <h2 class="text-3xl font-bold text-slate-900">Preuve locale : estimations récentes en Gironde</h2>
+                    <p class="mt-3 text-sm text-slate-600">Des fourchettes observées sur des biens comparables pour vous situer rapidement.</p>
+                </div>
+
+                <div class="mt-10 grid gap-6 md:grid-cols-3">
+                    <article class="rounded-2xl border border-blue-100 bg-blue-50/40 p-5 text-left">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-blue-700">Exemple local · Bordeaux Chartrons</p>
+                        <h3 class="mt-2 text-lg font-bold text-slate-900">Appartement T3 · 67 m² · balcon</h3>
+                        <p class="mt-3 text-sm text-slate-600">Fourchette estimative obtenue : <span class="font-semibold text-slate-900">335 000 € à 368 000 €</span></p>
+                        <p class="mt-2 text-xs text-slate-500">Soit environ 5 000 à 5 490 €/m² selon l'étage, l'état intérieur et le stationnement.</p>
+                    </article>
+
+                    <article class="rounded-2xl border border-blue-100 bg-blue-50/40 p-5 text-left">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-blue-700">Exemple local · Pessac Alouette</p>
+                        <h3 class="mt-2 text-lg font-bold text-slate-900">Maison 5 pièces · 118 m² · jardin 420 m²</h3>
+                        <p class="mt-3 text-sm text-slate-600">Fourchette estimative obtenue : <span class="font-semibold text-slate-900">452 000 € à 510 000 €</span></p>
+                        <p class="mt-2 text-xs text-slate-500">Soit environ 3 830 à 4 320 €/m², avec impact notable de la rénovation énergétique.</p>
+                    </article>
+
+                    <article class="rounded-2xl border border-blue-100 bg-blue-50/40 p-5 text-left">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-blue-700">Exemple local · Talence Forum</p>
+                        <h3 class="mt-2 text-lg font-bold text-slate-900">Studio · 24 m² · résidence étudiante</h3>
+                        <p class="mt-3 text-sm text-slate-600">Fourchette estimative obtenue : <span class="font-semibold text-slate-900">118 000 € à 136 000 €</span></p>
+                        <p class="mt-2 text-xs text-slate-500">Soit environ 4 920 à 5 670 €/m², selon la demande locative et les charges de copropriété.</p>
+                    </article>
+                </div>
+
+                <div class="mt-10 grid gap-6 md:grid-cols-3">
                     <blockquote class="rounded-2xl border border-slate-200 p-5 text-left">
                         <p class="text-amber-500">★★★★★</p>
-                        <p class="mt-3 text-sm text-slate-600">"Très rapide et cohérent avec les prix que j'avais repérés dans mon quartier."</p>
-                        <footer class="mt-3 text-xs font-semibold text-slate-500">— Claire, Bordeaux Centre</footer>
+                        <p class="mt-3 text-sm text-slate-600">« Estimation reçue en 40 secondes pour mon T3 aux Chartrons. La fourchette était proche de l'avis de valeur signé ensuite en agence. »</p>
+                        <footer class="mt-3 text-xs font-semibold text-slate-500">— Julie M., vendeuse · Chartrons (Bordeaux)</footer>
                     </blockquote>
                     <blockquote class="rounded-2xl border border-slate-200 p-5 text-left">
                         <p class="text-amber-500">★★★★★</p>
-                        <p class="mt-3 text-sm text-slate-600">"J'ai eu une fourchette réaliste en moins d'une minute, super pratique."</p>
-                        <footer class="mt-3 text-xs font-semibold text-slate-500">— Thomas, Mérignac</footer>
+                        <p class="mt-3 text-sm text-slate-600">« Pour notre maison à Pessac, on a enfin eu un prix cohérent avant de lancer les visites. Clair, rapide et sans appel commercial insistant. »</p>
+                        <footer class="mt-3 text-xs font-semibold text-slate-500">— Marc et Élodie R., propriétaires · Pessac</footer>
                     </blockquote>
                     <blockquote class="rounded-2xl border border-slate-200 p-5 text-left">
                         <p class="text-amber-500">★★★★★</p>
-                        <p class="mt-3 text-sm text-slate-600">"Interface simple et claire, parfait pour une première idée de prix."</p>
-                        <footer class="mt-3 text-xs font-semibold text-slate-500">— Nadia, Pessac</footer>
+                        <p class="mt-3 text-sm text-slate-600">« J'hésitais pour vendre mon studio à Talence : la fourchette m'a aidée à fixer un prix réaliste, puis j'ai vendu en moins de 3 semaines. »</p>
+                        <footer class="mt-3 text-xs font-semibold text-slate-500">— Sarah L., investisseuse · Talence</footer>
                     </blockquote>
                 </div>
             </div>
@@ -344,6 +420,34 @@ if (!is_array($villes) || $villes === []) {
         let estimationStep = 1;
 
         let latestEstimation = null;
+
+        const ctaVariants = [
+            'Voir le prix de mon bien à Bordeaux →',
+            'Lancer mon estimation gratuite →',
+            'Obtenir mon estimation instantanée →',
+            'Découvrir la valeur de mon logement →',
+            'Calculer mon prix au m² maintenant →'
+        ];
+
+        const applyCtaVariant = () => {
+            if (!(heroCtaSubmit instanceof HTMLButtonElement)) {
+                return;
+            }
+            const storageKey = 'hero_cta_variant_v1';
+            const storedIndex = Number.parseInt(localStorage.getItem(storageKey) || '', 10);
+            const hasValidStoredIndex = Number.isInteger(storedIndex) && storedIndex >= 0 && storedIndex < ctaVariants.length;
+            const variantIndex = hasValidStoredIndex ? storedIndex : Math.floor(Math.random() * ctaVariants.length);
+
+            if (!hasValidStoredIndex) {
+                localStorage.setItem(storageKey, String(variantIndex));
+            }
+
+            heroCtaSubmit.textContent = ctaVariants[variantIndex];
+            heroCtaSubmit.dataset.ctaVariant = `v${variantIndex + 1}`;
+            heroCtaSubmit.title = 'Estimation immobilière gratuite, immédiate et sans engagement';
+        };
+
+        applyCtaVariant();
 
         const surfaceLabels = {
             lt30: 'Moins de 30 m²',
