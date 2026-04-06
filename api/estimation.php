@@ -24,9 +24,9 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 $typeBien = trim((string) ($_POST['type_bien'] ?? ''));
 $ville = trim((string) ($_POST['ville'] ?? ''));
 $surfaceTranche = trim((string) ($_POST['surface_tranche'] ?? ''));
-$budgetTranche = trim((string) ($_POST['budget_tranche'] ?? ''));
+$budgetTranche = trim((string) ($_POST['budget_tranche'] ?? 'non_renseigne'));
 
-if ($typeBien === '' || $ville === '' || $surfaceTranche === '' || $budgetTranche === '') {
+if ($typeBien === '' || $ville === '' || $surfaceTranche === '') {
     jsonResponse([
         'success' => false,
         'message' => 'Merci de renseigner tous les champs.',
