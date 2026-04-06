@@ -10,6 +10,173 @@ $configFile = $configDir . '/config.php';
 $databaseFile = $configDir . '/database.php';
 $installSqlPath = $rootDir . '/install.sql';
 
+/**
+ * @return list<string>
+ */
+function extractInstallTables(string $sqlPath): array
+{
+    if (!is_file($sqlPath)) {
+        return [];
+    }
+
+    $sql = (string) file_get_contents($sqlPath);
+    if ($sql === '') {
+        return [];
+    }
+
+    preg_match_all('/CREATE TABLE IF NOT EXISTS\s+`?([a-zA-Z0-9_]+)`?/i', $sql, $matches);
+    $tables = array_values(array_unique($matches[1] ?? []));
+    sort($tables);
+
+    return $tables;
+}
+
+/**
+ * @param list<string> $expectedTables
+ * @return array<string,bool>
+ */
+function getTablesChecklist(array $dbConfig, array $expectedTables): array
+{
+    $checklist = [];
+    foreach ($expectedTables as $table) {
+        $checklist[$table] = false;
+    }
+
+    if ($expectedTables === []) {
+        return $checklist;
+    }
+
+    try {
+        $pdo = new PDO(
+            sprintf('mysql:host=%s;dbname=%s;charset=utf8mb4', $dbConfig['host'], $dbConfig['db_name']),
+            (string) $dbConfig['db_user'],
+            (string) $dbConfig['db_pass'],
+            [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                PDO::ATTR_EMULATE_PREPARES => false,
+            ]
+        );
+
+        $rows = $pdo->query('SHOW TABLES')->fetchAll(PDO::FETCH_NUM);
+        $existingTables = [];
+        foreach ($rows as $row) {
+            if (isset($row[0])) {
+                $existingTables[(string) $row[0]] = true;
+            }
+        }
+
+        foreach ($expectedTables as $table) {
+            $checklist[$table] = isset($existingTables[$table]);
+        }
+    } catch (Throwable $e) {
+        // Ignore: checklist remains false if DB cannot be reached.
+    }
+
+    return $checklist;
+}
+
+/**
+ * @return array{success: bool, message: string, smtp_warning?: string}
+ */
+function smtpHandshakeAndOptionalMail(array $payload): array
+{
+    $host = trim((string) ($payload['smtp_host'] ?? ''));
+    $port = (int) ($payload['smtp_port'] ?? 587);
+    $user = trim((string) ($payload['smtp_user'] ?? ''));
+    $pass = (string) ($payload['smtp_pass'] ?? '');
+    $adminEmail = trim((string) ($payload['admin_email'] ?? ''));
+
+    if ($host === '' || $port <= 0 || $user === '') {
+        return ['success' => false, 'message' => 'Host, port et utilisateur SMTP requis.'];
+    }
+
+    $errno = 0;
+    $errstr = '';
+    $socket = @fsockopen($host, $port, $errno, $errstr, 5.0);
+    if (!$socket) {
+        return ['success' => false, 'message' => sprintf('Impossible de se connecter (%s).', $errstr !== '' ? $errstr : $errno)];
+    }
+
+    stream_set_timeout($socket, 5);
+    $response = (string) fgets($socket, 512);
+    if (!str_starts_with($response, '220')) {
+        fclose($socket);
+        return ['success' => false, 'message' => 'Le serveur SMTP ne répond pas correctement (code 220 attendu).'];
+    }
+
+    fwrite($socket, "EHLO estimia.local\r\n");
+    $ehloResponse = '';
+    while (($line = fgets($socket, 512)) !== false) {
+        $ehloResponse .= $line;
+        if (preg_match('/^250\s/i', $line) === 1) {
+            break;
+        }
+    }
+    if (strpos($ehloResponse, '250') !== 0) {
+        fclose($socket);
+        return ['success' => false, 'message' => 'EHLO refusé par le serveur SMTP.'];
+    }
+
+    fwrite($socket, "AUTH LOGIN\r\n");
+    $authChallengeUser = (string) fgets($socket, 512);
+    if (!str_starts_with($authChallengeUser, '334')) {
+        fclose($socket);
+        return ['success' => false, 'message' => 'AUTH LOGIN non accepté par le serveur.'];
+    }
+
+    fwrite($socket, base64_encode($user) . "\r\n");
+    $authChallengePass = (string) fgets($socket, 512);
+    if (!str_starts_with($authChallengePass, '334')) {
+        fclose($socket);
+        return ['success' => false, 'message' => 'Identifiant SMTP refusé.'];
+    }
+
+    fwrite($socket, base64_encode($pass) . "\r\n");
+    $authResult = (string) fgets($socket, 512);
+    if (!str_starts_with($authResult, '235')) {
+        fclose($socket);
+        return ['success' => false, 'message' => 'Authentification SMTP échouée.'];
+    }
+
+    $smtpWarning = null;
+    if ($adminEmail !== '' && filter_var($adminEmail, FILTER_VALIDATE_EMAIL)) {
+        $fromEmail = $user;
+        fwrite($socket, sprintf("MAIL FROM:<%s>\r\n", $fromEmail));
+        $mailFromRes = (string) fgets($socket, 512);
+        fwrite($socket, sprintf("RCPT TO:<%s>\r\n", $adminEmail));
+        $rcptRes = (string) fgets($socket, 512);
+        fwrite($socket, "DATA\r\n");
+        $dataRes = (string) fgets($socket, 512);
+
+        if (str_starts_with($mailFromRes, '250') && (str_starts_with($rcptRes, '250') || str_starts_with($rcptRes, '251')) && str_starts_with($dataRes, '354')) {
+            $body = "Subject: Test SMTP EstimIA\r\n"
+                . sprintf("To: %s\r\n", $adminEmail)
+                . sprintf("From: %s\r\n", $fromEmail)
+                . "Content-Type: text/plain; charset=utf-8\r\n"
+                . "\r\n"
+                . "Votre configuration SMTP fonctionne !\r\n.\r\n";
+            fwrite($socket, $body);
+            $sendRes = (string) fgets($socket, 512);
+            if (!str_starts_with($sendRes, '250')) {
+                $smtpWarning = 'Connexion OK, mais l\'email test n\'a pas pu être confirmé.';
+            }
+        } else {
+            $smtpWarning = 'Connexion OK, mais le serveur a refusé l\'envoi du mail test.';
+        }
+    }
+
+    fwrite($socket, "QUIT\r\n");
+    fclose($socket);
+
+    $result = ['success' => true, 'message' => '✅ Connexion SMTP réussie'];
+    if ($smtpWarning !== null) {
+        $result['smtp_warning'] = $smtpWarning;
+    }
+
+    return $result;
+}
+
 if (isset($_GET['action']) && $_GET['action'] === 'test_db') {
     header('Content-Type: application/json; charset=utf-8');
 
@@ -63,6 +230,25 @@ if (isset($_GET['action']) && $_GET['action'] === 'test_db') {
     exit;
 }
 
+if (isset($_GET['action']) && $_GET['action'] === 'test_smtp') {
+    header('Content-Type: application/json; charset=utf-8');
+
+    $result = smtpHandshakeAndOptionalMail([
+        'smtp_host' => $_POST['smtp_host'] ?? '',
+        'smtp_port' => $_POST['smtp_port'] ?? '',
+        'smtp_user' => $_POST['smtp_user'] ?? '',
+        'smtp_pass' => $_POST['smtp_pass'] ?? '',
+        'admin_email' => $_POST['admin_email'] ?? '',
+    ]);
+
+    if ($result['success'] === false) {
+        http_response_code(422);
+    }
+
+    echo json_encode($result);
+    exit;
+}
+
 $alreadyInstalled = is_file($configFile);
 $step = (int) ($_GET['step'] ?? 1);
 if ($step < 1 || $step > 4) {
@@ -74,10 +260,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$alreadyInstalled) {
         $_SESSION['install_site'] = [
             'site_name' => trim((string) ($_POST['site_name'] ?? 'EstimIA')),
             'city_name' => trim((string) ($_POST['city_name'] ?? 'Bordeaux')),
+            'operation_radius_km' => max(1, (int) ($_POST['operation_radius_km'] ?? 30)),
             'admin_email' => trim((string) ($_POST['admin_email'] ?? '')),
             'site_phone' => trim((string) ($_POST['site_phone'] ?? '')),
             'admin_password' => (string) ($_POST['admin_password'] ?? ''),
             'base_url' => trim((string) ($_POST['base_url'] ?? '')),
+            'smtp_host' => trim((string) ($_POST['smtp_host'] ?? '')),
+            'smtp_port' => (int) ($_POST['smtp_port'] ?? 587),
+            'smtp_user' => trim((string) ($_POST['smtp_user'] ?? '')),
+            'smtp_pass' => (string) ($_POST['smtp_pass'] ?? ''),
         ];
 
         header('Location: ?step=4');
@@ -104,6 +295,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$alreadyInstalled) {
                 $sitePhone = addslashes((string) $site['site_phone']);
                 $adminEmail = addslashes((string) $site['admin_email']);
                 $baseUrl = addslashes((string) $site['base_url']);
+                $radius = max(1, (int) ($site['operation_radius_km'] ?? 30));
+                $smtpHost = addslashes((string) ($site['smtp_host'] ?? ''));
+                $smtpPort = max(1, (int) ($site['smtp_port'] ?? 587));
+                $smtpUser = addslashes((string) ($site['smtp_user'] ?? ''));
+                $smtpPass = addslashes((string) ($site['smtp_pass'] ?? ''));
                 $dbHost = addslashes((string) $db['host']);
                 $dbName = addslashes((string) $db['db_name']);
                 $dbUser = addslashes((string) $db['db_user']);
@@ -115,6 +311,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$alreadyInstalled) {
                     . "define('MAINTENANCE_MODE', false);\n"
                     . "define('SITE_NAME', '{$siteName}');\n"
                     . "define('CITY_NAME', '{$cityName}');\n"
+                    . "define('OPERATION_RADIUS_KM', {$radius});\n"
                     . "define('SITE_PHONE', '{$sitePhone}');\n\n"
                     . "// Base de données\n"
                     . "define('DB_HOST', '{$dbHost}');\n"
@@ -122,10 +319,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$alreadyInstalled) {
                     . "define('DB_USER', '{$dbUser}');\n"
                     . "define('DB_PASS', '{$dbPass}');\n\n"
                     . "// Email\n"
-                    . "define('SMTP_HOST', '');\n"
-                    . "define('SMTP_USER', '');\n"
-                    . "define('SMTP_PASS', '');\n"
-                    . "define('SMTP_PORT', 587);\n"
+                    . "define('SMTP_HOST', '{$smtpHost}');\n"
+                    . "define('SMTP_USER', '{$smtpUser}');\n"
+                    . "define('SMTP_PASS', '{$smtpPass}');\n"
+                    . "define('SMTP_PORT', {$smtpPort});\n"
                     . "define('MAIL_FROM', 'contact@estimia-bordeaux.fr');\n"
                     . "define('MAIL_FROM_NAME', 'EstimIA Bordeaux');\n\n"
                     . "// Sécurité\n"
@@ -191,6 +388,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$alreadyInstalled) {
                     'actif' => 1,
                 ]);
 
+                $tableChecklist = getTablesChecklist($db, $expectedTables);
                 $installCompleted = true;
                 unset($_SESSION['install_db'], $_SESSION['install_site']);
             } catch (Throwable $e) {
@@ -215,11 +413,37 @@ $dbSession = $_SESSION['install_db'] ?? ['host' => 'localhost', 'db_name' => '',
 $siteSession = $_SESSION['install_site'] ?? [
     'site_name' => 'EstimIA',
     'city_name' => 'Bordeaux',
+    'operation_radius_km' => 30,
     'admin_email' => '',
     'site_phone' => '',
     'admin_password' => '',
     'base_url' => '',
+    'smtp_host' => '',
+    'smtp_port' => 587,
+    'smtp_user' => '',
+    'smtp_pass' => '',
 ];
+
+$tableDescriptions = [
+    'estimations' => 'Stocke toutes les demandes d’estimation des visiteurs.',
+    'users' => 'Comptes administrateurs/agents pour accéder au back-office.',
+    'settings' => 'Paramètres du site (nom, ville, téléphone, couleurs...).',
+    'villes_prix' => 'Prix au m² par ville/quartier pour le calcul d’estimation.',
+    'lead_activities' => 'Historique des notes et actions sur les leads.',
+    'rate_limits' => 'Protection anti-abus et limitation de requêtes.',
+    'login_attempts' => 'Suivi des tentatives de connexion à l’admin.',
+    'email_logs' => 'Historique des emails envoyés (estimation, relance...).',
+    'webhook_logs' => 'Journal des appels webhooks sortants.',
+    'sessions' => 'Sessions admin actives.',
+    'admin_users' => 'Comptes d’administration avancée supplémentaires.',
+    'ads_checklist_progress' => 'Progression de la checklist Google Ads.',
+    'google_ads_drafts' => 'Brouillons d’annonces Google Ads.',
+];
+$expectedTables = extractInstallTables($installSqlPath);
+$tableChecklist = [];
+if (is_array($_SESSION['install_db'] ?? null)) {
+    $tableChecklist = getTablesChecklist($_SESSION['install_db'], $expectedTables);
+}
 ?>
 <!doctype html>
 <html lang="fr">
@@ -265,6 +489,26 @@ $siteSession = $_SESSION['install_site'] ?? [
             <a class="btn btn-success btn-sm me-2" href="../">Aller au site</a>
             <a class="btn btn-outline-light btn-sm" href="../admin/">Aller à l'admin</a>
         </div>
+
+        <?php if ($tableChecklist !== []): ?>
+            <div class="card p-4 mb-4">
+                <h3 class="h5 mb-3">Checklist des tables créées</h3>
+                <ul class="list-group">
+                    <?php foreach ($expectedTables as $table): ?>
+                        <?php $exists = (bool) ($tableChecklist[$table] ?? false); ?>
+                        <li class="list-group-item bg-dark text-light border-secondary">
+                            <div class="d-flex align-items-start gap-2">
+                                <span><?= $exists ? '✅' : '❌' ?></span>
+                                <div>
+                                    <strong><?= htmlspecialchars($table, ENT_QUOTES, 'UTF-8') ?></strong>
+                                    <div class="text-muted small"><?= htmlspecialchars($tableDescriptions[$table] ?? 'Table de support installée par le wizard.', ENT_QUOTES, 'UTF-8') ?></div>
+                                </div>
+                            </div>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+        <?php endif; ?>
     <?php endif; ?>
 
     <?php if (!$alreadyInstalled && empty($installCompleted) && $step === 1): ?>
@@ -327,6 +571,10 @@ $siteSession = $_SESSION['install_site'] ?? [
                     <input class="form-control" name="city_name" value="<?= htmlspecialchars((string) $siteSession['city_name'], ENT_QUOTES, 'UTF-8') ?>" required>
                 </div>
                 <div class="col-md-6">
+                    <label class="form-label">Rayon d'opération (km)</label>
+                    <input type="number" min="1" class="form-control" name="operation_radius_km" value="<?= htmlspecialchars((string) $siteSession['operation_radius_km'], ENT_QUOTES, 'UTF-8') ?>" required>
+                </div>
+                <div class="col-md-6">
                     <label class="form-label">Email admin</label>
                     <input type="email" class="form-control" name="admin_email" value="<?= htmlspecialchars((string) $siteSession['admin_email'], ENT_QUOTES, 'UTF-8') ?>" required>
                 </div>
@@ -342,6 +590,33 @@ $siteSession = $_SESSION['install_site'] ?? [
                     <label class="form-label">URL du site</label>
                     <input class="form-control" name="base_url" placeholder="https://bordeaux.estimia.fr" value="<?= htmlspecialchars((string) $siteSession['base_url'], ENT_QUOTES, 'UTF-8') ?>" required>
                 </div>
+                <div class="col-12 mt-2">
+                    <hr class="border-secondary">
+                    <h3 class="h5">Configuration SMTP</h3>
+                    <p class="help-text mb-2">Le test SMTP est optionnel et ne bloque pas l'installation.</p>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">SMTP Host</label>
+                    <input class="form-control" name="smtp_host" value="<?= htmlspecialchars((string) $siteSession['smtp_host'], ENT_QUOTES, 'UTF-8') ?>" placeholder="smtp.example.com">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Port</label>
+                    <input type="number" min="1" class="form-control" name="smtp_port" value="<?= htmlspecialchars((string) $siteSession['smtp_port'], ENT_QUOTES, 'UTF-8') ?>">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">SMTP User</label>
+                    <input class="form-control" name="smtp_user" value="<?= htmlspecialchars((string) $siteSession['smtp_user'], ENT_QUOTES, 'UTF-8') ?>">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">SMTP Password</label>
+                    <input type="password" class="form-control" name="smtp_pass" value="<?= htmlspecialchars((string) $siteSession['smtp_pass'], ENT_QUOTES, 'UTF-8') ?>">
+                </div>
+                <div class="col-12">
+                    <button class="btn btn-outline-info" type="button" id="testSmtpBtn">🔌 Tester la connexion SMTP</button>
+                </div>
+                <div class="col-12">
+                    <div id="smtpResult"></div>
+                </div>
                 <div class="col-12 d-flex gap-2 justify-content-end">
                     <a class="btn btn-outline-light" href="?step=2">Retour</a>
                     <button class="btn btn-primary" type="submit">Enregistrer et continuer</button>
@@ -353,12 +628,46 @@ $siteSession = $_SESSION['install_site'] ?? [
     <?php if (!$alreadyInstalled && empty($installCompleted) && $step === 4): ?>
         <div class="card p-4">
             <h2 class="step-title mb-3">Étape 4 — Finalisation</h2>
+            <div class="alert alert-secondary">
+                <div class="fw-semibold mb-1">🏙️ Ville cible : <?= htmlspecialchars((string) $siteSession['city_name'], ENT_QUOTES, 'UTF-8') ?></div>
+                <div class="fw-semibold">📍 Rayon d'opération : <?= (int) $siteSession['operation_radius_km'] ?> km</div>
+                <img
+                    class="img-fluid rounded border border-secondary mt-3"
+                    alt="Carte de la ville cible"
+                    src="https://maps.googleapis.com/maps/api/staticmap?size=800x240&zoom=11&maptype=roadmap&markers=color:red%7C<?= rawurlencode((string) $siteSession['city_name']) ?>"
+                    onerror="this.style.display='none';"
+                >
+            </div>
+
+            <?php if (trim((string) ($siteSession['smtp_host'] ?? '')) === '' || trim((string) ($siteSession['smtp_user'] ?? '')) === ''): ?>
+                <div class="alert alert-warning">
+                    ⚠️ SMTP non configuré, les emails ne seront pas envoyés.
+                </div>
+            <?php endif; ?>
+
             <p class="help-text">Cette étape va :</p>
             <ul>
                 <li>Générer <code>config/config.php</code>.</li>
                 <li>Générer <code>config/database.php</code>.</li>
                 <li>Créer le compte admin dans <code>users</code>.</li>
             </ul>
+            <?php if ($expectedTables !== []): ?>
+                <h3 class="h5 mt-4 mb-3">Checklist des tables créées (pré-vérification)</h3>
+                <ul class="list-group mb-4">
+                    <?php foreach ($expectedTables as $table): ?>
+                        <?php $exists = (bool) ($tableChecklist[$table] ?? false); ?>
+                        <li class="list-group-item bg-dark text-light border-secondary">
+                            <div class="d-flex align-items-start gap-2">
+                                <span><?= $exists ? '✅' : '❌' ?></span>
+                                <div>
+                                    <strong><?= htmlspecialchars($table, ENT_QUOTES, 'UTF-8') ?></strong>
+                                    <div class="text-muted small"><?= htmlspecialchars($tableDescriptions[$table] ?? 'Table de support installée par le wizard.', ENT_QUOTES, 'UTF-8') ?></div>
+                                </div>
+                            </div>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            <?php endif; ?>
             <form method="post" class="d-flex gap-2 justify-content-end">
                 <a class="btn btn-outline-light" href="?step=3">Retour</a>
                 <button class="btn btn-success" type="submit">Terminer l'installation</button>
@@ -385,6 +694,42 @@ $siteSession = $_SESSION['install_site'] ?? [
                 result.innerHTML = `<div class="alert alert-success">${data.message}</div>`;
             } catch (error) {
                 result.innerHTML = `<div class="alert alert-danger">${error.message}</div>`;
+            }
+        });
+    }
+
+    const smtpBtn = document.getElementById('testSmtpBtn');
+    if (smtpBtn) {
+        smtpBtn.addEventListener('click', async () => {
+            const form = smtpBtn.closest('form');
+            const result = document.getElementById('smtpResult');
+            if (!form || !result) {
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('smtp_host', form.querySelector('[name="smtp_host"]')?.value || '');
+            formData.append('smtp_port', form.querySelector('[name="smtp_port"]')?.value || '');
+            formData.append('smtp_user', form.querySelector('[name="smtp_user"]')?.value || '');
+            formData.append('smtp_pass', form.querySelector('[name="smtp_pass"]')?.value || '');
+            formData.append('admin_email', form.querySelector('[name="admin_email"]')?.value || '');
+
+            result.innerHTML = '<div class="alert alert-info">Test SMTP en cours...</div>';
+
+            try {
+                const response = await fetch('?action=test_smtp', {method: 'POST', body: formData});
+                const data = await response.json();
+                if (!response.ok || !data.success) {
+                    throw new Error(data.message || 'Échec SMTP');
+                }
+
+                let html = `<div class="alert alert-success">${data.message || '✅ Connexion SMTP réussie'}</div>`;
+                if (data.smtp_warning) {
+                    html += `<div class="alert alert-warning">⚠️ ${data.smtp_warning}</div>`;
+                }
+                result.innerHTML = html;
+            } catch (error) {
+                result.innerHTML = `<div class="alert alert-danger">❌ Échec : ${error.message}</div><div class="alert alert-warning mt-2 mb-0">⚠️ SMTP non configuré, les emails ne seront pas envoyés.</div>`;
             }
         });
     }
