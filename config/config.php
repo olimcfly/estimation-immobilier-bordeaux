@@ -17,8 +17,15 @@ define('SMTP_HOST', '');
 define('SMTP_USER', '');
 define('SMTP_PASS', '');
 define('SMTP_PORT', 587);
-define('MAIL_FROM', 'contact@estimia-bordeaux.fr');
+define('SMTP_FROM', SMTP_USER);
+define('MAIL_FROM', SMTP_FROM);
 define('MAIL_FROM_NAME', 'EstimIA Bordeaux');
+
+// IA — Multi-provider fallback
+define('AI_OPENAI_KEY', '');
+define('AI_ANTHROPIC_KEY', '');
+define('AI_PERPLEXITY_KEY', '');
+define('AI_MISTRAL_KEY', '');
 
 // Sécurité
 define('ADMIN_EMAIL', 'admin@estimia-bordeaux.fr');
