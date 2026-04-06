@@ -1,0 +1,77 @@
+:root {
+    --primary: #1a56db;
+    --primary-2: #6366f1;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(145deg, #f8fafc 0%, #eef2ff 100%);
+}
+
+.step-content {
+    display: none;
+}
+
+.step-content.active {
+    display: block;
+}
+
+.progress-node {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 9999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: .75rem;
+    font-weight: 700;
+}
+
+.progress-line {
+    flex: 1;
+    height: 2px;
+    background: #e5e7eb;
+}
+
+.progress-line.done {
+    background: #22c55e;
+}
+
+.progress-node.done {
+    background: #22c55e;
+    color: #fff;
+}
+
+.progress-node.active {
+    background: var(--primary);
+    color: #fff;
+}
+
+.progress-node.future {
+    background: #e5e7eb;
+    color: #9ca3af;
+}
+
+.check-item.ok {
+    border-color: #bbf7d0;
+    background: #f0fdf4;
+}
+
+.check-item.ko {
+    border-color: #fecaca;
+    background: #fef2f2;
+}
+
+.install-task.done {
+    color: #16a34a;
+}
+
+.bounce-in {
+    animation: bounceIn .7s ease;
+}
+
+@keyframes bounceIn {
+    0% { transform: scale(.5); opacity: 0; }
+    70% { transform: scale(1.1); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+}
