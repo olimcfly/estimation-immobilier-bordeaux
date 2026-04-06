@@ -1,8 +1,1 @@
-RewriteEngine On
-
-# URL SEO Prix au m²
-RewriteRule ^prix-m2/?$ pages/prix-m2.php [L,QSA]
-RewriteRule ^prix-m2/([a-zA-Z0-9-]+)/?$ pages/prix-m2.php?ville=$1 [L,QSA]
-
-# Sitemap
-RewriteRule ^sitemap\.xml$ pages/sitemap.php [L,QSA]
+ErrorDocument 404 /pages/404.php
