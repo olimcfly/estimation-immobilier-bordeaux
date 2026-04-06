@@ -1,7 +1,10 @@
 <?php
+
+declare(strict_types=1);
+
 $pageTitle = 'Leads';
-$currentPage = 'leads';
-$topNavCurrent = 'leads';
+$currentPage = 'google-ads';
+$topNavCurrent = 'dashboard';
 require_once __DIR__ . '/../includes/header.php';
 require_once __DIR__ . '/../includes/sidebar.php';
 
@@ -67,7 +70,8 @@ $statusColors = [
 
 <div class="mx-auto max-w-7xl space-y-6">
     <section class="rounded-2xl border border-slate-200 bg-white p-6">
-        <h1 class="mb-4 text-2xl font-bold">📞 Leads</h1>
+        <h1 class="mb-4 text-2xl font-bold">📞 Leads Google Ads</h1>
+        <p class="mb-4 text-sm text-slate-600">Connecté via la configuration DB centralisée (<code>includes/config.php</code> + <code>includes/database.php</code>).</p>
         <form method="GET" class="grid gap-4 md:grid-cols-6">
             <div>
                 <label class="mb-1 block text-xs font-medium">Stratégie</label>

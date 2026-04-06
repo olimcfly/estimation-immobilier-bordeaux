@@ -135,16 +135,16 @@ $statusLabels = [
     'perdu' => 'Perdu',
 ];
 
-$pageTitle = 'Leads & Estimations';
-$currentPage = 'leads';
+$pageTitle = 'Leads CRM (estimations)';
+$currentPage = 'estimations';
 $topNavCurrent = 'dashboard';
 
 require_once __DIR__ . '/includes/header.php';
 require_once __DIR__ . '/includes/sidebar.php';
 ?>
 
-<h1 class="text-3xl font-bold text-slate-800">Leads & Estimations</h1>
-<p class="mt-2 text-slate-600">Suivez vos contacts, filtrez rapidement et mettez à jour les statuts CRM.</p>
+<h1 class="text-3xl font-bold text-slate-800">Leads CRM (estimations)</h1>
+<p class="mt-2 text-slate-600">Leads issus du formulaire d'estimation : filtrez et mettez à jour les statuts CRM.</p>
 
 <?php if ($flashMessage !== null): ?>
     <div class="mt-6 rounded-xl border px-4 py-3 <?= $flashType === 'error' ? 'border-red-300 bg-red-50 text-red-700' : 'border-emerald-300 bg-emerald-50 text-emerald-700' ?>">

@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 $adminMenu = [
     ['key' => 'dashboard', 'label' => 'Dashboard', 'href' => '/admin/index.php', 'icon' => '🏠'],
-    ['key' => 'estimations', 'label' => 'Estimations', 'href' => '/admin/lead.php', 'icon' => '📊'],
-    ['key' => 'leads', 'label' => 'Leads', 'href' => '/admin/leads/index.php', 'icon' => '👥'],
+    ['key' => 'estimations', 'label' => 'Leads CRM', 'href' => '/admin/lead.php', 'icon' => '📊'],
     [
         'key' => 'google-ads',
         'label' => 'Google Ads',
@@ -14,6 +13,7 @@ $adminMenu = [
         'children' => [
             ['label' => 'Stratégies', 'href' => '/admin/google-ads/index.php'],
             ['label' => 'Campagnes', 'href' => '/admin/google-ads/campaigns.php'],
+            ['label' => 'Leads Ads', 'href' => '/admin/leads/index.php'],
         ],
     ],
     ['key' => 'traffic', 'label' => 'Trafic & Publicité', 'href' => '/admin/traffic/index.php', 'icon' => '📢'],
