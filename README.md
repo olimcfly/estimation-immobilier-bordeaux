@@ -51,6 +51,22 @@ estimation-immobilier-bordeaux/
 2. Vérifier `core/config/config.php` et `core/config/database.php`.
 3. Accéder à `/install/` pour compléter l'installation si nécessaire.
 
+## 📅 ÉTAPE 7 : DÉPLOIEMENT
+
+### 7.1 Pour une nouvelle installation
+
+1. Exécuter `core/database/install.sql`.
+2. Configurer les permissions pour `core/cron/backups/` :
+   ```bash
+   chmod 755 core/cron/backups/
+   ```
+
+### 7.2 Pour une installation existante
+
+1. Exécuter `sql/admin_security_upgrade.sql`.
+2. Mettre à jour les fichiers PHP concernés (`security.php`, `admin-auth.php`, etc.).
+3. Configurer le cron pour les sauvegardes.
+
 ## Onboarding admin
 
 - L'accès à `/admin/onboarding.php` est piloté par la session admin et le nombre d'entrées dans `admins`.
