@@ -30,11 +30,19 @@ define('SMTP_HOST', '{SMTP_HOST}');
 define('SMTP_PORT', (int) '{SMTP_PORT}');
 define('SMTP_USER', '{SMTP_USER}');
 define('SMTP_PASS', '{SMTP_PASS}');
-define('SMTP_FROM', '{SMTP_FROM}');
+define('SMTP_FROM', SMTP_USER);
+define('MAIL_FROM', SMTP_FROM);
 define('SMTP_ENCRYPTION', '{SMTP_ENCRYPTION}');
 
 // === GOOGLE ===
 define('GOOGLE_MAPS_API_KEY', '{GOOGLE_MAPS_KEY}');
+
+
+// === IA — Multi-provider fallback ===
+define('AI_OPENAI_KEY', '{AI_OPENAI_KEY}');
+define('AI_ANTHROPIC_KEY', '{AI_ANTHROPIC_KEY}');
+define('AI_PERPLEXITY_KEY', '{AI_PERPLEXITY_KEY}');
+define('AI_MISTRAL_KEY', '{AI_MISTRAL_KEY}');
 
 // === SÉCURITÉ ===
 define('APP_SECRET', '{APP_SECRET}');

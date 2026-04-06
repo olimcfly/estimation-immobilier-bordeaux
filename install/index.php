@@ -143,61 +143,13 @@ function applySqlFileIfTableMissing(PDO $pdo, string $tableName, string $sqlPath
     $pdo->exec($sql);
 }
 
-/* ─── AJAX: Test DB ─── */
-
-if (isset($_GET['action']) && $_GET['action'] === 'test_db') {
-    header('Content-Type: application/json; charset=utf-8');
-    $host = trim((string) ($_POST['host'] ?? 'localhost'));
-    $dbName = trim((string) ($_POST['db_name'] ?? ''));
-    $dbUser = trim((string) ($_POST['db_user'] ?? ''));
-    $dbPass = (string) ($_POST['db_pass'] ?? '');
-
-    if ($dbName === '' || $dbUser === '') {
-        http_response_code(422);
-        echo json_encode(['success' => false, 'message' => 'Nom de base et utilisateur requis.']);
-        exit;
-    }
-
-    try {
-        $pdo = new PDO(
-            sprintf('mysql:host=%s;dbname=%s;charset=utf8mb4', $host, $dbName),
-            $dbUser, $dbPass,
-            [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC, PDO::ATTR_EMULATE_PREPARES => false]
-        );
-        if (!is_file($installSqlPath)) throw new RuntimeException('Fichier install.sql introuvable.');
-        $sql = (string) file_get_contents($installSqlPath);
-        if ($sql === '') throw new RuntimeException('Le fichier install.sql est vide.');
-        $pdo->exec($sql);
-        applySqlFileIfTableMissing($pdo, 'leads', $createLeadsSqlPath);
-        $_SESSION['install_db'] = ['host' => $host, 'db_name' => $dbName, 'db_user' => $dbUser, 'db_pass' => $dbPass];
-        echo json_encode(['success' => true, 'message' => 'Connexion OK et schéma SQL appliqué.']);
-    } catch (Throwable $e) {
-        http_response_code(500);
-        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
-    }
-    exit;
-}
-
-/* ─── AJAX: Test SMTP ─── */
-
-if (isset($_GET['action']) && $_GET['action'] === 'test_smtp') {
-    header('Content-Type: application/json; charset=utf-8');
-    $result = smtpHandshakeAndOptionalMail([
-        'smtp_host' => $_POST['smtp_host'] ?? '',
-        'smtp_port' => $_POST['smtp_port'] ?? '',
-        'smtp_user' => $_POST['smtp_user'] ?? '',
-        'smtp_pass' => $_POST['smtp_pass'] ?? '',
-    ]);
-    if (!$result['success']) http_response_code(422);
-    echo json_encode($result);
-    exit;
-}
-
 /* ─── Logique Wizard ─── */
+
+
 
 $alreadyInstalled = is_file($configFile);
 $step = (int) ($_GET['step'] ?? 1);
-if ($step < 1 || $step > 4) $step = 1;
+if ($step < 1 || $step > 5) $step = 1;
 $error = '';
 $installCompleted = false;
 
@@ -216,12 +168,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$alreadyInstalled) {
             'smtp_port'            => (int) ($_POST['smtp_port'] ?? 587),
             'smtp_user'            => trim((string) ($_POST['smtp_user'] ?? '')),
             'smtp_pass'            => (string) ($_POST['smtp_pass'] ?? ''),
+            'ai_openai_key'        => trim((string) ($_POST['ai_openai_key'] ?? '')),
+            'ai_anthropic_key'     => trim((string) ($_POST['ai_anthropic_key'] ?? '')),
+            'ai_perplexity_key'    => trim((string) ($_POST['ai_perplexity_key'] ?? '')),
+            'ai_mistral_key'       => trim((string) ($_POST['ai_mistral_key'] ?? '')),
+            'operation_cities_json'=> (string) ($_POST['operation_cities_json'] ?? '[]'),
         ];
         header('Location: ?step=4');
         exit;
     }
 
     if ($step === 4) {
+        $site = $_SESSION['install_site'] ?? [];
+        if (!is_array($site)) {
+            $site = [];
+        }
+        $site['ai_openai_key'] = trim((string) ($_POST['ai_openai_key'] ?? ($site['ai_openai_key'] ?? '')));
+        $site['ai_anthropic_key'] = trim((string) ($_POST['ai_anthropic_key'] ?? ($site['ai_anthropic_key'] ?? '')));
+        $site['ai_perplexity_key'] = trim((string) ($_POST['ai_perplexity_key'] ?? ($site['ai_perplexity_key'] ?? '')));
+        $site['ai_mistral_key'] = trim((string) ($_POST['ai_mistral_key'] ?? ($site['ai_mistral_key'] ?? '')));
+        $_SESSION['install_site'] = $site;
+        header('Location: ?step=5');
+        exit;
+    }
+
+    if ($step === 5) {
         $db   = $_SESSION['install_db'] ?? null;
         $site = $_SESSION['install_site'] ?? null;
 
@@ -247,6 +218,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$alreadyInstalled) {
                 $smtpPort  = max(1, (int) ($site['smtp_port'] ?? 587));
                 $smtpUser  = $e((string) ($site['smtp_user'] ?? ''));
                 $smtpPass  = $e((string) ($site['smtp_pass'] ?? ''));
+                $aiOpenAi = $e((string) ($site['ai_openai_key'] ?? ''));
+                $aiAnthropic = $e((string) ($site['ai_anthropic_key'] ?? ''));
+                $aiPerplexity = $e((string) ($site['ai_perplexity_key'] ?? ''));
+                $aiMistral = $e((string) ($site['ai_mistral_key'] ?? ''));
+                $operationCitiesJson = $e((string) ($site['operation_cities_json'] ?? '[]'));
                 $dbHost    = $e((string) $db['host']);
                 $dbName    = $e((string) $db['db_name']);
                 $dbUser    = $e((string) $db['db_user']);
@@ -273,8 +249,16 @@ define('SMTP_HOST', '{$smtpHost}');
 define('SMTP_USER', '{$smtpUser}');
 define('SMTP_PASS', '{$smtpPass}');
 define('SMTP_PORT', {$smtpPort});
-define('MAIL_FROM', 'contact@estimia-bordeaux.fr');
+define('SMTP_FROM', '{$smtpUser}');
+define('MAIL_FROM', SMTP_FROM);
 define('MAIL_FROM_NAME', 'EstimIA Bordeaux');
+define('OPERATION_CITIES_JSON', '{$operationCitiesJson}');
+
+// IA — Multi-provider fallback
+define('AI_OPENAI_KEY', '{$aiOpenAi}');
+define('AI_ANTHROPIC_KEY', '{$aiAnthropic}');
+define('AI_PERPLEXITY_KEY', '{$aiPerplexity}');
+define('AI_MISTRAL_KEY', '{$aiMistral}');
 
 // Sécurité
 define('ADMIN_EMAIL', '{$adminEmail}');
@@ -365,6 +349,8 @@ $siteSession = $_SESSION['install_site'] ?? [
     'site_name' => 'EstimIA', 'city_name' => 'Bordeaux', 'operation_radius_km' => 30,
     'admin_email' => '', 'site_phone' => '', 'admin_password' => '', 'base_url' => '',
     'smtp_host' => '', 'smtp_port' => 587, 'smtp_user' => '', 'smtp_pass' => '',
+    'ai_openai_key' => '', 'ai_anthropic_key' => '', 'ai_perplexity_key' => '', 'ai_mistral_key' => '',
+    'operation_cities_json' => '[]',
 ];
 
 $tableDescriptions = [
@@ -391,7 +377,7 @@ if (is_array($_SESSION['install_db'] ?? null)) {
 }
 
 $allReqOk = !in_array(false, $requirements, true);
-$stepLabels = ['Pré-requis', 'Base de données', 'Configuration', 'Finalisation'];
+$stepLabels = ['Pré-requis', 'Base de données', 'Configuration', 'Clés IA', 'Finalisation'];
 
 ?>
 <!doctype html>
@@ -894,6 +880,25 @@ $stepLabels = ['Pré-requis', 'Base de données', 'Configuration', 'Finalisation
         }
 
         .animate-in { animation: fadeUp .4s ease-out both; }
+
+        .cities-box {
+            position: relative;
+            border: 1px solid var(--border);
+            background: rgba(255,255,255,.015);
+            border-radius: var(--radius-sm);
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .cities-list { display: grid; gap: 8px; margin: 12px 0; }
+        .city-line { display: flex; align-items: center; gap: 8px; font-size: .86rem; }
+        .source-badge {
+            position: absolute;
+            right: 12px;
+            bottom: 10px;
+            font-size: .72rem;
+            color: var(--text-muted);
+        }
     </style>
 </head>
 <body>
@@ -911,7 +916,7 @@ $stepLabels = ['Pré-requis', 'Base de données', 'Configuration', 'Finalisation
 
     <!-- Stepper -->
     <div class="stepper animate-in" style="animation-delay:.05s">
-        <?php for ($i = 1; $i <= 4; $i++): ?>
+        <?php for ($i = 1; $i <= 5; $i++): ?>
             <div class="stepper-item <?= $i === $step ? 'active' : ($i < $step ? 'done' : '') ?>">
                 <span class="stepper-num"><?= $i < $step ? '✓' : $i ?></span>
                 <span><?= $stepLabels[$i - 1] ?></span>
@@ -1036,19 +1041,40 @@ $stepLabels = ['Pré-requis', 'Base de données', 'Configuration', 'Finalisation
                     </div>
                     <div class="form-group">
                         <label class="form-label">Ville cible</label>
-                        <input class="form-input" name="city_name" value="<?= htmlspecialchars((string) $siteSession['city_name'], ENT_QUOTES, 'UTF-8') ?>" required>
+                        <input class="form-input" id="city_name" name="city_name" value="<?= htmlspecialchars((string) $siteSession['city_name'], ENT_QUOTES, 'UTF-8') ?>" required>
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
                         <label class="form-label">Rayon d'opération (km)</label>
-                        <input class="form-input" type="number" name="operation_radius_km" value="<?= (int) $siteSession['operation_radius_km'] ?>" min="1">
+                        <input class="form-input" type="number" id="operation_radius_km" name="operation_radius_km" value="<?= (int) $siteSession['operation_radius_km'] ?>" min="1">
                     </div>
                     <div class="form-group">
                         <label class="form-label">Téléphone</label>
                         <input class="form-input" name="site_phone" value="<?= htmlspecialchars((string) $siteSession['site_phone'], ENT_QUOTES, 'UTF-8') ?>">
                     </div>
+                </div>
+
+                <div class="cities-box">
+                    <div class="form-section-title">Étape 2 — Villes voisines assistées par IA</div>
+                    <div class="form-section-desc">Sélectionnez les villes à couvrir puis ajoutez-en manuellement si besoin.</div>
+                    <input type="hidden" id="operation_cities_json" name="operation_cities_json" value="<?= htmlspecialchars((string) $siteSession['operation_cities_json'], ENT_QUOTES, 'UTF-8') ?>">
+                    <button type="button" class="btn btn-outline-test" id="loadCitiesBtn">
+                        <span class="spinner" id="citiesSpinner"></span>
+                        Rechercher les villes voisines
+                    </button>
+                    <div id="citiesStatus" style="margin-top:10px"></div>
+                    <div id="citiesList" class="cities-list"></div>
+                    <div class="form-row" style="margin-top:8px">
+                        <div class="form-group" style="margin-bottom:0">
+                            <input class="form-input" id="manualCityInput" placeholder="Ajouter une ville manuellement">
+                        </div>
+                        <div class="form-group" style="margin-bottom:0">
+                            <button type="button" class="btn btn-ghost" id="addManualCityBtn">Ajouter</button>
+                        </div>
+                    </div>
+                    <div class="source-badge" id="aiSourceBadge"></div>
                 </div>
 
                 <div class="form-row">
@@ -1111,6 +1137,23 @@ $stepLabels = ['Pré-requis', 'Base de données', 'Configuration', 'Finalisation
     <!-- ════════ STEP 4 ════════ -->
     <?php elseif (!$alreadyInstalled && $step === 4): ?>
         <div class="card animate-in" style="animation-delay:.1s">
+            <div class="card-title">Clés IA multi-provider</div>
+            <div class="card-desc">Saisissez vos clés API (fallback automatique transparent pour l'utilisateur).</div>
+            <form method="post">
+                <div class="form-group"><label class="form-label">OpenAI API key</label><input class="form-input" name="ai_openai_key" value="<?= htmlspecialchars((string) $siteSession['ai_openai_key'], ENT_QUOTES, 'UTF-8') ?>" placeholder="sk-..."></div>
+                <div class="form-group"><label class="form-label">Anthropic API key</label><input class="form-input" name="ai_anthropic_key" value="<?= htmlspecialchars((string) $siteSession['ai_anthropic_key'], ENT_QUOTES, 'UTF-8') ?>"></div>
+                <div class="form-group"><label class="form-label">Perplexity API key</label><input class="form-input" name="ai_perplexity_key" value="<?= htmlspecialchars((string) $siteSession['ai_perplexity_key'], ENT_QUOTES, 'UTF-8') ?>"></div>
+                <div class="form-group"><label class="form-label">Mistral API key</label><input class="form-input" name="ai_mistral_key" value="<?= htmlspecialchars((string) $siteSession['ai_mistral_key'], ENT_QUOTES, 'UTF-8') ?>"></div>
+                <div class="btn-row">
+                    <a class="btn btn-ghost" href="?step=3">← Retour</a>
+                    <button type="submit" class="btn btn-primary">Suivant →</button>
+                </div>
+            </form>
+        </div>
+
+    <!-- ════════ STEP 5 ════════ -->
+    <?php elseif (!$alreadyInstalled && $step === 5): ?>
+        <div class="card animate-in" style="animation-delay:.1s">
             <div class="card-title">Finalisation</div>
             <div class="card-desc">Vérifiez le récapitulatif puis lancez l'installation.</div>
 
@@ -1163,7 +1206,7 @@ $stepLabels = ['Pré-requis', 'Base de données', 'Configuration', 'Finalisation
 
             <form method="post">
                 <div class="btn-row">
-                    <a class="btn btn-ghost" href="?step=3">← Retour</a>
+                    <a class="btn btn-ghost" href="?step=4">← Retour</a>
                     <button type="submit" class="btn btn-success" id="finalizeBtn">
                         <span class="spinner" id="finalSpinner"></span>
                         Lancer l'installation
@@ -1190,7 +1233,7 @@ $stepLabels = ['Pré-requis', 'Base de données', 'Configuration', 'Finalisation
             result.innerHTML = '';
 
             try {
-                const r = await fetch('?action=test_db', { method: 'POST', body: fd });
+                const r = await fetch('test-db.php', { method: 'POST', body: fd });
                 const data = await r.json();
                 result.innerHTML = data.success
                     ? `<div class="alert alert-success">${data.message}</div>`
@@ -1221,7 +1264,7 @@ $stepLabels = ['Pré-requis', 'Base de données', 'Configuration', 'Finalisation
             result.innerHTML = '';
 
             try {
-                const r = await fetch('?action=test_smtp', { method: 'POST', body: fd });
+                const r = await fetch('test-smtp.php', { method: 'POST', body: fd });
                 const data = await r.json();
                 if (!r.ok) throw new Error(data.message || 'Échec');
                 result.innerHTML = `<div class="alert alert-success">${data.message}</div>`;
@@ -1231,6 +1274,108 @@ $stepLabels = ['Pré-requis', 'Base de données', 'Configuration', 'Finalisation
                 spinner.style.display = 'none';
                 smtpBtn.disabled = false;
             }
+        });
+    }
+
+    /* ── AI Cities ── */
+    const loadCitiesBtn = document.getElementById('loadCitiesBtn');
+    const citiesHidden = document.getElementById('operation_cities_json');
+    const citiesList = document.getElementById('citiesList');
+    const citiesStatus = document.getElementById('citiesStatus');
+    const aiSourceBadge = document.getElementById('aiSourceBadge');
+    const sourceLabels = {
+        openai: '🟢 Powered by OpenAI',
+        anthropic: '🟣 Powered by Claude',
+        perplexity: '🔵 Powered by Perplexity',
+        mistral: '🟠 Powered by Mistral',
+        fallback: '⚪ Mode hors-ligne',
+    };
+    let selectedCities = [];
+
+    function persistCities() {
+        citiesHidden.value = JSON.stringify(selectedCities);
+    }
+
+    function renderCities() {
+        citiesList.innerHTML = '';
+        selectedCities.forEach((city, idx) => {
+            const id = `city_option_${idx}`;
+            const line = document.createElement('label');
+            line.className = 'city-line';
+            line.innerHTML = `<input type="checkbox" id="${id}" checked data-city="${city.replace(/"/g, '&quot;')}"> <span>✅ ${city}</span>`;
+            const input = line.querySelector('input');
+            input.addEventListener('change', () => {
+                if (!input.checked) {
+                    selectedCities = selectedCities.filter(c => c !== city);
+                    renderCities();
+                    persistCities();
+                }
+            });
+            citiesList.appendChild(line);
+        });
+    }
+
+    function loadCitiesFromHidden() {
+        if (!citiesHidden || !citiesHidden.value) return;
+        try {
+            const parsed = JSON.parse(citiesHidden.value);
+            if (Array.isArray(parsed)) {
+                selectedCities = parsed.filter(v => typeof v === 'string' && v.trim() !== '');
+                renderCities();
+            }
+        } catch (_) {}
+    }
+
+    if (loadCitiesBtn) {
+        loadCitiesFromHidden();
+        loadCitiesBtn.addEventListener('click', async () => {
+            const city = (document.getElementById('city_name')?.value || '').trim();
+            const radius = (document.getElementById('operation_radius_km')?.value || '30').trim();
+            const spinner = document.getElementById('citiesSpinner');
+            if (!city) return;
+
+            const fd = new FormData();
+            fd.append('city', city);
+            fd.append('radius', radius);
+            spinner.style.display = 'inline-block';
+            loadCitiesBtn.disabled = true;
+            citiesStatus.innerHTML = '<div class="alert alert-info">Analyse géographique en cours...</div>';
+
+            try {
+                const r = await fetch('ai-cities.php', { method: 'POST', body: fd });
+                const data = await r.json();
+                if (Array.isArray(data.cities) && data.cities.length > 0) {
+                    selectedCities = data.cities;
+                    renderCities();
+                    persistCities();
+                    citiesStatus.innerHTML = '';
+                    aiSourceBadge.textContent = sourceLabels[data.source] || sourceLabels.fallback;
+                } else {
+                    aiSourceBadge.textContent = sourceLabels.fallback;
+                    citiesStatus.innerHTML = '';
+                }
+            } catch (_) {
+                aiSourceBadge.textContent = sourceLabels.fallback;
+                citiesStatus.innerHTML = '';
+            } finally {
+                spinner.style.display = 'none';
+                loadCitiesBtn.disabled = false;
+            }
+        });
+    }
+
+    const addManualCityBtn = document.getElementById('addManualCityBtn');
+    if (addManualCityBtn) {
+        addManualCityBtn.addEventListener('click', () => {
+            const input = document.getElementById('manualCityInput');
+            const value = (input.value || '').trim();
+            if (!value) return;
+            if (!selectedCities.includes(value)) {
+                selectedCities.push(value);
+                renderCities();
+                persistCities();
+            }
+            input.value = '';
         });
     }
 
