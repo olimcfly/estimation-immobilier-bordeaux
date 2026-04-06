@@ -113,10 +113,18 @@ if (!is_array($villes) || $villes === []) {
 
                         <div class="w-full lg:w-auto lg:pl-3">
                             <label class="mb-1 hidden text-sm font-medium text-blue-100 lg:block">&nbsp;</label>
-                            <button type="submit" class="h-[56px] w-full rounded-xl bg-orange-500 px-8 text-base font-bold text-white transition hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-300 lg:w-auto">
-                                Estimer →
+                            <button id="hero-cta-submit" type="submit" class="h-[56px] w-full rounded-xl bg-orange-500 px-8 text-base font-bold text-white transition hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-300 lg:w-auto">
+                                Obtenir mon estimation instantanée →
                             </button>
                         </div>
+                    </div>
+                    <p class="mt-3 text-center text-xs font-semibold text-blue-100">
+                        100% gratuit • Résultat immédiat • Sans engagement
+                    </p>
+                    <div class="mt-3 flex flex-wrap items-center justify-center gap-2 text-[11px] font-medium text-blue-100/95">
+                        <span class="rounded-full border border-white/30 bg-white/10 px-3 py-1">Quartiers bordelais analysés</span>
+                        <span class="rounded-full border border-white/30 bg-white/10 px-3 py-1">Adapté aux appartements urbains</span>
+                        <span class="rounded-full border border-white/30 bg-white/10 px-3 py-1">Comparaison au prix/m² local</span>
                     </div>
                     <p id="form-feedback" class="mt-3 hidden text-sm font-medium text-red-200"></p>
                 </form>
@@ -231,6 +239,7 @@ if (!is_array($villes) || $villes === []) {
                                 <input id="prenom" name="prenom" type="text" placeholder="Prénom" required class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm focus:border-blue-500 focus:outline-none">
                                 <input id="telephone" name="telephone" type="tel" placeholder="Téléphone" required class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm focus:border-blue-500 focus:outline-none">
                                 <button id="contact-submit" type="submit" class="w-full rounded-xl bg-gradient-to-r from-blue-700 to-blue-500 px-4 py-3 font-bold text-white transition hover:from-blue-800 hover:to-blue-600">Me faire rappeler gratuitement →</button>
+                                <p class="text-center text-xs font-medium text-slate-500">Sans engagement • Réponse d'un conseiller local</p>
                             </form>
                         </div>
                         <div id="wizard-dots" class="mt-4 flex items-center justify-center gap-2">
@@ -303,6 +312,7 @@ if (!is_array($villes) || $villes === []) {
 
     <script>
         const form = document.getElementById('estimation-form');
+        const heroCtaSubmit = document.getElementById('hero-cta-submit');
         const feedback = document.getElementById('form-feedback');
         const resultSection = document.getElementById('result-section');
         const recap = document.getElementById('result-recap');
@@ -331,6 +341,34 @@ if (!is_array($villes) || $villes === []) {
         let wizardStep = 0;
 
         let latestEstimation = null;
+
+        const ctaVariants = [
+            'Voir le prix de mon bien à Bordeaux →',
+            'Lancer mon estimation gratuite →',
+            'Obtenir mon estimation instantanée →',
+            'Découvrir la valeur de mon logement →',
+            'Calculer mon prix au m² maintenant →'
+        ];
+
+        const applyCtaVariant = () => {
+            if (!(heroCtaSubmit instanceof HTMLButtonElement)) {
+                return;
+            }
+            const storageKey = 'hero_cta_variant_v1';
+            const storedIndex = Number.parseInt(localStorage.getItem(storageKey) || '', 10);
+            const hasValidStoredIndex = Number.isInteger(storedIndex) && storedIndex >= 0 && storedIndex < ctaVariants.length;
+            const variantIndex = hasValidStoredIndex ? storedIndex : Math.floor(Math.random() * ctaVariants.length);
+
+            if (!hasValidStoredIndex) {
+                localStorage.setItem(storageKey, String(variantIndex));
+            }
+
+            heroCtaSubmit.textContent = ctaVariants[variantIndex];
+            heroCtaSubmit.dataset.ctaVariant = `v${variantIndex + 1}`;
+            heroCtaSubmit.title = 'Estimation immobilière gratuite, immédiate et sans engagement';
+        };
+
+        applyCtaVariant();
 
         const surfaceLabels = {
             lt30: 'Moins de 30 m²',
