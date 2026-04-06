@@ -272,6 +272,46 @@ if (!is_array($villes) || $villes === []) {
             </div>
         </section>
 
+        <section class="bg-slate-900 px-4 py-16 text-white sm:px-6 lg:px-8">
+            <div class="mx-auto max-w-6xl">
+                <div class="mx-auto max-w-3xl text-center">
+                    <p class="inline-flex items-center rounded-full bg-white/15 px-4 py-2 text-xs font-semibold uppercase tracking-wide">💰 Spécial investisseurs Bordeaux</p>
+                    <h2 class="mt-4 text-3xl font-extrabold leading-tight md:text-4xl">Investir à Bordeaux, c’est bien.<br>Investir au bon prix, c’est rentable.</h2>
+                    <p class="mt-4 text-base text-slate-200 md:text-lg">
+                        Avant d'acheter, de revendre ou d'arbitrer un bien, connaître sa vraie valeur vous aide à sécuriser vos rendements et vos marges.
+                    </p>
+                </div>
+
+                <div class="mt-10 grid gap-6 md:grid-cols-3">
+                    <article class="rounded-2xl border border-white/15 bg-white/5 p-6">
+                        <p class="text-2xl">📊</p>
+                        <h3 class="mt-3 text-lg font-semibold">Rentabilité locative réelle</h3>
+                        <p class="mt-2 text-sm text-slate-200">
+                            Estimez la valeur juste pour éviter de surpayer et améliorer votre rendement net dès l'acquisition.
+                        </p>
+                    </article>
+                    <article class="rounded-2xl border border-white/15 bg-white/5 p-6">
+                        <p class="text-2xl">🏷️</p>
+                        <h3 class="mt-3 text-lg font-semibold">Négociation d'achat / revente</h3>
+                        <p class="mt-2 text-sm text-slate-200">
+                            Basez vos offres et votre stratégie de sortie sur des données locales fiables, quartier par quartier.
+                        </p>
+                    </article>
+                    <article class="rounded-2xl border border-white/15 bg-white/5 p-6">
+                        <p class="text-2xl">📈</p>
+                        <h3 class="mt-3 text-lg font-semibold">Arbitrage patrimonial</h3>
+                        <p class="mt-2 text-sm text-slate-200">
+                            Comparez objectivement conserver, rénover ou revendre pour allouer votre capital là où le potentiel est le plus fort.
+                        </p>
+                    </article>
+                </div>
+
+                <p class="mt-8 text-center text-sm font-medium text-slate-200">
+                    Une estimation précise aujourd'hui peut faire la différence entre un investissement moyen et une opération performante à la revente.
+                </p>
+            </div>
+        </section>
+
         <section class="bg-white px-4 py-16 sm:px-6 lg:px-8">
             <div class="mx-auto max-w-5xl text-center">
                 <h2 class="text-3xl font-bold text-slate-900">Déjà 500+ estimations à Bordeaux</h2>
