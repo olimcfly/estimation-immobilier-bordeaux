@@ -32,9 +32,33 @@ $h1 = (string) ($config['h1_titre'] ?? ('Combien vaut votre bien à ' . $villePr
 $sousTitre = (string) ($config['sous_titre'] ?? 'Obtenez une estimation instantanée basée sur les données du marché local.');
 $metaDescription = (string) ($config['meta_description'] ?? ('Estimation gratuite à ' . $villePrincipale));
 $villes = $config['villes'] ?? [$villePrincipale];
-if (!is_array($villes) || $villes === []) {
+if (!is_array($villes)) {
     $villes = [$villePrincipale];
 }
+$villesParDefaut = [
+    'Bordeaux',
+    'Mérignac',
+    'Pessac',
+    'Talence',
+    'Bègles',
+    'Le Bouscat',
+    'Bruges',
+    'Cenon',
+    'Floirac',
+    'Lormont',
+    "Villenave-d'Ornon",
+    'Eysines',
+    'Gradignan',
+    'Saint-Médard-en-Jalles',
+    'Caudéran',
+];
+
+$villesNettoyees = array_values(array_filter(array_map(
+    static fn ($ville): string => trim((string) $ville),
+    array_merge($villesParDefaut, [$villePrincipale], $villes)
+), static fn (string $ville): bool => $ville !== ''));
+
+$villes = array_values(array_unique($villesNettoyees));
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -118,7 +142,7 @@ if (!is_array($villes) || $villes === []) {
 
                         <div class="w-full lg:w-auto lg:pl-3">
                             <label class="mb-1 hidden text-sm font-medium text-blue-100 lg:block">&nbsp;</label>
-                            <button type="submit" class="h-[56px] w-full rounded-xl bg-orange-500 px-8 text-base font-bold text-white transition hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-300 lg:w-auto">
+                            <button id="hero-cta-submit" type="submit" class="h-[56px] w-full rounded-xl bg-orange-500 px-8 text-base font-bold text-white transition hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-300 lg:w-auto">
                                 Obtenir mon estimation →
                             </button>
                         </div>
@@ -146,8 +170,22 @@ if (!is_array($villes) || $villes === []) {
                 <hr class="my-6 border-slate-200">
 
                 <div id="result-workflow" class="space-y-4">
-                    <p class="text-center text-sm text-slate-700">Pour affiner cette estimation, complétez ce court parcours.</p>
-                    <div class="overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                    <div id="estimation-page" class="space-y-4">
+                        <p class="text-center text-sm text-slate-700">Estimation calculée avec une double lecture IA : <span class="font-semibold text-slate-900">Perplexity</span> et <span class="font-semibold text-slate-900">Mammouth AI</span>.</p>
+                        <div class="grid gap-3 text-sm text-slate-700 sm:grid-cols-2">
+                            <div class="rounded-xl border border-indigo-100 bg-indigo-50 p-3">🤖 Perplexity IA · Vérification cohérence marché local</div>
+                            <div class="rounded-xl border border-emerald-100 bg-emerald-50 p-3">🧠 Mammouth AI · Ajustements par type de bien et surface</div>
+                        </div>
+                        <button id="go-rdv-page" type="button" class="w-full rounded-xl bg-slate-900 px-4 py-3 font-semibold text-white transition hover:bg-slate-800">Continuer vers la demande de RDV et le rapport détaillé →</button>
+                    </div>
+
+                    <div id="rdv-page" class="hidden overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                        <div class="mb-3 flex items-center justify-between">
+                            <p class="text-sm font-semibold text-slate-700">Page 2/2 · Demande de RDV & rapport détaillé</p>
+                            <button id="back-to-estimation" type="button" class="text-xs font-semibold text-slate-500 hover:text-slate-700">← Retour estimation</button>
+                        </div>
+                        <p class="mb-4 text-sm text-slate-600">Complétez ce parcours pour recevoir votre rapport détaillé et planifier un rappel.</p>
+                        <div class="overflow-hidden">
                         <div id="wizard-track" class="flex transition-transform duration-500 ease-out">
                             <div class="wizard-step w-full shrink-0 space-y-4 px-1">
                                 <h3 class="text-center text-xl font-bold text-slate-900">Recevez votre rapport détaillé</h3>
@@ -251,6 +289,7 @@ if (!is_array($villes) || $villes === []) {
                             <span class="h-2.5 w-2.5 rounded-full bg-blue-600"></span><span class="h-2.5 w-2.5 rounded-full bg-slate-300"></span><span class="h-2.5 w-2.5 rounded-full bg-slate-300"></span><span class="h-2.5 w-2.5 rounded-full bg-slate-300"></span><span class="h-2.5 w-2.5 rounded-full bg-slate-300"></span><span class="h-2.5 w-2.5 rounded-full bg-slate-300"></span><span class="h-2.5 w-2.5 rounded-full bg-slate-300"></span>
                         </div>
                         <p id="contact-feedback" class="mt-4 hidden rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-semibold text-green-700"></p>
+                        </div>
                     </div>
                 </div>
 
@@ -411,6 +450,11 @@ if (!is_array($villes) || $villes === []) {
         const raison = document.getElementById('raison');
         const budgetBant = document.getElementById('budget_bant');
         const delai = document.getElementById('delai');
+        const heroCtaSubmit = document.getElementById('hero-cta-submit');
+        const estimationPage = document.getElementById('estimation-page');
+        const rdvPage = document.getElementById('rdv-page');
+        const goRdvPageButton = document.getElementById('go-rdv-page');
+        const backToEstimationButton = document.getElementById('back-to-estimation');
         const typeBienInput = document.getElementById('type_bien');
         const villeInput = document.getElementById('ville');
         const surfaceInput = document.getElementById('surface_tranche');
@@ -474,6 +518,20 @@ if (!is_array($villes) || $villes === []) {
                 dot.classList.toggle('bg-slate-300', index > wizardStep);
             });
         };
+        const setResultPage = (page) => {
+            const showRdv = page === 'rdv';
+            estimationPage.classList.toggle('hidden', showRdv);
+            rdvPage.classList.toggle('hidden', !showRdv);
+        };
+
+        goRdvPageButton.addEventListener('click', () => {
+            setResultPage('rdv');
+            setWizardStep(0);
+        });
+
+        backToEstimationButton.addEventListener('click', () => {
+            setResultPage('estimation');
+        });
 
         estimationStepNext.addEventListener('click', () => {
             if (typeBienInput.value === '' || villeInput.value === '') {
@@ -619,6 +677,7 @@ if (!is_array($villes) || $villes === []) {
                     estimation_haute: data.estimation_haute
                 };
 
+                setResultPage('estimation');
                 resultSection.classList.remove('pointer-events-none', 'max-h-0', '-translate-y-4', 'opacity-0', 'py-0');
                 resultSection.classList.add('max-h-[1200px]', 'translate-y-0', 'opacity-100', 'py-12');
                 resultSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -710,6 +769,7 @@ if (!is_array($villes) || $villes === []) {
             delai.value = '';
             setEstimationStep(1);
             setWizardStep(0);
+            setResultPage('estimation');
             contactFeedback.classList.add('hidden');
             contactFeedback.textContent = '';
             form.scrollIntoView({ behavior: 'smooth', block: 'center' });
