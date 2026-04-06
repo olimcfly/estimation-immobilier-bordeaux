@@ -39,13 +39,28 @@ if (isPost()) {
     $nom = sanitize($_POST['nom'] ?? '');
     $email = sanitize($_POST['email'] ?? '');
     $telephone = sanitize($_POST['telephone'] ?? '');
-    $dateSouhaitee = sanitize($_POST['date_souhaitee'] ?? '');
+    $dateSouhaitee = sanitize($_POST['date_souhaitee'] ?? ($_POST['date_rdv'] ?? ''));
     $creneau = sanitize($_POST['creneau'] ?? '');
     $message = sanitize($_POST['message'] ?? '');
 
     $creneauxAutorises = ['', 'matin', 'apres_midi', 'soir'];
+    $mappingCreneau = [
+        '09h-12h' => 'matin',
+        '9h-12h' => 'matin',
+        '10h-11h' => 'matin',
+        '14h-17h' => 'apres_midi',
+        '17h-19h' => 'soir',
+    ];
+    if (isset($mappingCreneau[$creneau])) {
+        $creneau = $mappingCreneau[$creneau];
+    }
+    $dateValide = true;
+    if ($dateSouhaitee !== '') {
+        $dateObject = DateTime::createFromFormat('Y-m-d', $dateSouhaitee);
+        $dateValide = $dateObject !== false && $dateObject->format('Y-m-d') === $dateSouhaitee && $dateSouhaitee >= date('Y-m-d');
+    }
 
-    if ($nom === '' || !filter_var($email, FILTER_VALIDATE_EMAIL) || $telephone === '' || !in_array($creneau, $creneauxAutorises, true)) {
+    if ($nom === '' || !filter_var($email, FILTER_VALIDATE_EMAIL) || $telephone === '' || !in_array($creneau, $creneauxAutorises, true) || !$dateValide) {
         $errorMessage = 'Merci de compléter correctement les champs obligatoires.';
     } else {
         try {

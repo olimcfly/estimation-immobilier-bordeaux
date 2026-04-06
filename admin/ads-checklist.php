@@ -227,6 +227,13 @@ foreach ($rows as $r) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['toggle_step'])) {
+    if (!validateCsrfToken()) {
+        http_response_code(403);
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['ok' => false, 'error' => 'Token CSRF invalide'], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
     $stepKey = trim((string) $_POST['toggle_step']);
     $isCompleted = isset($_POST['completed']) ? (int) $_POST['completed'] : null;
 
@@ -341,6 +348,8 @@ foreach ($allSteps as $step) {
 </div>
 
 <script>
+const csrfToken = <?= json_encode(csrfToken(), JSON_UNESCAPED_UNICODE) ?>;
+
 function getBadge(percent) {
     if (percent < 25) return '🚀 Démarrage';
     if (percent < 50) return '⚡ En cours';
@@ -370,6 +379,7 @@ async function toggleStep(stepKey) {
     const formData = new FormData();
     formData.append('toggle_step', stepKey);
     formData.append('completed', String(newValue));
+    formData.append('_token', csrfToken);
 
     const res = await fetch(window.location.href, {
         method: 'POST',

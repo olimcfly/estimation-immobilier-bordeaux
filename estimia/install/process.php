@@ -10,6 +10,16 @@ header('Content-Type: application/json; charset=utf-8');
 
 $action = (string) ($_POST['action'] ?? $_GET['action'] ?? '');
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $postedCsrf = $_POST['csrf_token'] ?? null;
+    $sessionCsrf = $_SESSION['install_csrf'] ?? null;
+    if (!is_string($postedCsrf) || !is_string($sessionCsrf) || !hash_equals($sessionCsrf, $postedCsrf)) {
+        http_response_code(403);
+        echo json_encode(['success' => false, 'message' => 'Token CSRF invalide. Rechargez la page d’installation.'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        exit;
+    }
+}
+
 $respond = static function (bool $success, string $message = '', array $extra = []): void {
     echo json_encode(array_merge(['success' => $success, 'message' => $message], $extra), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     exit;

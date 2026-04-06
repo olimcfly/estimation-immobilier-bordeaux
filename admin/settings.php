@@ -450,7 +450,7 @@ try {
                                 <td><?= h($user['email'] ?? '') ?></td>
                                 <td><span class="badge"><?= h($user['role'] ?? 'agent') ?></span></td>
                                 <td><?= h((string) ($user['last_login_at'] ?? '-')) ?></td>
-                                <td><a href="users.php">Gérer</a></td>
+                                <td><a href="settings.php#users">Gérer</a></td>
                             </tr>
                         <?php endforeach; ?>
                     <?php endif; ?>
@@ -482,9 +482,9 @@ try {
             <section id="backup" class="settings-section">
                 <h2>💾 Sauvegarde</h2>
                 <div class="form-actions">
-                    <a class="btn" href="tools/export_db.php">📥 Exporter la base de données</a>
-                    <a class="btn secondary" href="tools/export_leads.php">📥 Exporter tous les leads (CSV)</a>
-                    <a class="btn danger" href="tools/purge_leads.php" onclick="return confirm('Confirmer la purge des leads de plus de 36 mois ?');">🗑️ Purger les leads &gt; 36 mois</a>
+                    <a class="btn" href="/admin/export.php?type=db_backup">📥 Exporter la base de données</a>
+                    <a class="btn secondary" href="/admin/export.php?type=leads_csv">📥 Exporter tous les leads (CSV)</a>
+                    <a class="btn danger" href="/pages/admin-actions.php?action=purge_old_leads" onclick="return confirm('Confirmer la purge des leads de plus de 36 mois ?');">🗑️ Purger les leads &gt; 36 mois</a>
                 </div>
 
                 <h3>Infos système</h3>

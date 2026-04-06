@@ -36,8 +36,12 @@ $validInteractionTypes = [
     'changement_statut',
 ];
 $validStatuts = ['nouveau', 'contacte', 'qualifie', 'en_negociation', 'converti', 'perdu'];
+$csrfToken = generateCSRFToken();
 
 if (isPost()) {
+    if (!verifyCSRFToken($_POST['csrf_token'] ?? null)) {
+        redirect('lead.php?id=' . $id);
+    }
     $action = sanitize($_GET['action'] ?? ($_POST['action'] ?? ''));
 
     if ($action === 'add_note') {
@@ -270,6 +274,7 @@ require_once __DIR__ . '/includes/admin_header.php';
                     <summary class="cursor-pointer rounded-xl border px-3 py-2 text-sm font-semibold">Actions</summary>
                     <div class="absolute right-0 z-10 mt-2 w-72 space-y-3 rounded-xl border bg-white p-3 text-sm shadow-xl">
                         <form method="POST" action="lead.php?id=<?php echo $id; ?>&action=status" class="space-y-2">
+                            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrfToken, ENT_QUOTES, 'UTF-8'); ?>">
                             <label class="text-xs font-semibold text-gray-500">Changer statut</label>
                             <select name="lead_statut" onchange="this.form.submit()" class="w-full rounded border px-2 py-1">
                                 <?php foreach ($validStatuts as $statut): ?>
@@ -281,6 +286,7 @@ require_once __DIR__ . '/includes/admin_header.php';
                         </form>
 
                         <form method="POST" action="lead.php?id=<?php echo $id; ?>&action=assign" class="space-y-2">
+                            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrfToken, ENT_QUOTES, 'UTF-8'); ?>">
                             <label class="text-xs font-semibold text-gray-500">Assigner un agent</label>
                             <select name="agent_assigne" onchange="this.form.submit()" class="w-full rounded border px-2 py-1">
                                 <option value="0">Non assigné</option>
@@ -302,6 +308,7 @@ require_once __DIR__ . '/includes/admin_header.php';
                         <?php endif; ?>
 
                         <form method="POST" action="lead.php?id=<?php echo $id; ?>&action=delete" onsubmit="return confirm('Supprimer ce lead ?');">
+                            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrfToken, ENT_QUOTES, 'UTF-8'); ?>">
                             <button class="w-full rounded bg-red-50 px-2 py-1 text-left text-red-600 hover:bg-red-100">Supprimer</button>
                         </form>
                     </div>
@@ -414,6 +421,7 @@ require_once __DIR__ . '/includes/admin_header.php';
             </div>
 
             <form method="POST" action="lead.php?id=<?php echo $id; ?>&action=add_note" class="mb-6 rounded-xl bg-gray-50 p-4">
+                            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrfToken, ENT_QUOTES, 'UTF-8'); ?>">
                 <div class="grid gap-3 md:grid-cols-4">
                     <select name="type_interaction" class="rounded border px-2 py-2 text-sm">
                         <?php foreach (['note', 'appel_sortant', 'email_envoye', 'relance', 'changement_statut'] as $interactionType): ?>
@@ -497,6 +505,7 @@ require_once __DIR__ . '/includes/admin_header.php';
             <?php endif; ?>
 
             <form method="POST" action="lead.php?id=<?php echo $id; ?>&action=assign" class="mt-3">
+                            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrfToken, ENT_QUOTES, 'UTF-8'); ?>">
                 <select name="agent_assigne" class="w-full rounded border px-3 py-2 text-sm">
                     <option value="0">Non assigné</option>
                     <?php foreach ($agents as $agent):
@@ -527,11 +536,13 @@ require_once __DIR__ . '/includes/admin_header.php';
                     <p class="mt-1 text-sm text-gray-500"><?php echo sanitize((string) $rdv['message']); ?></p>
                 <?php endif; ?>
                 <form method="POST" action="lead.php?id=<?php echo $id; ?>&action=rdv_done" class="mt-3">
+                            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrfToken, ENT_QUOTES, 'UTF-8'); ?>">
                     <button class="w-full rounded bg-green-600 px-3 py-2 text-sm font-semibold text-white">Marquer comme effectué</button>
                 </form>
             <?php else: ?>
                 <p class="text-sm text-gray-500">Aucun RDV</p>
                 <form method="POST" action="lead.php?id=<?php echo $id; ?>&action=create_rdv" class="mt-3 space-y-2">
+                            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrfToken, ENT_QUOTES, 'UTF-8'); ?>">
                     <input name="nom" placeholder="Nom" class="w-full rounded border px-3 py-2 text-sm" value="<?php echo htmlspecialchars((string) ($lead['nom'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>">
                     <input name="email" placeholder="Email" class="w-full rounded border px-3 py-2 text-sm" value="<?php echo htmlspecialchars((string) ($lead['email'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>">
                     <input name="telephone" placeholder="Téléphone" class="w-full rounded border px-3 py-2 text-sm" value="<?php echo htmlspecialchars((string) ($lead['telephone'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>">

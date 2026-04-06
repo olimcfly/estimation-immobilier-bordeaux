@@ -303,7 +303,10 @@ $statusClasses = ['nouveau' => 'bg-gray-100 text-gray-700', 'contacte' => 'bg-ye
     async function updateRdvStatus(rdvId, status) {
         const response = await fetch('api/update-rdv.php', {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': window.adminCsrfToken || '',
+            },
             body: JSON.stringify({rdv_id: Number(rdvId), field: 'statut', value: status}),
         });
 

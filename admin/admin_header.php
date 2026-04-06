@@ -5,12 +5,9 @@ declare(strict_types=1);
 require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/../includes/database.php';
 require_once __DIR__ . '/../includes/security.php';
+require_once __DIR__ . '/../includes/admin-auth.php';
 
 initSecureSession();
-
-if (empty($_SESSION['admin_id'])) {
-    $_SESSION['admin_id'] = 1;
-}
 
 if (!function_exists('admin_h')) {
     function admin_h(?string $value): string

@@ -64,6 +64,30 @@ if (isPost()) {
         $formData[$key] = sanitize($_POST[$key] ?? $defaultValue);
     }
 
+    $allowedValues = [
+        'annee_construction_range' => ['avant_1950', '1950_1970', '1970_1990', '1990_2000', '2000_2010', '2010_2020', 'apres_2020', ''],
+        'etat_general' => ['neuf', 'tres_bon', 'bon', 'a_rafraichir', 'a_renover', ''],
+        'type_chauffage' => ['individuel_gaz', 'individuel_electrique', 'collectif', 'pompe_chaleur', 'autre', ''],
+        'dpe' => ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'non_renseigne'],
+        'projet' => ['vendre', 'estimer_seulement', 'succession', 'divorce', 'investissement', 'autre'],
+        'delai_vente' => ['urgent', '3_mois', '6_mois', '1_an', 'pas_presse'],
+        'etage' => ['', 'rdc', 'maison', '10+', '1', '2', '3', '4', '5', '6', '7', '8', '9'],
+        'deja_en_vente' => ['0', '1'],
+    ];
+
+    $fallbackValues = [
+        'dpe' => 'non_renseigne',
+        'projet' => 'estimer_seulement',
+        'delai_vente' => 'pas_presse',
+        'deja_en_vente' => '0',
+    ];
+
+    foreach ($allowedValues as $field => $allowed) {
+        if (!in_array($formData[$field], $allowed, true)) {
+            $formData[$field] = $fallbackValues[$field] ?? '';
+        }
+    }
+
     if ($formData['nom'] === '' || !filter_var($formData['email'], FILTER_VALIDATE_EMAIL) || $formData['telephone'] === '') {
         $errorMessage = 'Veuillez renseigner correctement les champs obligatoires.';
     } else {

@@ -159,7 +159,10 @@ require_once __DIR__ . '/includes/admin_header.php';
     async function updateLeadStatus(leadId, status) {
         const response = await fetch('api/update-lead.php', {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': window.adminCsrfToken || '',
+            },
             body: JSON.stringify({lead_id: Number(leadId), field: 'lead_statut', value: status}),
         });
 

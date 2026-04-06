@@ -18,9 +18,10 @@ $adminPageTitle = isset($adminPageTitle) && is_string($adminPageTitle) && $admin
     : 'Dashboard';
 
 $currentFile = basename((string) ($_SERVER['PHP_SELF'] ?? ''));
+$adminCsrfToken = generateCSRFToken();
 
 $navItems = [
-    ['label' => 'Dashboard', 'href' => 'index.php', 'icon' => 'layout-dashboard', 'active' => $currentFile === 'index.php'],
+    ['label' => 'Dashboard', 'href' => 'dashboard.php', 'icon' => 'layout-dashboard', 'active' => in_array($currentFile, ['index.php', 'dashboard.php'], true)],
     ['label' => 'Analytiques', 'href' => 'analytics.php', 'icon' => 'bar-chart-3', 'active' => $currentFile === 'analytics.php'],
     ['label' => 'Estimations', 'href' => 'estimations.php', 'icon' => 'calculator', 'active' => $currentFile === 'estimations.php'],
     ['label' => 'Pipeline', 'href' => 'pipeline.php', 'icon' => 'columns-3', 'active' => $currentFile === 'pipeline.php'],
@@ -35,13 +36,14 @@ $navItems = [
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="<?php echo htmlspecialchars($adminCsrfToken, ENT_QUOTES, 'UTF-8'); ?>">
     <title><?php echo htmlspecialchars($adminPageTitle, ENT_QUOTES, 'UTF-8'); ?> | Admin EstimIA</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body class="bg-gray-100 font-sans text-gray-900">
 <aside class="fixed inset-y-0 left-0 z-40 w-64 bg-gray-900 p-6 text-white">
-    <a href="index.php" class="mb-10 block text-2xl font-extrabold">EstimIA</a>
+    <a href="dashboard.php" class="mb-10 block text-2xl font-extrabold">EstimIA</a>
 
     <nav class="space-y-2">
         <?php foreach ($navItems as $item): ?>
@@ -55,6 +57,9 @@ $navItems = [
 </aside>
 
 <div class="ml-64 min-h-screen">
+    <script>
+        window.adminCsrfToken = <?php echo json_encode($adminCsrfToken, JSON_UNESCAPED_UNICODE); ?>;
+    </script>
     <header class="border-b border-gray-200 bg-white px-8 py-5">
         <h1 class="text-2xl font-bold"><?php echo htmlspecialchars($adminPageTitle, ENT_QUOTES, 'UTF-8'); ?></h1>
     </header>

@@ -12,18 +12,24 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
 }
 
 if (!empty($_SESSION['admin_logged'])) {
-    redirect('index.php');
+    redirect('dashboard.php');
 }
 
+$csrfToken = generateCSRFToken();
 $errorMessage = '';
 
 if (isPost()) {
+    $postedToken = $_POST['csrf_token'] ?? null;
+    if (!verifyCSRFToken(is_string($postedToken) ? $postedToken : null)) {
+        $errorMessage = 'Session expirée. Veuillez réessayer.';
+    }
+
     $email = sanitize($_POST['email'] ?? '');
     $password = (string) ($_POST['password'] ?? '');
 
-    if ($email === '' || $password === '') {
+    if ($errorMessage === '' && ($email === '' || $password === '')) {
         $errorMessage = 'Veuillez renseigner votre email et mot de passe.';
-    } else {
+    } elseif ($errorMessage === '') {
         try {
             $pdo = Database::getConnection();
             $stmt = $pdo->prepare('SELECT id, email, password_hash FROM admin_users WHERE email = :email LIMIT 1');
@@ -33,7 +39,7 @@ if (isPost()) {
             if ($admin && password_verify($password, (string) $admin['password_hash'])) {
                 $_SESSION['admin_logged'] = true;
                 $_SESSION['admin_email'] = (string) $admin['email'];
-                redirect('index.php');
+                redirect('dashboard.php');
             }
 
             $errorMessage = 'Identifiants invalides.';
@@ -66,6 +72,7 @@ if (isPost()) {
         <?php endif; ?>
 
         <form method="POST" action="login.php" class="space-y-5">
+            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrfToken, ENT_QUOTES, 'UTF-8'); ?>">
             <div>
                 <label for="email" class="mb-2 block text-sm font-semibold text-gray-700">Email</label>
                 <input id="email" name="email" type="email" required class="w-full rounded-xl border-2 border-gray-200 px-4 py-3 outline-none transition-all focus:border-blue-600 focus:ring-4 focus:ring-blue-100">

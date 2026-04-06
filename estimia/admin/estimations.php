@@ -9,6 +9,7 @@ $adminPageTitle = 'Gestion des leads';
 require_once __DIR__ . '/includes/admin_header.php';
 
 $pdo = Database::getConnection();
+$csrfToken = generateCSRFToken();
 
 $type = sanitize($_GET['type'] ?? 'tous');
 $vue = sanitize($_GET['vue'] ?? 'tableau');
@@ -266,6 +267,7 @@ $endItem = min($page * $perPage, $totalLeads);
     </script>
 <?php else: ?>
     <form id="bulkForm" method="POST" action="actions.php">
+        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrfToken, ENT_QUOTES, 'UTF-8'); ?>">
         <input type="hidden" name="redirect_query" value="<?php echo htmlspecialchars(http_build_query($_GET), ENT_QUOTES, 'UTF-8'); ?>">
         <div id="bulkBar" class="mb-3 hidden items-center justify-between rounded-xl border bg-blue-50 px-4 py-3 text-sm">
             <span id="bulkCount">0 sélectionnés</span>
@@ -328,6 +330,7 @@ $endItem = min($page * $perPage, $totalLeads);
                         <td class="px-3 py-3"><span class="rounded-full px-2.5 py-1 text-xs font-semibold <?php echo $typeClass; ?>"><?php echo sanitize($typeLead); ?></span></td>
                         <td class="px-3 py-3">
                             <form method="POST" action="actions.php" class="flex items-center gap-2">
+                                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrfToken, ENT_QUOTES, 'UTF-8'); ?>">
                                 <input type="hidden" name="ids[]" value="<?php echo $id; ?>">
                                 <input type="hidden" name="action" value="statut">
                                 <input type="hidden" name="redirect_query" value="<?php echo htmlspecialchars(http_build_query($_GET), ENT_QUOTES, 'UTF-8'); ?>">

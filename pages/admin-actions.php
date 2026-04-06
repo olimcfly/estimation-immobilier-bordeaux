@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../includes/admin-auth.php';
 
 $action = $_GET['action'] ?? '';
 
@@ -26,7 +27,18 @@ switch ($action) {
         }
         exit;
 
+    case 'export_leads':
+        header('Location: /admin/export.php?type=leads_csv');
+        exit;
+
+    case 'purge_old_leads':
+        $db = Database::getConnection();
+        $stmt = $db->prepare('DELETE FROM estimations WHERE created_at < DATE_SUB(NOW(), INTERVAL 36 MONTH)');
+        $stmt->execute();
+        header('Location: /admin/settings.php?purge=success');
+        exit;
+
     default:
-        header('Location: dashboard.php');
+        header('Location: /admin/settings.php');
         exit;
 }

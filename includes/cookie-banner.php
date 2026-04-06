@@ -6,7 +6,7 @@ $showCookieBanner = !isset($_COOKIE['cookies_accepted']) && !isset($_COOKIE['coo
     <div class="max-w-5xl mx-auto flex flex-col md:flex-row md:items-center gap-3 md:gap-6">
         <p class="text-sm flex-1">
             Ce site utilise des cookies pour améliorer votre expérience et analyser le trafic.
-            <a class="underline" href="/politique-confidentialite">En savoir plus</a>
+            <a class="underline" href="/pages/politique-confidentialite.php">En savoir plus</a>
         </p>
         <div class="flex items-center gap-2">
             <button id="cookie-accept" class="px-4 py-2 rounded bg-primary text-white">Accepter</button>

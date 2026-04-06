@@ -7,7 +7,19 @@ require_once __DIR__ . '/../includes/guard.php';
 $adminPageTitle = 'Tableau de bord - ' . siteConfig('city', 'Zone');
 require_once __DIR__ . '/includes/admin_header.php';
 
-$pdo = Database::getConnection();
+try {
+    $pdo = Database::getConnection();
+} catch (Throwable $e) {
+    http_response_code(503);
+    ?>
+    <div class="rounded-xl border border-amber-200 bg-amber-50 p-6 text-amber-800">
+        <h2 class="text-xl font-bold">Base de données indisponible</h2>
+        <p class="mt-2">Le tableau de bord ne peut pas charger les statistiques pour le moment. Réessayez dans quelques minutes.</p>
+    </div>
+    <?php
+    require_once __DIR__ . '/includes/admin_footer.php';
+    exit;
+}
 
 $periode = sanitize($_GET['periode'] ?? '30j');
 $validPeriodes = ['today', '7j', '30j', 'mois', 'trimestre'];
