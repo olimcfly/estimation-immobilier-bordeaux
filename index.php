@@ -103,92 +103,111 @@ declare(strict_types=1);
                 <hr class="my-6 border-slate-200">
 
                 <div id="result-workflow" class="space-y-4">
-                    <p class="text-center text-sm text-slate-700">Pour affiner cette estimation, parlez à un conseiller.</p>
-                    <button id="start-bant" type="button" class="w-full rounded-xl bg-gradient-to-r from-blue-700 to-indigo-600 px-4 py-3 font-bold text-white transition hover:from-blue-800 hover:to-indigo-700">
-                        Affiner avec un conseiller
-                    </button>
-
-                    <form id="bant-form" class="pointer-events-none max-h-0 -translate-y-2 space-y-4 overflow-hidden opacity-0 transition-all duration-500">
-                        <div>
-                            <p class="mb-2 text-sm font-semibold text-slate-700">Quel est votre projet ?</p>
-                            <div id="projet-pills" class="grid grid-cols-1 gap-2 sm:grid-cols-3">
-                                <label class="cursor-pointer rounded-xl border border-blue-200 px-3 py-2 text-center text-sm font-semibold text-blue-700 transition hover:border-blue-500 hover:bg-blue-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-600 has-[:checked]:text-white">
-                                    <input type="radio" name="projet" value="Vendre mon bien" class="sr-only" required>
-                                    Vendre mon bien
-                                </label>
-                                <label class="cursor-pointer rounded-xl border border-blue-200 px-3 py-2 text-center text-sm font-semibold text-blue-700 transition hover:border-blue-500 hover:bg-blue-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-600 has-[:checked]:text-white">
-                                    <input type="radio" name="projet" value="Acheter un bien" class="sr-only" required>
-                                    Acheter un bien
-                                </label>
-                                <label class="cursor-pointer rounded-xl border border-blue-200 px-3 py-2 text-center text-sm font-semibold text-blue-700 transition hover:border-blue-500 hover:bg-blue-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-600 has-[:checked]:text-white">
-                                    <input type="radio" name="projet" value="Investir dans l'immobilier" class="sr-only" required>
-                                    Investir
-                                </label>
+                    <p class="text-center text-sm text-slate-700">Pour affiner cette estimation, complétez ce court parcours.</p>
+                    <div class="overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                        <div id="wizard-track" class="flex transition-transform duration-500 ease-out">
+                            <div class="wizard-step w-full shrink-0 space-y-4 px-1">
+                                <h3 class="text-center text-xl font-bold text-slate-900">Recevez votre rapport détaillé</h3>
+                                <input id="rapport_email" name="email" type="email" placeholder="Votre email" required class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm focus:border-blue-500 focus:outline-none">
+                                <button id="step-email-next" type="button" class="w-full rounded-xl bg-slate-900 px-4 py-3 font-semibold text-white transition hover:bg-slate-800">Recevoir mon rapport →</button>
                             </div>
+
+                            <div class="wizard-step w-full shrink-0 space-y-4 px-1">
+                                <h3 class="text-center text-xl font-bold text-slate-900">Quel est votre projet ?</h3>
+                                <div id="projet-pills" class="grid grid-cols-1 gap-2 sm:grid-cols-3">
+                                    <label class="cursor-pointer rounded-xl border border-blue-200 px-3 py-4 text-center text-sm font-semibold text-blue-700 transition hover:border-blue-500 hover:bg-blue-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-600 has-[:checked]:text-white">
+                                        <input type="radio" name="projet" value="Vendre mon bien" class="sr-only">
+                                        🏠 Vendre
+                                    </label>
+                                    <label class="cursor-pointer rounded-xl border border-blue-200 px-3 py-4 text-center text-sm font-semibold text-blue-700 transition hover:border-blue-500 hover:bg-blue-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-600 has-[:checked]:text-white">
+                                        <input type="radio" name="projet" value="Acheter un bien" class="sr-only">
+                                        🔑 Acheter
+                                    </label>
+                                    <label class="cursor-pointer rounded-xl border border-blue-200 px-3 py-4 text-center text-sm font-semibold text-blue-700 transition hover:border-blue-500 hover:bg-blue-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-600 has-[:checked]:text-white">
+                                        <input type="radio" name="projet" value="Investir dans l'immobilier" class="sr-only">
+                                        📈 Investir
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="wizard-step w-full shrink-0 space-y-4 px-1">
+                                <h3 class="text-center text-xl font-bold text-slate-900">Comment envisagez-vous votre projet ?</h3>
+                                <div id="methode-pills" class="grid grid-cols-1 gap-2">
+                                    <label class="cursor-pointer rounded-xl border border-blue-200 px-3 py-4 text-sm font-semibold text-blue-700 transition hover:border-blue-500 hover:bg-blue-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-600 has-[:checked]:text-white"><input type="radio" name="methode_vente" value="Seul" class="sr-only">🏡 Seul(e), entre particuliers</label>
+                                    <label class="cursor-pointer rounded-xl border border-blue-200 px-3 py-4 text-sm font-semibold text-blue-700 transition hover:border-blue-500 hover:bg-blue-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-600 has-[:checked]:text-white"><input type="radio" name="methode_vente" value="Agence" class="sr-only">🏢 Avec une agence immobilière</label>
+                                    <label class="cursor-pointer rounded-xl border border-blue-200 px-3 py-4 text-sm font-semibold text-blue-700 transition hover:border-blue-500 hover:bg-blue-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-600 has-[:checked]:text-white"><input type="radio" name="methode_vente" value="Coach" class="sr-only">🎯 Avec un coach / consultant immobilier</label>
+                                    <label class="cursor-pointer rounded-xl border border-blue-200 px-3 py-4 text-sm font-semibold text-blue-700 transition hover:border-blue-500 hover:bg-blue-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-600 has-[:checked]:text-white"><input type="radio" name="methode_vente" value="Je ne sais pas" class="sr-only">🤔 Je ne sais pas encore</label>
+                                </div>
+                            </div>
+
+                            <div class="wizard-step w-full shrink-0 space-y-4 px-1">
+                                <h3 class="text-center text-xl font-bold text-slate-900">Comment avez-vous trouvé notre site ?</h3>
+                                <select id="source_site" name="source_site" class="w-full rounded-xl border border-slate-200 bg-white px-4 py-4 text-base focus:border-blue-500 focus:outline-none">
+                                    <option value="">Choisir</option>
+                                    <option value="Recherche Google">Recherche Google</option>
+                                    <option value="Publicité Google">Publicité Google</option>
+                                    <option value="Publicité Facebook / Instagram">Publicité Facebook / Instagram</option>
+                                    <option value="Bouche à oreille">Bouche à oreille</option>
+                                    <option value="Réseaux sociaux">Réseaux sociaux</option>
+                                    <option value="Blog / article">Blog / article</option>
+                                    <option value="Autre">Autre</option>
+                                </select>
+                                <button id="step-source-next" type="button" class="w-full rounded-xl bg-slate-900 px-4 py-3 font-semibold text-white transition hover:bg-slate-800">Suivant →</button>
+                            </div>
+
+                            <div class="wizard-step w-full shrink-0 space-y-3 px-1">
+                                <h3 class="text-center text-xl font-bold text-slate-900">Parlez-nous de votre situation</h3>
+                                <select id="decisionnaire" name="decisionnaire" class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm focus:border-blue-500 focus:outline-none">
+                                    <option value="">Êtes-vous le décisionnaire ?</option>
+                                    <option value="Oui, seul(e)">Oui, seul(e)</option>
+                                    <option value="Oui, en couple / à plusieurs">Oui, en couple / à plusieurs</option>
+                                    <option value="Non, je me renseigne pour quelqu'un">Non, je me renseigne pour quelqu'un</option>
+                                </select>
+                                <select id="raison" name="raison" class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm focus:border-blue-500 focus:outline-none">
+                                    <option value="">Quelle est la raison principale ?</option>
+                                    <option value="Déménagement / mutation">Déménagement / mutation</option>
+                                    <option value="Séparation / divorce">Séparation / divorce</option>
+                                    <option value="Succession / héritage">Succession / héritage</option>
+                                    <option value="Investissement locatif">Investissement locatif</option>
+                                    <option value="Résidence principale">Résidence principale</option>
+                                    <option value="Agrandissement famille">Agrandissement famille</option>
+                                    <option value="Autre">Autre</option>
+                                </select>
+                                <button id="step-situation-next" type="button" class="w-full rounded-xl bg-slate-900 px-4 py-3 font-semibold text-white transition hover:bg-slate-800">Suivant →</button>
+                            </div>
+
+                            <div class="wizard-step w-full shrink-0 space-y-3 px-1">
+                                <h3 class="text-center text-xl font-bold text-slate-900">Votre timing</h3>
+                                <select id="budget_bant" name="budget_bant" class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm focus:border-blue-500 focus:outline-none">
+                                    <option value="">Quel est votre budget ou prix de vente souhaité ?</option>
+                                    <option value="Moins de 150 000 €">Moins de 150 000 €</option>
+                                    <option value="150 000 € - 300 000 €">150 000 € - 300 000 €</option>
+                                    <option value="300 000 € - 500 000 €">300 000 € - 500 000 €</option>
+                                    <option value="500 000 € - 800 000 €">500 000 € - 800 000 €</option>
+                                    <option value="Plus de 800 000 €">Plus de 800 000 €</option>
+                                </select>
+                                <select id="delai" name="delai" class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm focus:border-blue-500 focus:outline-none">
+                                    <option value="">Quel est votre délai ?</option>
+                                    <option value="Urgent (moins de 3 mois)">Urgent (moins de 3 mois)</option>
+                                    <option value="Dans les 6 mois">Dans les 6 mois</option>
+                                    <option value="Dans l'année">Dans l'année</option>
+                                    <option value="Pas de délai précis">Pas de délai précis</option>
+                                </select>
+                                <button id="step-timing-next" type="button" class="w-full rounded-xl bg-slate-900 px-4 py-3 font-semibold text-white transition hover:bg-slate-800">Dernière étape →</button>
+                            </div>
+
+                            <form id="contact-form" class="wizard-step w-full shrink-0 space-y-3 px-1">
+                                <h3 class="text-center text-xl font-bold text-slate-900">Vos coordonnées</h3>
+                                <input id="prenom" name="prenom" type="text" placeholder="Prénom" required class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm focus:border-blue-500 focus:outline-none">
+                                <input id="telephone" name="telephone" type="tel" placeholder="Téléphone" required class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm focus:border-blue-500 focus:outline-none">
+                                <button id="contact-submit" type="submit" class="w-full rounded-xl bg-gradient-to-r from-blue-700 to-blue-500 px-4 py-3 font-bold text-white transition hover:from-blue-800 hover:to-blue-600">Me faire rappeler gratuitement →</button>
+                            </form>
                         </div>
-
-                        <div>
-                            <label for="decisionnaire" class="mb-1 block text-sm font-semibold text-slate-700">Êtes-vous le décisionnaire ?</label>
-                            <select id="decisionnaire" name="decisionnaire" required class="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm focus:border-blue-500 focus:outline-none">
-                                <option value="">Choisir</option>
-                                <option value="Oui, seul(e)">Oui, seul(e)</option>
-                                <option value="Oui, en couple / à plusieurs">Oui, en couple / à plusieurs</option>
-                                <option value="Non, je me renseigne pour quelqu'un">Non, je me renseigne pour quelqu'un</option>
-                            </select>
+                        <div id="wizard-dots" class="mt-4 flex items-center justify-center gap-2">
+                            <span class="h-2.5 w-2.5 rounded-full bg-blue-600"></span><span class="h-2.5 w-2.5 rounded-full bg-slate-300"></span><span class="h-2.5 w-2.5 rounded-full bg-slate-300"></span><span class="h-2.5 w-2.5 rounded-full bg-slate-300"></span><span class="h-2.5 w-2.5 rounded-full bg-slate-300"></span><span class="h-2.5 w-2.5 rounded-full bg-slate-300"></span><span class="h-2.5 w-2.5 rounded-full bg-slate-300"></span>
                         </div>
-
-                        <div>
-                            <label for="budget_bant" class="mb-1 block text-sm font-semibold text-slate-700">Quel est votre budget ou prix de vente souhaité ?</label>
-                            <select id="budget_bant" name="budget_bant" required class="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm focus:border-blue-500 focus:outline-none">
-                                <option value="">Choisir</option>
-                                <option value="Moins de 150 000 €">Moins de 150 000 €</option>
-                                <option value="150 000 € - 300 000 €">150 000 € - 300 000 €</option>
-                                <option value="300 000 € - 500 000 €">300 000 € - 500 000 €</option>
-                                <option value="500 000 € - 800 000 €">500 000 € - 800 000 €</option>
-                                <option value="Plus de 800 000 €">Plus de 800 000 €</option>
-                            </select>
-                        </div>
-
-                        <div>
-                            <label for="delai" class="mb-1 block text-sm font-semibold text-slate-700">Quel est votre délai ?</label>
-                            <select id="delai" name="delai" required class="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm focus:border-blue-500 focus:outline-none">
-                                <option value="">Choisir</option>
-                                <option value="Urgent (moins de 3 mois)">Urgent (moins de 3 mois)</option>
-                                <option value="Dans les 6 mois">Dans les 6 mois</option>
-                                <option value="Dans l'année">Dans l'année</option>
-                                <option value="Pas de délai précis">Pas de délai précis</option>
-                            </select>
-                        </div>
-
-                        <div>
-                            <label for="raison" class="mb-1 block text-sm font-semibold text-slate-700">Quelle est la raison principale ?</label>
-                            <select id="raison" name="raison" required class="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm focus:border-blue-500 focus:outline-none">
-                                <option value="">Choisir</option>
-                                <option value="Déménagement / mutation">Déménagement / mutation</option>
-                                <option value="Séparation / divorce">Séparation / divorce</option>
-                                <option value="Succession / héritage">Succession / héritage</option>
-                                <option value="Investissement locatif">Investissement locatif</option>
-                                <option value="Résidence principale">Résidence principale</option>
-                                <option value="Agrandissement famille">Agrandissement famille</option>
-                                <option value="Autre">Autre</option>
-                            </select>
-                        </div>
-
-                        <button id="continue-contact" type="button" class="w-full rounded-xl bg-slate-900 px-4 py-3 font-semibold text-white transition hover:bg-slate-800">
-                            Continuer →
-                        </button>
-                    </form>
-
-                    <form id="contact-form" class="pointer-events-none max-h-0 -translate-y-2 space-y-3 overflow-hidden opacity-0 transition-all duration-500">
-                        <input id="prenom" name="prenom" type="text" placeholder="Prénom" required class="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm focus:border-blue-500 focus:outline-none">
-                        <input id="telephone" name="telephone" type="tel" placeholder="Téléphone" required class="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm focus:border-blue-500 focus:outline-none">
-                        <input id="email" name="email" type="email" placeholder="Email" required class="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm focus:border-blue-500 focus:outline-none">
-                        <button id="contact-submit" type="submit" class="w-full rounded-xl bg-gradient-to-r from-blue-700 to-blue-500 px-4 py-3 font-bold text-white transition hover:from-blue-800 hover:to-blue-600">
-                            Me faire rappeler gratuitement →
-                        </button>
-                    </form>
-
-                    <p id="contact-feedback" class="hidden rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-semibold text-green-700"></p>
+                        <p id="contact-feedback" class="mt-4 hidden rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-semibold text-green-700"></p>
+                    </div>
                 </div>
 
                 <button id="new-estimation" type="button" class="mt-4 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
@@ -260,13 +279,26 @@ declare(strict_types=1);
         const range = document.getElementById('result-range');
         const priceM2 = document.getElementById('result-price-m2');
         const newEstimationBtn = document.getElementById('new-estimation');
-        const startBantBtn = document.getElementById('start-bant');
-        const bantForm = document.getElementById('bant-form');
-        const continueContactBtn = document.getElementById('continue-contact');
+        const wizardTrack = document.getElementById('wizard-track');
+        const wizardDots = [...document.querySelectorAll('#wizard-dots span')];
+        const rapportEmail = document.getElementById('rapport_email');
+        const stepEmailNext = document.getElementById('step-email-next');
+        const stepSourceNext = document.getElementById('step-source-next');
+        const stepSituationNext = document.getElementById('step-situation-next');
+        const stepTimingNext = document.getElementById('step-timing-next');
         const contactForm = document.getElementById('contact-form');
         const contactFeedback = document.getElementById('contact-feedback');
         const contactSubmit = document.getElementById('contact-submit');
         const projetPills = document.getElementById('projet-pills');
+        const methodePills = document.getElementById('methode-pills');
+        const sourceSite = document.getElementById('source_site');
+        const decisionnaire = document.getElementById('decisionnaire');
+        const raison = document.getElementById('raison');
+        const budgetBant = document.getElementById('budget_bant');
+        const delai = document.getElementById('delai');
+        const emailRadios = [...projetPills.querySelectorAll('input[type="radio"]')];
+        const methodeRadios = [...methodePills.querySelectorAll('input[type="radio"]')];
+        let wizardStep = 0;
 
         let latestEstimation = null;
 
@@ -280,21 +312,92 @@ declare(strict_types=1);
         };
 
         const formatPrice = (value) => new Intl.NumberFormat('fr-FR').format(Math.round(value)) + ' €';
-        const showStep = (element) => {
-            element.classList.remove('pointer-events-none', 'max-h-0', '-translate-y-2', 'opacity-0');
-            element.classList.add('pointer-events-auto', 'max-h-[1200px]', 'translate-y-0', 'opacity-100');
-        };
-        const hideStep = (element) => {
-            element.classList.add('pointer-events-none', 'max-h-0', '-translate-y-2', 'opacity-0');
-            element.classList.remove('pointer-events-auto', 'max-h-[1200px]', 'translate-y-0', 'opacity-100');
+        const setWizardStep = (step) => {
+            wizardStep = Math.max(0, Math.min(6, step));
+            wizardTrack.style.transform = `translateX(-${wizardStep * 100}%)`;
+            wizardDots.forEach((dot, index) => {
+                dot.classList.toggle('bg-blue-600', index <= wizardStep);
+                dot.classList.toggle('bg-slate-300', index > wizardStep);
+            });
         };
 
-        projetPills.addEventListener('change', () => {
+        projetPills.addEventListener('change', (event) => {
+            const target = event.target;
+            if (!(target instanceof HTMLInputElement)) {
+                return;
+            }
             [...projetPills.querySelectorAll('label')].forEach((label) => {
                 const input = label.querySelector('input[type="radio"]');
                 label.classList.toggle('ring-2', input.checked);
                 label.classList.toggle('ring-blue-200', input.checked);
             });
+            setWizardStep(2);
+        });
+
+        methodePills.addEventListener('change', () => {
+            [...methodePills.querySelectorAll('label')].forEach((label) => {
+                const input = label.querySelector('input[type="radio"]');
+                label.classList.toggle('ring-2', input.checked);
+                label.classList.toggle('ring-blue-200', input.checked);
+            });
+            setWizardStep(3);
+        });
+
+        stepEmailNext.addEventListener('click', async () => {
+            if (!rapportEmail.reportValidity()) {
+                return;
+            }
+            stepEmailNext.disabled = true;
+            const originalText = stepEmailNext.textContent;
+            stepEmailNext.textContent = 'Envoi...';
+            try {
+                const payload = new FormData();
+                payload.append('email', rapportEmail.value.trim());
+                const response = await fetch('/api/rapport.php', { method: 'POST', body: payload });
+                if (!response.ok) {
+                    throw new Error('Impossible d\'envoyer le rapport pour le moment.');
+                }
+                setWizardStep(1);
+            } catch (error) {
+                contactFeedback.className = 'mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-700';
+                contactFeedback.textContent = error.message || 'Service temporairement indisponible.';
+                contactFeedback.classList.remove('hidden');
+            } finally {
+                stepEmailNext.disabled = false;
+                stepEmailNext.textContent = originalText;
+            }
+        });
+
+        stepSourceNext.addEventListener('click', () => {
+            if (sourceSite.value === '') {
+                sourceSite.reportValidity();
+                return;
+            }
+            setWizardStep(4);
+        });
+
+        stepSituationNext.addEventListener('click', () => {
+            if (decisionnaire.value === '' || raison.value === '') {
+                if (decisionnaire.value === '') {
+                    decisionnaire.reportValidity();
+                } else {
+                    raison.reportValidity();
+                }
+                return;
+            }
+            setWizardStep(5);
+        });
+
+        stepTimingNext.addEventListener('click', () => {
+            if (budgetBant.value === '' || delai.value === '') {
+                if (budgetBant.value === '') {
+                    budgetBant.reportValidity();
+                } else {
+                    delai.reportValidity();
+                }
+                return;
+            }
+            setWizardStep(6);
         });
 
         form.addEventListener('submit', async (event) => {
@@ -303,9 +406,7 @@ declare(strict_types=1);
             feedback.textContent = '';
             contactFeedback.classList.add('hidden');
             contactFeedback.textContent = '';
-            hideStep(bantForm);
-            hideStep(contactForm);
-            startBantBtn.classList.remove('hidden');
+            setWizardStep(0);
 
             const submitButton = form.querySelector('button[type="submit"]');
             const buttonText = submitButton.textContent;
@@ -352,19 +453,6 @@ declare(strict_types=1);
             }
         });
 
-        startBantBtn.addEventListener('click', () => {
-            showStep(bantForm);
-            startBantBtn.classList.add('hidden');
-        });
-
-        continueContactBtn.addEventListener('click', () => {
-            if (!bantForm.reportValidity()) {
-                return;
-            }
-            showStep(contactForm);
-            contactForm.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        });
-
         contactForm.addEventListener('submit', async (event) => {
             event.preventDefault();
             if (!latestEstimation) {
@@ -378,10 +466,15 @@ declare(strict_types=1);
             contactSubmit.textContent = 'Envoi en cours...';
 
             try {
-                const payload = new FormData();
-                const bantData = new FormData(bantForm);
-                const contactData = new FormData(contactForm);
-                [...bantData.entries(), ...contactData.entries()].forEach(([key, value]) => payload.append(key, value));
+                const payload = new FormData(contactForm);
+                payload.append('email', rapportEmail.value.trim());
+                payload.append('projet', emailRadios.find((input) => input.checked)?.value || '');
+                payload.append('methode_vente', methodeRadios.find((input) => input.checked)?.value || '');
+                payload.append('source_site', sourceSite.value);
+                payload.append('decisionnaire', decisionnaire.value);
+                payload.append('raison', raison.value);
+                payload.append('budget_bant', budgetBant.value);
+                payload.append('delai', delai.value);
                 Object.entries(latestEstimation).forEach(([key, value]) => payload.append(key, String(value)));
 
                 const response = await fetch('/api/contact.php', {
@@ -394,7 +487,7 @@ declare(strict_types=1);
                     throw new Error(data.message || 'Impossible d\'envoyer votre demande.');
                 }
 
-                const prenom = (contactData.get('prenom') || '').toString().trim();
+                const prenom = (payload.get('prenom') || '').toString().trim();
                 contactFeedback.className = 'rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-semibold text-green-700 transition-all duration-500';
                 contactFeedback.textContent = `✅ Merci ${prenom} ! Un conseiller vous rappelle sous 24h.`;
                 contactFeedback.classList.remove('hidden');
@@ -403,6 +496,19 @@ declare(strict_types=1);
                     { duration: 280, easing: 'ease-out' }
                 );
                 contactForm.reset();
+                rapportEmail.value = '';
+                projetPills.querySelectorAll('input').forEach((input) => {
+                    input.checked = false;
+                });
+                methodePills.querySelectorAll('input').forEach((input) => {
+                    input.checked = false;
+                });
+                sourceSite.value = '';
+                decisionnaire.value = '';
+                raison.value = '';
+                budgetBant.value = '';
+                delai.value = '';
+                setWizardStep(0);
             } catch (error) {
                 contactFeedback.className = 'rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700';
                 contactFeedback.textContent = error.message || 'Le service est momentanément indisponible.';
@@ -416,11 +522,14 @@ declare(strict_types=1);
         newEstimationBtn.addEventListener('click', () => {
             resultSection.classList.add('pointer-events-none', 'max-h-0', '-translate-y-4', 'opacity-0', 'py-0');
             resultSection.classList.remove('max-h-[1200px]', 'translate-y-0', 'opacity-100', 'py-12');
-            hideStep(bantForm);
-            hideStep(contactForm);
-            startBantBtn.classList.remove('hidden');
-            bantForm.reset();
             contactForm.reset();
+            rapportEmail.value = '';
+            sourceSite.value = '';
+            decisionnaire.value = '';
+            raison.value = '';
+            budgetBant.value = '';
+            delai.value = '';
+            setWizardStep(0);
             contactFeedback.classList.add('hidden');
             contactFeedback.textContent = '';
             form.scrollIntoView({ behavior: 'smooth', block: 'center' });
