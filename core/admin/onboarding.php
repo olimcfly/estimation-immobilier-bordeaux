@@ -6,6 +6,10 @@ require_once __DIR__ . '/auth-utils.php';
 
 session_start();
 
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 if (!empty($_SESSION['admin_logged']) && !empty($_SESSION['admin_id'])) {
     header('Location: /admin/index.php');
     exit;
@@ -20,6 +24,8 @@ try {
     $db = Database::getConnection();
     adminEnsureTables($db);
 
+    // Le verrouillage de l'onboarding dépend uniquement de la table `admins`.
+    // Aucun fichier setup.lock n'est utilisé dans ce projet.
     $adminCount = (int) $db->query('SELECT COUNT(*) FROM admins')->fetchColumn();
     if ($adminCount > 0) {
         header('Location: /admin/login.php');
@@ -27,15 +33,21 @@ try {
     }
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $submittedToken = (string) ($_POST['csrf_token'] ?? '');
+        $sessionToken = (string) ($_SESSION['csrf_token'] ?? '');
+        if ($submittedToken === '' || $sessionToken === '' || !hash_equals($sessionToken, $submittedToken)) {
+            $error = 'Session invalide. Veuillez recharger la page puis réessayer.';
+        }
+
         $prenomValue = trim((string) ($_POST['prenom'] ?? ''));
         $nomValue = trim((string) ($_POST['nom'] ?? ''));
         $emailValue = adminLowercase(trim((string) ($_POST['email'] ?? '')));
 
-        if ($prenomValue === '' || $nomValue === '' || $emailValue === '') {
+        if ($error === null && ($prenomValue === '' || $nomValue === '' || $emailValue === '')) {
             $error = 'Tous les champs sont obligatoires.';
-        } elseif (!filter_var($emailValue, FILTER_VALIDATE_EMAIL)) {
+        } elseif ($error === null && !filter_var($emailValue, FILTER_VALIDATE_EMAIL)) {
             $error = 'Adresse email invalide.';
-        } else {
+        } elseif ($error === null) {
             $insert = $db->prepare('INSERT INTO admins (prenom, nom, email) VALUES (:prenom, :nom, :email)');
             $insert->execute([
                 'prenom' => $prenomValue,
@@ -95,6 +107,7 @@ try {
         <?php endif; ?>
 
         <form method="post" class="mt-8 space-y-5">
+            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars((string) ($_SESSION['csrf_token'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>">
             <div>
                 <label for="prenom" class="mb-2 block text-sm font-semibold text-slate-700">Prénom</label>
                 <input id="prenom" name="prenom" required value="<?php echo htmlspecialchars($prenomValue, ENT_QUOTES, 'UTF-8'); ?>" class="w-full rounded-xl border border-slate-300 px-4 py-3 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-100">

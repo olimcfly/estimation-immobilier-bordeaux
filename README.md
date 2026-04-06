@@ -51,6 +51,11 @@ estimation-immobilier-bordeaux/
 2. Vérifier `core/config/config.php` et `core/config/database.php`.
 3. Accéder à `/install/` pour compléter l'installation si nécessaire.
 
+## Onboarding admin
+
+- L'accès à `/admin/onboarding.php` est piloté par la session admin et le nombre d'entrées dans `admins`.
+- Il n'existe pas de mécanisme `setup.lock` dans ce dépôt.
+
 ## Ressources
 
 - Plan SEO/SEA + automatisation: `docs/plan-seo-ads-automation-bordeaux.md`
