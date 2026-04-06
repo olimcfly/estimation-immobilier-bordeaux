@@ -33,3 +33,14 @@ INSERT INTO settings (setting_key, setting_value, setting_group) VALUES
 ('google_ads_id', '', 'integrations'),
 ('maintenance_mode', '0', 'system'),
 ('debug_mode', '0', 'system');
+
+INSERT INTO modules (name, slug, icon, is_active) VALUES
+('Dashboard', 'dashboard', 'fas fa-home', 1),
+('Leads', 'leads', 'fas fa-users', 1),
+('Google Ads', 'google-ads', 'fas fa-ad', 1),
+('Utilisateurs', 'users', 'fas fa-user-shield', 1),
+('Paramètres', 'settings', 'fas fa-cog', 1)
+ON DUPLICATE KEY UPDATE
+name = VALUES(name),
+icon = VALUES(icon),
+is_active = VALUES(is_active);

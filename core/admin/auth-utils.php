@@ -16,10 +16,21 @@ function adminEnsureTables(PDO $db): void
             prenom VARCHAR(100) NOT NULL,
             nom VARCHAR(100) NOT NULL,
             email VARCHAR(255) NOT NULL UNIQUE,
+            password VARCHAR(255) NULL,
+            role ENUM('superadmin','admin') DEFAULT 'admin',
+            is_active TINYINT(1) DEFAULT 1,
+            is_online TINYINT(1) DEFAULT 0,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            last_login DATETIME NULL
+            last_login DATETIME NULL,
+            INDEX idx_role (role),
+            INDEX idx_is_online (is_online)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
     );
+
+    $db->exec('ALTER TABLE admins ADD COLUMN IF NOT EXISTS password VARCHAR(255) NULL');
+    $db->exec("ALTER TABLE admins ADD COLUMN IF NOT EXISTS role ENUM('superadmin','admin') DEFAULT 'admin'");
+    $db->exec('ALTER TABLE admins ADD COLUMN IF NOT EXISTS is_active TINYINT(1) DEFAULT 1');
+    $db->exec('ALTER TABLE admins ADD COLUMN IF NOT EXISTS is_online TINYINT(1) DEFAULT 0');
 
     $db->exec(
         "CREATE TABLE IF NOT EXISTS admin_codes (
@@ -33,6 +44,36 @@ function adminEnsureTables(PDO $db): void
             INDEX idx_admin_created (admin_id, created_at),
             INDEX idx_expires (expires_at),
             CONSTRAINT fk_admin_codes_admin FOREIGN KEY (admin_id) REFERENCES admins(id) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+    );
+
+    $db->exec(
+        "CREATE TABLE IF NOT EXISTS modules (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            name VARCHAR(50) NOT NULL,
+            slug VARCHAR(50) NOT NULL UNIQUE,
+            icon VARCHAR(30) DEFAULT 'fas fa-cog',
+            is_active TINYINT(1) DEFAULT 1,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            INDEX idx_modules_active (is_active)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+    );
+
+    $db->exec(
+        "CREATE TABLE IF NOT EXISTS user_sessions (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            user_id INT NOT NULL,
+            session_id VARCHAR(255) NOT NULL,
+            ip_address VARCHAR(45),
+            user_agent TEXT,
+            is_online TINYINT(1) DEFAULT 1,
+            last_activity DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            INDEX idx_user_sessions_user (user_id),
+            INDEX idx_user_sessions_session (session_id),
+            INDEX idx_user_sessions_online (is_online),
+            CONSTRAINT fk_user_sessions_admin FOREIGN KEY (user_id) REFERENCES admins(id) ON DELETE CASCADE
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
     );
 }
