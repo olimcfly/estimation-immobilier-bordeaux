@@ -5,6 +5,7 @@ declare(strict_types=1);
 $adminMenu = [
     ['key' => 'dashboard', 'label' => 'Dashboard', 'href' => '/admin/index.php', 'icon' => '🏠'],
     ['key' => 'estimations', 'label' => 'Leads CRM', 'href' => '/admin/lead.php', 'icon' => '📊'],
+    ['key' => 'crm-vendeurs', 'label' => 'CRM Vendeurs', 'href' => '/admin/crm-vendeurs.php', 'icon' => '🤝'],
     [
         'key' => 'google-ads',
         'label' => 'Google Ads',
