@@ -31,25 +31,29 @@ if (!isset($pageTitle) || !is_string($pageTitle) || $pageTitle === '') {
     <style>
         :root,
         [data-theme="light"] {
-            --admin-sidebar-bg: #111827;
+            --admin-sidebar-bg: #0d223d;
             --admin-sidebar-text: #f8fafc;
-            --admin-sidebar-muted: #cbd5e1;
-            --admin-sidebar-active-bg: #1d4ed8;
+            --admin-sidebar-muted: #aac0de;
+            --admin-sidebar-active-bg: #173a63;
             --admin-content-bg: #f8fafc;
             --admin-header-bg: #ffffff;
             --admin-header-text: #0f172a;
             --admin-border: #e2e8f0;
+            --admin-sidebar-accent: #ff7a1a;
+            --admin-sidebar-hover: #102d51;
         }
 
         [data-theme="dark"] {
-            --admin-sidebar-bg: #020617;
+            --admin-sidebar-bg: #081a31;
             --admin-sidebar-text: #e2e8f0;
-            --admin-sidebar-muted: #94a3b8;
-            --admin-sidebar-active-bg: #1e40af;
+            --admin-sidebar-muted: #92abd0;
+            --admin-sidebar-active-bg: #133559;
             --admin-content-bg: #0f172a;
             --admin-header-bg: #0b1220;
             --admin-header-text: #f8fafc;
             --admin-border: #334155;
+            --admin-sidebar-accent: #ff8f3d;
+            --admin-sidebar-hover: #102846;
         }
 
         .focus-visible-ring:focus-visible {
