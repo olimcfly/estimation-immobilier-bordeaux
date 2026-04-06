@@ -13,7 +13,7 @@ $uploadDir = $rootDir . '/assets';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $step = (int) ($_POST['step'] ?? 1);
 
-    if ($step >= 1 && $step <= 4) {
+    if ($step >= 1 && $step <= 5) {
         $_SESSION['install_wizard'] = array_merge(
             $_SESSION['install_wizard'] ?? [],
             [
@@ -29,6 +29,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'h1_titre' => trim((string) ($_POST['h1_titre'] ?? ($_SESSION['install_wizard']['h1_titre'] ?? ''))),
                 'sous_titre' => trim((string) ($_POST['sous_titre'] ?? ($_SESSION['install_wizard']['sous_titre'] ?? ''))),
                 'meta_description' => trim((string) ($_POST['meta_description'] ?? ($_SESSION['install_wizard']['meta_description'] ?? ''))),
+                'api_key_openai' => trim((string) ($_POST['api_key_openai'] ?? ($_SESSION['install_wizard']['api_key_openai'] ?? ''))),
+                'api_key_perplexity' => trim((string) ($_POST['api_key_perplexity'] ?? ($_SESSION['install_wizard']['api_key_perplexity'] ?? ''))),
+                'api_key_claude' => trim((string) ($_POST['api_key_claude'] ?? ($_SESSION['install_wizard']['api_key_claude'] ?? ''))),
+                'api_key_dvf' => trim((string) ($_POST['api_key_dvf'] ?? ($_SESSION['install_wizard']['api_key_dvf'] ?? ''))),
+                'api_key_mamouth' => trim((string) ($_POST['api_key_mamouth'] ?? ($_SESSION['install_wizard']['api_key_mamouth'] ?? ''))),
+                'api_keys_activate_now' => isset($_POST['api_keys_activate_now'])
+                    ? true
+                    : (bool) ($_SESSION['install_wizard']['api_keys_activate_now'] ?? false),
             ]
         );
 
@@ -94,7 +102,45 @@ function applySqlFileIfTableMissing(PDO $pdo, string $tableName, string $sqlPath
     $pdo->exec($sql);
 }
 
-/* ─── Logique Wizard ─── */
+    if ($step === 6) {
+        $wizard = $_SESSION['install_wizard'] ?? [];
+
+        $agenceNom = trim((string) ($wizard['agence_nom'] ?? ''));
+        $villePrincipale = trim((string) ($wizard['ville_principale'] ?? ''));
+        $villes = $wizard['villes'] ?? [];
+
+        if ($agenceNom === '' || $villePrincipale === '' || empty($villes)) {
+            header('Location: index.php?step=1&error=missing_data');
+            exit;
+        }
+
+        if (!is_dir($configDir) && !mkdir($configDir, 0755, true) && !is_dir($configDir)) {
+            die('Impossible de créer le dossier config/.');
+        }
+
+        $config = [
+            'installed' => true,
+            'agence_nom' => $agenceNom,
+            'ville_principale' => $villePrincipale,
+            'logo' => (string) ($wizard['logo'] ?? ''),
+            'couleur' => preg_match('/^#[0-9A-Fa-f]{6}$/', (string) ($wizard['couleur'] ?? '')) ? $wizard['couleur'] : '#1e3a5f',
+            'email_reception' => (string) ($wizard['email_reception'] ?? ''),
+            'smtp_host' => (string) ($wizard['smtp_host'] ?? ''),
+            'smtp_port' => (int) ($wizard['smtp_port'] ?? 587),
+            'smtp_user' => (string) ($wizard['smtp_user'] ?? ''),
+            'smtp_pass' => (string) ($wizard['smtp_pass'] ?? ''),
+            'email_expediteur' => (string) ($wizard['email_expediteur'] ?? ''),
+            'h1_titre' => (string) ($wizard['h1_titre'] ?: ('Combien vaut votre bien à ' . $villePrincipale . ' ?')),
+            'sous_titre' => (string) ($wizard['sous_titre'] ?: 'Obtenez une estimation instantanée basée sur les données du marché local.'),
+            'meta_description' => (string) ($wizard['meta_description'] ?: ('Estimation gratuite à ' . $villePrincipale)),
+            'villes' => array_values($villes),
+            'api_key_openai' => (string) ($wizard['api_key_openai'] ?? ''),
+            'api_key_perplexity' => (string) ($wizard['api_key_perplexity'] ?? ''),
+            'api_key_claude' => (string) ($wizard['api_key_claude'] ?? ''),
+            'api_key_dvf' => (string) ($wizard['api_key_dvf'] ?? ''),
+            'api_key_mamouth' => (string) ($wizard['api_key_mamouth'] ?? ''),
+            'api_keys_activate_now' => (bool) ($wizard['api_keys_activate_now'] ?? false),
+        ];
 
 
 
@@ -283,7 +329,7 @@ PHP;
     }
 }
 
-$step = max(1, min(5, (int) ($_GET['step'] ?? 1)));
+$step = max(1, min(6, (int) ($_GET['step'] ?? 1)));
 $data = $_SESSION['install_wizard'] ?? [];
 
 $dbSession   = $_SESSION['install_db'] ?? ['host' => 'localhost', 'db_name' => '', 'db_user' => '', 'db_pass' => ''];
@@ -843,7 +889,15 @@ $stepLabels = ['Pré-requis', 'Base de données', 'Configuration', 'Clés IA', '
         }
     </style>
 </head>
-<body>
+<body class="bg-slate-100 text-slate-900">
+<div class="mx-auto max-w-3xl p-4 md:p-8">
+    <div class="rounded-2xl bg-white p-6 shadow-sm">
+        <h1 class="text-2xl font-bold">Installation de votre site d'estimation</h1>
+        <p class="mt-2 text-sm text-slate-600">Étape <?= $step; ?>/6</p>
+
+        <?php if (isset($_GET['error']) && $_GET['error'] === 'missing_data'): ?>
+            <p class="mt-4 rounded-lg bg-red-100 px-3 py-2 text-sm text-red-700">Merci de compléter toutes les données obligatoires avant de générer le site.</p>
+        <?php endif; ?>
 
 <div class="installer">
 
@@ -1018,88 +1072,72 @@ $stepLabels = ['Pré-requis', 'Base de données', 'Configuration', 'Clés IA', '
             </form>
         </div>
 
-    <!-- ════════ STEP 4 ════════ -->
-    <?php elseif (!$alreadyInstalled && $step === 4): ?>
-        <div class="card animate-in" style="animation-delay:.1s">
-            <div class="card-title">Clés IA multi-provider</div>
-            <div class="card-desc">Saisissez vos clés API (fallback automatique transparent pour l'utilisateur).</div>
-            <form method="post">
-                <div class="form-group"><label class="form-label">OpenAI API key</label><input class="form-input" name="ai_openai_key" value="<?= htmlspecialchars((string) $siteSession['ai_openai_key'], ENT_QUOTES, 'UTF-8') ?>" placeholder="sk-..."></div>
-                <div class="form-group"><label class="form-label">Anthropic API key</label><input class="form-input" name="ai_anthropic_key" value="<?= htmlspecialchars((string) $siteSession['ai_anthropic_key'], ENT_QUOTES, 'UTF-8') ?>"></div>
-                <div class="form-group"><label class="form-label">Perplexity API key</label><input class="form-input" name="ai_perplexity_key" value="<?= htmlspecialchars((string) $siteSession['ai_perplexity_key'], ENT_QUOTES, 'UTF-8') ?>"></div>
-                <div class="form-group"><label class="form-label">Mistral API key</label><input class="form-input" name="ai_mistral_key" value="<?= htmlspecialchars((string) $siteSession['ai_mistral_key'], ENT_QUOTES, 'UTF-8') ?>"></div>
-                <div class="btn-row">
-                    <a class="btn btn-ghost" href="?step=3">← Retour</a>
-                    <button type="submit" class="btn btn-primary">Suivant →</button>
+        <?php if ($step === 4): ?>
+            <form class="mt-6 space-y-4" method="post">
+                <input type="hidden" name="step" value="4">
+                <h2 class="text-lg font-semibold">Configuration des Clés d'API</h2>
+                <p class="text-sm text-slate-600">
+                    Bienvenue dans l'assistant d'installation ! Avant de continuer, configurez les clés d'API ci-dessous.
+                </p>
+                <div class="rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">
+                    <p class="font-medium">Instructions :</p>
+                    <ul class="mt-2 list-disc space-y-1 pl-5">
+                        <li>Saisissez vos clés d'API dans les champs correspondants.</li>
+                        <li>Validez pour passer à l'étape suivante.</li>
+                        <li>Cette étape n'est pas bloquante : vous pouvez continuer sans clé, mais certaines fonctionnalités ne seront pas disponibles.</li>
+                    </ul>
                 </div>
-            </form>
-        </div>
-
-    <!-- ════════ STEP 5 ════════ -->
-    <?php elseif (!$alreadyInstalled && $step === 5): ?>
-        <div class="card animate-in" style="animation-delay:.1s">
-            <div class="card-title">Finalisation</div>
-            <div class="card-desc">Vérifiez le récapitulatif puis lancez l'installation.</div>
-
-            <div class="recap-grid">
-                <div class="recap-item">
-                    <div class="recap-label">Site</div>
-                    <div class="recap-value"><?= htmlspecialchars((string) $siteSession['site_name'], ENT_QUOTES, 'UTF-8') ?></div>
+                <div class="grid gap-3 md:grid-cols-2">
+                    <label class="block text-sm font-medium">OpenAI
+                        <input name="api_key_openai" value="<?= htmlspecialchars((string) ($data['api_key_openai'] ?? ''), ENT_QUOTES); ?>" class="mt-1 w-full rounded-lg border px-3 py-2" placeholder="sk-...">
+                    </label>
+                    <label class="block text-sm font-medium">Perplexity
+                        <input name="api_key_perplexity" value="<?= htmlspecialchars((string) ($data['api_key_perplexity'] ?? ''), ENT_QUOTES); ?>" class="mt-1 w-full rounded-lg border px-3 py-2" placeholder="pplx-...">
+                    </label>
+                    <label class="block text-sm font-medium">Claude
+                        <input name="api_key_claude" value="<?= htmlspecialchars((string) ($data['api_key_claude'] ?? ''), ENT_QUOTES); ?>" class="mt-1 w-full rounded-lg border px-3 py-2" placeholder="claude-...">
+                    </label>
+                    <label class="block text-sm font-medium">DVF
+                        <input name="api_key_dvf" value="<?= htmlspecialchars((string) ($data['api_key_dvf'] ?? ''), ENT_QUOTES); ?>" class="mt-1 w-full rounded-lg border px-3 py-2" placeholder="dvf-...">
+                    </label>
+                    <label class="block text-sm font-medium md:col-span-2">Mamouth
+                        <input name="api_key_mamouth" value="<?= htmlspecialchars((string) ($data['api_key_mamouth'] ?? ''), ENT_QUOTES); ?>" class="mt-1 w-full rounded-lg border px-3 py-2" placeholder="mamouth-...">
+                    </label>
                 </div>
-                <div class="recap-item">
-                    <div class="recap-label">Ville cible</div>
-                    <div class="recap-value"><?= htmlspecialchars((string) $siteSession['city_name'], ENT_QUOTES, 'UTF-8') ?></div>
-                </div>
-                <div class="recap-item">
-                    <div class="recap-label">Rayon</div>
-                    <div class="recap-value"><?= (int) $siteSession['operation_radius_km'] ?> km</div>
-                </div>
-                <div class="recap-item">
-                    <div class="recap-label">Admin</div>
-                    <div class="recap-value"><?= htmlspecialchars((string) $siteSession['admin_email'], ENT_QUOTES, 'UTF-8') ?></div>
-                </div>
-                <div class="recap-item">
-                    <div class="recap-label">SMTP</div>
-                    <div class="recap-value"><?= trim((string) ($siteSession['smtp_host'] ?? '')) !== '' ? htmlspecialchars((string) $siteSession['smtp_host'], ENT_QUOTES, 'UTF-8') : '<span style="color:var(--warning)">Non configuré</span>' ?></div>
-                </div>
-                <div class="recap-item">
-                    <div class="recap-label">URL</div>
-                    <div class="recap-value" style="font-size:.8rem;word-break:break-all"><?= htmlspecialchars((string) $siteSession['base_url'], ENT_QUOTES, 'UTF-8') ?></div>
-                </div>
-            </div>
-
-            <?php if (trim((string) ($siteSession['smtp_host'] ?? '')) === ''): ?>
-                <div class="alert alert-warning">SMTP non configuré — les emails ne seront pas envoyés.</div>
-            <?php endif; ?>
-
-            <?php if ($expectedTables !== []): ?>
-                <div class="form-section-title">Tables à créer</div>
-                <div class="table-grid" style="margin-bottom:24px">
-                    <?php foreach ($expectedTables as $table): ?>
-                        <?php $ok = (bool) ($tableChecklist[$table] ?? false); ?>
-                        <div class="table-row">
-                            <span class="status"><?= $ok ? '✅' : '⏳' ?></span>
-                            <div>
-                                <div class="table-name"><?= htmlspecialchars($table, ENT_QUOTES, 'UTF-8') ?></div>
-                                <div class="table-desc-text"><?= htmlspecialchars($tableDescriptions[$table] ?? 'Table système.', ENT_QUOTES, 'UTF-8') ?></div>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
-                </div>
-            <?php endif; ?>
-
-            <form method="post">
-                <div class="btn-row">
-                    <a class="btn btn-ghost" href="?step=4">← Retour</a>
-                    <button type="submit" class="btn btn-success" id="finalizeBtn">
-                        <span class="spinner" id="finalSpinner"></span>
-                        Lancer l'installation
-                    </button>
+                <label class="flex items-start gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700">
+                    <input type="checkbox" name="api_keys_activate_now" value="1" class="mt-0.5" <?= !empty($data['api_keys_activate_now']) ? 'checked' : ''; ?>>
+                    <span><strong>Optionnel :</strong> Activer les clés dès la validation.</span>
+                </label>
+                <p class="text-xs text-slate-500">
+                    Remarque : Les clés seront sauvegardées en toute sécurité. Vous pourrez les modifier ou les désactiver ultérieurement dans les paramètres.
+                </p>
+                <div class="flex gap-2">
+                    <a href="?step=3" class="rounded-lg border px-4 py-2">Retour</a>
+                    <button class="rounded-lg bg-blue-700 px-4 py-2 text-white">Suivant</button>
                 </div>
             </form>
         <?php endif; ?>
 
         <?php if ($step === 5): ?>
+            <form class="mt-6 space-y-4" method="post">
+                <input type="hidden" name="step" value="5">
+                <label class="block text-sm font-medium">Titre H1
+                    <input name="h1_titre" value="<?= htmlspecialchars((string) ($data['h1_titre'] ?? ''), ENT_QUOTES); ?>" class="mt-1 w-full rounded-lg border px-3 py-2" placeholder="Combien vaut votre bien à {ville} ?" required>
+                </label>
+                <label class="block text-sm font-medium">Sous-titre
+                    <textarea name="sous_titre" class="mt-1 w-full rounded-lg border px-3 py-2" rows="3" required><?= htmlspecialchars((string) ($data['sous_titre'] ?? ''), ENT_QUOTES); ?></textarea>
+                </label>
+                <label class="block text-sm font-medium">Meta description
+                    <textarea name="meta_description" class="mt-1 w-full rounded-lg border px-3 py-2" rows="2" required><?= htmlspecialchars((string) ($data['meta_description'] ?? ''), ENT_QUOTES); ?></textarea>
+                </label>
+                <div class="flex gap-2">
+                    <a href="?step=4" class="rounded-lg border px-4 py-2">Retour</a>
+                    <button class="rounded-lg bg-blue-700 px-4 py-2 text-white">Continuer</button>
+                </div>
+            </form>
+        <?php endif; ?>
+
+        <?php if ($step === 6): ?>
             <div class="mt-6 space-y-4 text-sm">
                 <p>Vérifiez les informations ci-dessous puis générez votre site.</p>
                 <ul class="list-disc space-y-1 pl-5 text-slate-700">
@@ -1109,9 +1147,9 @@ $stepLabels = ['Pré-requis', 'Base de données', 'Configuration', 'Clés IA', '
                     <li><strong>Email réception :</strong> <?= htmlspecialchars((string) ($data['email_reception'] ?? ''), ENT_QUOTES); ?></li>
                 </ul>
                 <form method="post">
-                    <input type="hidden" name="step" value="5">
+                    <input type="hidden" name="step" value="6">
                     <div class="flex gap-2">
-                        <a href="?step=4" class="rounded-lg border px-4 py-2">Retour</a>
+                        <a href="?step=5" class="rounded-lg border px-4 py-2">Retour</a>
                         <button class="rounded-lg bg-emerald-600 px-4 py-2 font-semibold text-white">Générer mon site</button>
                     </div>
                 </form>
