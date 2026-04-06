@@ -2,37 +2,59 @@
 
 declare(strict_types=1);
 
-$db = Database::getConnection();
-$modules = [];
-
-try {
-    $modules = $db->query(
-        "SELECT * FROM `modules` WHERE `is_active` = TRUE ORDER BY `id`"
-    )->fetchAll(PDO::FETCH_ASSOC);
-} catch (Throwable $exception) {
-    $modules = [];
-}
-
-$adminMenu = array_map(
-    static function (array $module): array {
-        $slug = isset($module['slug']) ? trim((string) $module['slug']) : '';
-
-        return [
-            'key' => $slug !== '' ? $slug : 'module-' . (string) ($module['id'] ?? ''),
-            'label' => isset($module['name']) ? (string) $module['name'] : 'Module',
-            'href' => '/admin/' . ltrim($slug, '/'),
-            'icon' => isset($module['icon']) ? (string) $module['icon'] : '🧩',
-            'badge' => null,
-        ];
-    },
-    $modules
-);
-
-if ($adminMenu === []) {
-    $adminMenu = [
-        ['key' => 'dashboard', 'label' => 'Dashboard', 'href' => '/admin/index.php', 'icon' => '🏠', 'badge' => null],
-    ];
-}
+$adminMenu = [
+    ['key' => 'dashboard', 'label' => 'Dashboard', 'href' => '/admin/index.php', 'icon' => '🏠', 'badge' => null],
+    [
+        'key' => 'leads',
+        'label' => 'Leads CRM',
+        'href' => '/admin/lead.php',
+        'icon' => '🏢',
+        'badge' => '32',
+        'children' => [
+            ['label' => 'Pipeline', 'href' => '/admin/lead.php', 'badge' => '12'],
+            ['label' => 'Nouveaux', 'href' => '/admin/leads/index.php', 'badge' => '8'],
+            ['label' => 'Relances', 'href' => '/admin/leads/index.php?tab=followup', 'badge' => '5'],
+        ],
+    ],
+    [
+        'key' => 'google-ads',
+        'label' => 'Acquisition',
+        'href' => '/admin/google-ads/index.php',
+        'icon' => '📈',
+        'badge' => 'Pro',
+        'children' => [
+            ['label' => 'Stratégies', 'href' => '/admin/google-ads/index.php'],
+            ['label' => 'Campagnes', 'href' => '/admin/google-ads/campaigns.php'],
+            ['label' => 'ROI Ads', 'href' => '/admin/ads-roi.php'],
+        ],
+    ],
+    ['key' => 'traffic', 'label' => 'Trafic', 'href' => '/admin/traffic/index.php', 'icon' => '📢', 'badge' => null],
+    [
+        'key' => 'automations',
+        'label' => 'Automations',
+        'href' => '/admin/webhooks.php',
+        'icon' => '⚡',
+        'badge' => '7',
+        'children' => [
+            ['label' => 'Webhooks', 'href' => '/admin/webhooks.php'],
+            ['label' => 'Exports', 'href' => '/admin/settings.php#backup'],
+            ['label' => 'Rapports', 'href' => '/admin/export.php'],
+        ],
+    ],
+    ['key' => 'users', 'label' => 'Utilisateurs', 'href' => '/admin/users.php', 'icon' => '👥', 'badge' => null],
+    [
+        'key' => 'settings',
+        'label' => 'Paramètres',
+        'href' => '/admin/settings.php',
+        'icon' => '⚙️',
+        'badge' => null,
+        'children' => [
+            ['label' => 'Général', 'href' => '/admin/settings.php#general'],
+            ['label' => 'Société', 'href' => '/admin/settings.php#company'],
+            ['label' => 'Intégrations', 'href' => '/admin/settings.php#integrations'],
+        ],
+    ],
+];
 
 $adminResources = [
     ['label' => 'Centre d\'aide', 'href' => '/pages/faq.php'],
