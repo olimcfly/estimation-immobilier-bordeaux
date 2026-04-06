@@ -38,33 +38,48 @@ function installSendEmail(string $to, string $subject, string $html, string $fro
     return mail($to, $subject, $html, implode("\r\n", $headers));
 }
 
-function extractInstallTables(string $sqlPath): array
+function smtpHandshakeAndOptionalMail(array $cfg): array
 {
-    if (!is_file($sqlPath)) {
-        return [];
-    }
-    $content = file_get_contents($sqlPath);
-    preg_match_all('/CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?`?(\w+)`?/i', $content, $matches);
-    return $matches[1] ?? [];
-}
+    $host = trim($cfg['smtp_host'] ?? '');
+    $port = (int) ($cfg['smtp_port'] ?? 465);
+    $user = trim($cfg['smtp_user'] ?? '');
+    $pass = trim($cfg['smtp_pass'] ?? '');
 
-function getTablesChecklist(array $db, array $tables): array
-{
-    try {
-        $pdo = new PDO(
-            sprintf('mysql:host=%s;dbname=%s;charset=utf8mb4', $db['host'], $db['db_name']),
-            (string) $db['db_user'],
-            (string) $db['db_pass']
-        );
-        $existing = $pdo->query('SHOW TABLES')->fetchAll(PDO::FETCH_COLUMN);
-        $result = [];
-        foreach ($tables as $t) {
-            $result[$t] = in_array($t, $existing, true);
-        }
-        return $result;
-    } catch (Throwable $e) {
-        return [];
+    if ($host === '' || $user === '' || $pass === '') {
+        return ['success' => false, 'message' => 'Paramètres SMTP incomplets.'];
     }
+
+    $errno = 0;
+    $errstr = '';
+    $prefix = ($port === 465) ? 'ssl://' : '';
+    $conn = @fsockopen($prefix . $host, $port, $errno, $errstr, 10);
+
+    if (!$conn) {
+        return ['success' => false, 'message' => "Connexion échouée : $errstr ($errno)"];
+    }
+
+    $banner = fgets($conn, 512);
+
+    fputs($conn, "EHLO localhost\r\n");
+    $ehlo = fgets($conn, 512);
+
+    fputs($conn, "AUTH LOGIN\r\n");
+    $auth = fgets($conn, 512);
+
+    fputs($conn, base64_encode($user) . "\r\n");
+    fgets($conn, 512);
+
+    fputs($conn, base64_encode($pass) . "\r\n");
+    $loginResult = fgets($conn, 512);
+
+    fputs($conn, "QUIT\r\n");
+    fclose($conn);
+
+    if (strpos($loginResult, '235') === 0) {
+        return ['success' => true, 'message' => 'Connexion SMTP réussie et authentification OK.'];
+    }
+
+    return ['success' => false, 'message' => 'Authentification échouée : ' . trim($loginResult)];
 }
 
 if (isset($_GET['action']) && $_GET['action'] === 'test_db') {
