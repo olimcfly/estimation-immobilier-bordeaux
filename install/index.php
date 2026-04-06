@@ -7,117 +7,68 @@ session_start();
 $rootDir = dirname(__DIR__);
 $configDir = $rootDir . '/config';
 $configFile = $configDir . '/config.php';
-$databaseFile = $configDir . '/database.php';
-$installSqlPath = $rootDir . '/install.sql';
-$createLeadsSqlPath = $rootDir . '/sql/create_leads_table.sql';
+$installHtaccess = __DIR__ . '/.htaccess';
+$uploadDir = $rootDir . '/assets';
 
-/* ─── Helpers ─── */
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $step = (int) ($_POST['step'] ?? 1);
 
-function installRenderEmailTemplate(string $rootDir, string $template, array $data = []): string
-{
-    $templatePath = $rootDir . '/templates/emails/' . $template . '.php';
-    if (!is_file($templatePath)) return '';
-    extract($data, EXTR_SKIP);
-    ob_start();
-    require $templatePath;
-    return (string) ob_get_clean();
-}
-
-function installSendEmail(string $to, string $subject, string $html, string $fromName): bool
-{
-    $headers = [
-        'MIME-Version: 1.0',
-        'Content-type: text/html; charset=UTF-8',
-        sprintf('From: %s <%s>', $fromName, 'contact@estimia-bordeaux.fr'),
-        'Reply-To: contact@estimia-bordeaux.fr',
-        'X-Mailer: PHP/' . phpversion(),
-    ];
-    return mail($to, $subject, $html, implode("\r\n", $headers));
-}
-
-function smtpHandshakeAndOptionalMail(array $cfg): array
-{
-    $host = trim($cfg['smtp_host'] ?? '');
-    $port = (int) ($cfg['smtp_port'] ?? 465);
-    $user = trim($cfg['smtp_user'] ?? '');
-    $pass = trim($cfg['smtp_pass'] ?? '');
-
-    if ($host === '' || $user === '' || $pass === '') {
-        return ['success' => false, 'message' => 'Paramètres SMTP incomplets.'];
-    }
-
-    $prefix = ($port === 465) ? 'ssl://' : '';
-    $conn = @fsockopen($prefix . $host, $port, $errno, $errstr, 10);
-
-    if (!$conn) {
-        return ['success' => false, 'message' => "Connexion échouée : $errstr ($errno)"];
-    }
-
-    $readReply = function () use ($conn) {
-        $reply = '';
-        while ($line = fgets($conn, 512)) {
-            $reply .= $line;
-            if (isset($line[3]) && $line[3] === ' ') break;
-        }
-        return $reply;
-    };
-
-    $banner = $readReply();
-    fputs($conn, "EHLO localhost\r\n");
-    $ehlo = $readReply();
-
-    fputs($conn, "AUTH LOGIN\r\n");
-    $auth = $readReply();
-
-    if (strpos($auth, '334') !== 0) {
-        fputs($conn, "QUIT\r\n");
-        fclose($conn);
-        return ['success' => false, 'message' => 'AUTH LOGIN non supporté : ' . trim($auth)];
-    }
-
-    fputs($conn, base64_encode($user) . "\r\n");
-    $readReply();
-
-    fputs($conn, base64_encode($pass) . "\r\n");
-    $loginResult = $readReply();
-
-    fputs($conn, "QUIT\r\n");
-    fclose($conn);
-
-    if (strpos($loginResult, '235') === 0) {
-        return ['success' => true, 'message' => 'Connexion SMTP réussie et authentification OK.'];
-    }
-
-    return ['success' => false, 'message' => 'Authentification échouée : ' . trim($loginResult)];
-}
-
-function extractInstallTables(string $sqlPath): array
-{
-    if (!is_file($sqlPath)) return [];
-    $sql = (string) file_get_contents($sqlPath);
-    preg_match_all('/CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?`?(\w+)`?/i', $sql, $m);
-    return array_unique($m[1] ?? []);
-}
-
-function getTablesChecklist(array $db, array $expected): array
-{
-    try {
-        $pdo = new PDO(
-            sprintf('mysql:host=%s;dbname=%s;charset=utf8mb4', $db['host'], $db['db_name']),
-            $db['db_user'],
-            $db['db_pass'],
-            [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
+    if ($step >= 1 && $step <= 4) {
+        $_SESSION['install_wizard'] = array_merge(
+            $_SESSION['install_wizard'] ?? [],
+            [
+                'agence_nom' => trim((string) ($_POST['agence_nom'] ?? ($_SESSION['install_wizard']['agence_nom'] ?? ''))),
+                'ville_principale' => trim((string) ($_POST['ville_principale'] ?? ($_SESSION['install_wizard']['ville_principale'] ?? ''))),
+                'couleur' => trim((string) ($_POST['couleur'] ?? ($_SESSION['install_wizard']['couleur'] ?? '#1e3a5f'))),
+                'email_reception' => trim((string) ($_POST['email_reception'] ?? ($_SESSION['install_wizard']['email_reception'] ?? ''))),
+                'smtp_host' => trim((string) ($_POST['smtp_host'] ?? ($_SESSION['install_wizard']['smtp_host'] ?? ''))),
+                'smtp_port' => (int) ($_POST['smtp_port'] ?? ($_SESSION['install_wizard']['smtp_port'] ?? 587)),
+                'smtp_user' => trim((string) ($_POST['smtp_user'] ?? ($_SESSION['install_wizard']['smtp_user'] ?? ''))),
+                'smtp_pass' => (string) ($_POST['smtp_pass'] ?? ($_SESSION['install_wizard']['smtp_pass'] ?? '')),
+                'email_expediteur' => trim((string) ($_POST['email_expediteur'] ?? ($_SESSION['install_wizard']['email_expediteur'] ?? ''))),
+                'h1_titre' => trim((string) ($_POST['h1_titre'] ?? ($_SESSION['install_wizard']['h1_titre'] ?? ''))),
+                'sous_titre' => trim((string) ($_POST['sous_titre'] ?? ($_SESSION['install_wizard']['sous_titre'] ?? ''))),
+                'meta_description' => trim((string) ($_POST['meta_description'] ?? ($_SESSION['install_wizard']['meta_description'] ?? ''))),
+            ]
         );
-        $existing = $pdo->query('SHOW TABLES')->fetchAll(PDO::FETCH_COLUMN);
-        $result = [];
-        foreach ($expected as $t) {
-            $result[$t] = in_array($t, $existing, true);
+
+        if ($step === 1 && isset($_FILES['logo']) && is_uploaded_file($_FILES['logo']['tmp_name'])) {
+            if (!is_dir($uploadDir) && !mkdir($uploadDir, 0755, true) && !is_dir($uploadDir)) {
+                die('Impossible de créer le dossier assets/.');
+            }
+
+            $finfo = new finfo(FILEINFO_MIME_TYPE);
+            $mime = (string) $finfo->file($_FILES['logo']['tmp_name']);
+            $allowed = [
+                'image/png' => 'png',
+                'image/jpeg' => 'jpg',
+                'image/webp' => 'webp',
+                'image/svg+xml' => 'svg',
+            ];
+
+            if (isset($allowed[$mime])) {
+                $extension = $allowed[$mime];
+                $target = $uploadDir . '/logo.' . $extension;
+                if (!move_uploaded_file($_FILES['logo']['tmp_name'], $target)) {
+                    die('Impossible d\'enregistrer le logo uploadé.');
+                }
+                $_SESSION['install_wizard']['logo'] = 'assets/logo.' . $extension;
+            }
         }
-        return $result;
-    } catch (Throwable $e) {
-        return [];
-    }
-}
+
+        if ($step === 2) {
+            $rawCities = $_POST['villes'] ?? [];
+            $cities = [];
+            if (is_array($rawCities)) {
+                foreach ($rawCities as $city) {
+                    $city = trim((string) $city);
+                    if ($city !== '') {
+                        $cities[] = $city;
+                    }
+                }
+            }
+            $_SESSION['install_wizard']['villes'] = array_values(array_unique($cities));
+        }
 
 function tableExists(PDO $pdo, string $tableName): bool
 {
@@ -153,7 +104,7 @@ if ($step < 1 || $step > 5) $step = 1;
 $error = '';
 $installCompleted = false;
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$alreadyInstalled) {
+        unset($_SESSION['install_wizard']);
 
     if ($step === 3) {
         $_SESSION['install_site'] = [
@@ -177,6 +128,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$alreadyInstalled) {
         header('Location: ?step=4');
         exit;
     }
+}
 
     if ($step === 4) {
         $site = $_SESSION['install_site'] ?? [];
@@ -331,18 +283,8 @@ PHP;
     }
 }
 
-/* ─── Pré-calculs vue ─── */
-
-$requirements = [
-    'PHP >= 8.0'              => version_compare(PHP_VERSION, '8.0.0', '>='),
-    'Extension pdo'           => extension_loaded('pdo'),
-    'Extension pdo_mysql'     => extension_loaded('pdo_mysql'),
-    'Extension mbstring'      => extension_loaded('mbstring'),
-    'Extension json'          => extension_loaded('json'),
-    'Extension curl'          => extension_loaded('curl'),
-    'Dossier config/ writable' => is_dir($configDir) && is_writable($configDir),
-    'Dossier assets/ writable' => is_dir($rootDir . '/assets') && is_writable($rootDir . '/assets'),
-];
+$step = max(1, min(5, (int) ($_GET['step'] ?? 1)));
+$data = $_SESSION['install_wizard'] ?? [];
 
 $dbSession   = $_SESSION['install_db'] ?? ['host' => 'localhost', 'db_name' => '', 'db_user' => '', 'db_pass' => ''];
 $siteSession = $_SESSION['install_site'] ?? [
@@ -960,68 +902,10 @@ $stepLabels = ['Pré-requis', 'Base de données', 'Configuration', 'Clés IA', '
                         </div>
                     <?php endforeach; ?>
                 </div>
-            <?php endif; ?>
-        </div>
-
-    <!-- ════════ STEP 1 ════════ -->
-    <?php elseif (!$alreadyInstalled && $step === 1): ?>
-        <div class="card animate-in" style="animation-delay:.1s">
-            <div class="card-title">Vérification des pré-requis</div>
-            <div class="card-desc">Votre serveur doit remplir ces conditions avant de continuer.</div>
-
-            <ul class="checklist">
-                <?php foreach ($requirements as $label => $ok): ?>
-                    <li class="checklist-item">
-                        <span class="check-icon <?= $ok ? 'check-ok' : 'check-fail' ?>"><?= $ok ? '✓' : '✗' ?></span>
-                        <span class="checklist-label"><?= htmlspecialchars($label, ENT_QUOTES, 'UTF-8') ?></span>
-                    </li>
-                <?php endforeach; ?>
-            </ul>
-
-            <div class="btn-row">
-                <?php if ($allReqOk): ?>
-                    <a class="btn btn-primary" href="?step=2">Continuer →</a>
-                <?php else: ?>
-                    <span class="btn btn-ghost" style="opacity:.5;cursor:not-allowed">Pré-requis manquants</span>
-                <?php endif; ?>
-            </div>
-        </div>
-
-    <!-- ════════ STEP 2 ════════ -->
-    <?php elseif (!$alreadyInstalled && $step === 2): ?>
-        <div class="card animate-in" style="animation-delay:.1s">
-            <div class="card-title">Base de données</div>
-            <div class="card-desc">Connexion MySQL et création automatique du schéma.</div>
-
-            <form id="dbForm">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">Hôte</label>
-                        <input class="form-input" name="host" value="<?= htmlspecialchars((string) $dbSession['host'], ENT_QUOTES, 'UTF-8') ?>" placeholder="localhost">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Nom de la base</label>
-                        <input class="form-input" name="db_name" value="<?= htmlspecialchars((string) $dbSession['db_name'], ENT_QUOTES, 'UTF-8') ?>" required>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">Utilisateur</label>
-                        <input class="form-input" name="db_user" value="<?= htmlspecialchars((string) $dbSession['db_user'], ENT_QUOTES, 'UTF-8') ?>" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Mot de passe</label>
-                        <input class="form-input" type="password" name="db_pass" value="<?= htmlspecialchars((string) $dbSession['db_pass'], ENT_QUOTES, 'UTF-8') ?>">
-                    </div>
-                </div>
-
-                <div class="btn-row">
-                    <a class="btn btn-ghost" href="?step=1">← Retour</a>
-                    <button type="button" class="btn btn-outline-test" id="testDbBtn">
-                        <span class="spinner" id="dbSpinner"></span>
-                        Tester la connexion
-                    </button>
-                    <a class="btn btn-primary" href="?step=3">Suivant →</a>
+                <button type="button" id="add-city" class="mt-3 rounded-lg border px-3 py-2 text-sm">+ Ajouter une ville</button>
+                <div class="mt-5 flex gap-2">
+                    <a href="?step=1" class="rounded-lg border px-4 py-2">Retour</a>
+                    <button class="rounded-lg bg-blue-700 px-4 py-2 text-white">Continuer</button>
                 </div>
             </form>
             <div id="dbResult" style="margin-top:16px"></div>
@@ -1213,9 +1097,27 @@ $stepLabels = ['Pré-requis', 'Base de données', 'Configuration', 'Clés IA', '
                     </button>
                 </div>
             </form>
-        </div>
-    <?php endif; ?>
+        <?php endif; ?>
 
+        <?php if ($step === 5): ?>
+            <div class="mt-6 space-y-4 text-sm">
+                <p>Vérifiez les informations ci-dessous puis générez votre site.</p>
+                <ul class="list-disc space-y-1 pl-5 text-slate-700">
+                    <li><strong>Agence :</strong> <?= htmlspecialchars((string) ($data['agence_nom'] ?? ''), ENT_QUOTES); ?></li>
+                    <li><strong>Ville principale :</strong> <?= htmlspecialchars((string) ($data['ville_principale'] ?? ''), ENT_QUOTES); ?></li>
+                    <li><strong>Villes :</strong> <?= htmlspecialchars(implode(', ', $data['villes'] ?? []), ENT_QUOTES); ?></li>
+                    <li><strong>Email réception :</strong> <?= htmlspecialchars((string) ($data['email_reception'] ?? ''), ENT_QUOTES); ?></li>
+                </ul>
+                <form method="post">
+                    <input type="hidden" name="step" value="5">
+                    <div class="flex gap-2">
+                        <a href="?step=4" class="rounded-lg border px-4 py-2">Retour</a>
+                        <button class="rounded-lg bg-emerald-600 px-4 py-2 font-semibold text-white">Générer mon site</button>
+                    </div>
+                </form>
+            </div>
+        <?php endif; ?>
+    </div>
 </div>
 
 <script>
@@ -1245,19 +1147,6 @@ $stepLabels = ['Pré-requis', 'Base de données', 'Configuration', 'Clés IA', '
                 dbBtn.disabled = false;
             }
         });
-    }
-
-    /* ── SMTP Test ── */
-    const smtpBtn = document.getElementById('testSmtpBtn');
-    if (smtpBtn) {
-        smtpBtn.addEventListener('click', async () => {
-            const result = document.getElementById('smtpResult');
-            const spinner = document.getElementById('smtpSpinner');
-            const fd = new FormData();
-            fd.append('smtp_host', document.getElementById('smtp_host').value);
-            fd.append('smtp_port', document.getElementById('smtp_port').value);
-            fd.append('smtp_user', document.getElementById('smtp_user').value);
-            fd.append('smtp_pass', document.getElementById('smtp_pass').value);
 
             spinner.style.display = 'inline-block';
             smtpBtn.disabled = true;
@@ -1390,6 +1279,5 @@ $stepLabels = ['Pré-requis', 'Base de données', 'Configuration', 'Clés IA', '
         });
     }
 </script>
-
 </body>
 </html>
