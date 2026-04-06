@@ -38,6 +38,35 @@ function installSendEmail(string $to, string $subject, string $html, string $fro
     return mail($to, $subject, $html, implode("\r\n", $headers));
 }
 
+function extractInstallTables(string $sqlPath): array
+{
+    if (!is_file($sqlPath)) {
+        return [];
+    }
+    $content = file_get_contents($sqlPath);
+    preg_match_all('/CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?`?(\w+)`?/i', $content, $matches);
+    return $matches[1] ?? [];
+}
+
+function getTablesChecklist(array $db, array $tables): array
+{
+    try {
+        $pdo = new PDO(
+            sprintf('mysql:host=%s;dbname=%s;charset=utf8mb4', $db['host'], $db['db_name']),
+            (string) $db['db_user'],
+            (string) $db['db_pass']
+        );
+        $existing = $pdo->query('SHOW TABLES')->fetchAll(PDO::FETCH_COLUMN);
+        $result = [];
+        foreach ($tables as $t) {
+            $result[$t] = in_array($t, $existing, true);
+        }
+        return $result;
+    } catch (Throwable $e) {
+        return [];
+    }
+}
+
 if (isset($_GET['action']) && $_GET['action'] === 'test_db') {
     header('Content-Type: application/json; charset=utf-8');
 
