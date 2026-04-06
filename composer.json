@@ -1,0 +1,6 @@
+{
+  "name": "estimateur-immobilier/installation-dvf",
+  "description": "Installateur de Estimateur Immobilier avec base DVF",
+  "type": "project",
+  "require": {}
+}
