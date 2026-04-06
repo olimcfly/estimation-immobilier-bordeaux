@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-require_once '../config/config.php';
-require_once '../config/database.php';
-require_once '../includes/admin-auth.php';
+require_once __DIR__ . '/../includes/config.php';
+require_once __DIR__ . '/../includes/database.php';
+require_once __DIR__ . '/../includes/admin-auth.php';
 
 $type = $_GET['type'] ?? '';
 $db = Database::getConnection();

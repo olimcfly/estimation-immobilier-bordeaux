@@ -1,6 +1,6 @@
 <?php
 $pageTitle = "Google Ads - Guide & Générateur";
-require_once __DIR__ . '/../includes/admin_header.php';
+require_once __DIR__ . '/admin_header.php';
 
 $ville = defined('CITY_NAME') ? CITY_NAME : 'Votre ville';
 $rayon = defined('CITY_RADIUS_KM') ? (int) CITY_RADIUS_KM : 15;
@@ -644,4 +644,4 @@ function completeGuide() {
 }
 </script>
 
-<?php require_once __DIR__ . '/../includes/admin_footer.php'; ?>
+<?php require_once __DIR__ . '/admin_footer.php'; ?>
