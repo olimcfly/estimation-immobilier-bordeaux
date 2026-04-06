@@ -27,7 +27,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $estimationId = (int) $db->lastInsertId();
 
-    // Envoyer l'email de résultat au client
     $mailer = new Mailer();
     $mailer->send(
         $email,
@@ -52,3 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header('Location: /?estimation=success&id=' . $estimationId);
     exit;
 }
+
+require __DIR__ . '/templates/header.php';
+require __DIR__ . '/templates/home.php';
+require __DIR__ . '/templates/footer.php';
