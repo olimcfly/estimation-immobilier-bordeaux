@@ -8,7 +8,7 @@ define('SITE_PHONE', '');
 
 // Base de données
 define('DB_HOST', 'localhost');
-define('DB_NAME', 'sc2tasq5564_estimia');
+define('DB_NAME', 'sc2tasq5564_bordeaux');
 define('DB_USER', 'sc2tasq5564_estimia');
 define('DB_PASS', ''); // À remplir
 
