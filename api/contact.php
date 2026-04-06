@@ -19,7 +19,7 @@ function normalize(string $value): string
     return trim($value);
 }
 
-function computeBantScore(string $projet, string $decisionnaire, string $delai, string $budget): int
+function computeBantScore(string $projet, string $decisionnaire, string $delai, string $budget, string $methodeVente): int
 {
     $scoreProjet = match ($projet) {
         'Vendre mon bien' => 30,
@@ -51,7 +51,15 @@ function computeBantScore(string $projet, string $decisionnaire, string $delai, 
         default => 0,
     };
 
-    return min(100, $scoreProjet + $scoreDecisionnaire + $scoreDelai + $scoreBudget);
+    $scoreMethodeVente = match ($methodeVente) {
+        'Agence' => 5,
+        'Coach' => 10,
+        'Je ne sais pas' => 3,
+        'Seul' => 0,
+        default => 0,
+    };
+
+    return min(100, $scoreProjet + $scoreDecisionnaire + $scoreDelai + $scoreBudget + $scoreMethodeVente);
 }
 
 function sendAdminNotification(array $lead, int $score): bool
@@ -71,6 +79,8 @@ function sendAdminNotification(array $lead, int $score): bool
         . '<p><strong>Email:</strong> ' . htmlspecialchars((string) $lead['email'], ENT_QUOTES, 'UTF-8') . '</p>'
         . '<hr>'
         . '<p><strong>Projet:</strong> ' . htmlspecialchars((string) $lead['projet'], ENT_QUOTES, 'UTF-8') . '</p>'
+        . '<p><strong>Méthode de vente:</strong> ' . htmlspecialchars((string) $lead['methode_vente'], ENT_QUOTES, 'UTF-8') . '</p>'
+        . '<p><strong>Source:</strong> ' . htmlspecialchars((string) $lead['source_site'], ENT_QUOTES, 'UTF-8') . '</p>'
         . '<p><strong>Décisionnaire:</strong> ' . htmlspecialchars((string) $lead['decisionnaire'], ENT_QUOTES, 'UTF-8') . '</p>'
         . '<p><strong>Budget:</strong> ' . htmlspecialchars((string) $lead['budget_bant'], ENT_QUOTES, 'UTF-8') . '</p>'
         . '<p><strong>Délai:</strong> ' . htmlspecialchars((string) $lead['delai'], ENT_QUOTES, 'UTF-8') . '</p>'
@@ -106,6 +116,8 @@ try {
         'telephone' => normalize((string) ($_POST['telephone'] ?? '')),
         'email' => normalize((string) ($_POST['email'] ?? '')),
         'projet' => normalize((string) ($_POST['projet'] ?? '')),
+        'methode_vente' => normalize((string) ($_POST['methode_vente'] ?? '')),
+        'source_site' => normalize((string) ($_POST['source_site'] ?? '')),
         'decisionnaire' => normalize((string) ($_POST['decisionnaire'] ?? '')),
         'budget_bant' => normalize((string) ($_POST['budget_bant'] ?? '')),
         'delai' => normalize((string) ($_POST['delai'] ?? '')),
@@ -131,7 +143,7 @@ try {
         ]);
     }
 
-    $requiredBant = ['projet', 'decisionnaire', 'budget_bant', 'delai', 'raison'];
+    $requiredBant = ['projet', 'methode_vente', 'source_site', 'decisionnaire', 'budget_bant', 'delai', 'raison'];
     foreach ($requiredBant as $field) {
         if ($lead[$field] === '') {
             jsonResponse([
@@ -141,7 +153,7 @@ try {
         }
     }
 
-    $scoreBant = computeBantScore($lead['projet'], $lead['decisionnaire'], $lead['delai'], $lead['budget_bant']);
+    $scoreBant = computeBantScore($lead['projet'], $lead['decisionnaire'], $lead['delai'], $lead['budget_bant'], $lead['methode_vente']);
 
     $db = Database::getConnection();
 
@@ -153,6 +165,8 @@ try {
             telephone VARCHAR(30),
             email VARCHAR(255),
             projet VARCHAR(50),
+            methode_vente VARCHAR(100),
+            source_site VARCHAR(100),
             decisionnaire VARCHAR(50),
             budget_bant VARCHAR(50),
             delai VARCHAR(50),
@@ -168,6 +182,8 @@ try {
 
     $schemaUpdates = [
         'ALTER TABLE leads ADD COLUMN projet VARCHAR(50)',
+        'ALTER TABLE leads ADD COLUMN methode_vente VARCHAR(100)',
+        'ALTER TABLE leads ADD COLUMN source_site VARCHAR(100)',
         'ALTER TABLE leads ADD COLUMN decisionnaire VARCHAR(50)',
         'ALTER TABLE leads ADD COLUMN budget_bant VARCHAR(50)',
         'ALTER TABLE leads ADD COLUMN delai VARCHAR(50)',
@@ -190,9 +206,9 @@ try {
 
     $insert = $db->prepare(
         'INSERT INTO leads
-        (prenom, telephone, email, projet, decisionnaire, budget_bant, delai, raison, type_bien, ville, surface_tranche, estimation_basse, estimation_haute, score_bant)
+        (prenom, telephone, email, projet, methode_vente, source_site, decisionnaire, budget_bant, delai, raison, type_bien, ville, surface_tranche, estimation_basse, estimation_haute, score_bant)
         VALUES
-        (:prenom, :telephone, :email, :projet, :decisionnaire, :budget_bant, :delai, :raison, :type_bien, :ville, :surface_tranche, :estimation_basse, :estimation_haute, :score_bant)'
+        (:prenom, :telephone, :email, :projet, :methode_vente, :source_site, :decisionnaire, :budget_bant, :delai, :raison, :type_bien, :ville, :surface_tranche, :estimation_basse, :estimation_haute, :score_bant)'
     );
 
     $insert->execute([
@@ -200,6 +216,8 @@ try {
         'telephone' => $lead['telephone'],
         'email' => $lead['email'],
         'projet' => $lead['projet'],
+        'methode_vente' => $lead['methode_vente'],
+        'source_site' => $lead['source_site'],
         'decisionnaire' => $lead['decisionnaire'],
         'budget_bant' => $lead['budget_bant'],
         'delai' => $lead['delai'],
