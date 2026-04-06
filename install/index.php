@@ -9,6 +9,7 @@ $configDir = $rootDir . '/config';
 $configFile = $configDir . '/config.php';
 $databaseFile = $configDir . '/database.php';
 $installSqlPath = $rootDir . '/install.sql';
+$createLeadsSqlPath = $rootDir . '/sql/create_leads_table.sql';
 
 /* ─── Helpers ─── */
 
@@ -118,6 +119,30 @@ function getTablesChecklist(array $db, array $expected): array
     }
 }
 
+function tableExists(PDO $pdo, string $tableName): bool
+{
+    $stmt = $pdo->prepare(
+        'SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = :table_name'
+    );
+    $stmt->execute(['table_name' => $tableName]);
+    return (int) $stmt->fetchColumn() > 0;
+}
+
+function applySqlFileIfTableMissing(PDO $pdo, string $tableName, string $sqlPath): void
+{
+    if (tableExists($pdo, $tableName)) {
+        return;
+    }
+    if (!is_file($sqlPath)) {
+        throw new RuntimeException(basename($sqlPath) . ' introuvable.');
+    }
+    $sql = trim((string) file_get_contents($sqlPath));
+    if ($sql === '') {
+        throw new RuntimeException(basename($sqlPath) . ' est vide.');
+    }
+    $pdo->exec($sql);
+}
+
 /* ─── AJAX: Test DB ─── */
 
 if (isset($_GET['action']) && $_GET['action'] === 'test_db') {
@@ -143,6 +168,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'test_db') {
         $sql = (string) file_get_contents($installSqlPath);
         if ($sql === '') throw new RuntimeException('Le fichier install.sql est vide.');
         $pdo->exec($sql);
+        applySqlFileIfTableMissing($pdo, 'leads', $createLeadsSqlPath);
         $_SESSION['install_db'] = ['host' => $host, 'db_name' => $dbName, 'db_user' => $dbUser, 'db_pass' => $dbPass];
         echo json_encode(['success' => true, 'message' => 'Connexion OK et schéma SQL appliqué.']);
     } catch (Throwable $e) {
@@ -281,6 +307,7 @@ PHP;
                     $db['db_user'], $db['db_pass'],
                     [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
                 );
+                applySqlFileIfTableMissing($pdo, 'leads', $createLeadsSqlPath);
 
                 $nameParts     = preg_split('/\s+/', trim((string) $site['site_name'])) ?: [];
                 $defaultPrenom = isset($nameParts[0]) && $nameParts[0] !== '' ? $nameParts[0] : 'Admin';

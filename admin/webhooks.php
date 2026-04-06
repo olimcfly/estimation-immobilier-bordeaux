@@ -53,7 +53,11 @@ $lastSuccess = $stats['last_success'] ?? 'Aucun envoi réussi';
 
 $rows = $db->query('SELECT * FROM webhook_logs ORDER BY id DESC LIMIT 100')->fetchAll(PDO::FETCH_ASSOC);
 
-include __DIR__ . '/../includes/header.php';
+$pageTitle = 'Webhooks';
+$currentPage = 'webhooks';
+$topNavCurrent = 'settings';
+require_once __DIR__ . '/includes/header.php';
+require_once __DIR__ . '/includes/sidebar.php';
 ?>
 <section class="space-y-6">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -140,4 +144,4 @@ include __DIR__ . '/../includes/header.php';
         </table>
     </div>
 </section>
-<?php include __DIR__ . '/../includes/footer.php'; ?>
+<?php require_once __DIR__ . '/includes/footer.php'; ?>

@@ -201,10 +201,10 @@ if ($pdo instanceof PDO) {
     }
 }
 
-$headerPath = __DIR__ . '/admin_header.php';
-if (file_exists($headerPath)) {
-    include $headerPath;
-}
+$currentPage = 'google-ads';
+$topNavCurrent = 'google-ads';
+require_once __DIR__ . '/includes/header.php';
+require_once __DIR__ . '/includes/sidebar.php';
 ?>
 
 <style>
@@ -726,3 +726,5 @@ if (file_exists($headerPath)) {
     renderEditor();
 })();
 </script>
+
+<?php require_once __DIR__ . '/includes/footer.php'; ?>

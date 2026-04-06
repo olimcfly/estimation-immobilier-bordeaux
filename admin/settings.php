@@ -6,7 +6,10 @@ $pageTitle = 'Paramètres';
 
 require_once __DIR__ . '/../includes/database.php';
 require_once __DIR__ . '/../classes/Settings.php';
-require_once __DIR__ . '/admin_header.php';
+$currentPage = 'settings';
+$topNavCurrent = 'settings';
+require_once __DIR__ . '/includes/header.php';
+require_once __DIR__ . '/includes/sidebar.php';
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -495,10 +498,6 @@ try {
                     <li>Espace disque libre : <strong><?= $systemInfo['disk_free'] !== null ? h(number_format((float) $systemInfo['disk_free'] / 1024 / 1024 / 1024, 2, ',', ' ')) . ' GB' : 'N/A' ?></strong></li>
                 </ul>
             </section>
-        </main>
-    </div>
-</div>
-
 <script>
 const colorInput = document.getElementById('site_color');
 const colorPreview = document.getElementById('color_preview');
@@ -555,3 +554,5 @@ if (testWebhookBtn) {
     testWebhookBtn.addEventListener('click', () => postTest('ajax/test_webhook.php', 'Webhook de test envoyé (si la route est disponible).'));
 }
 </script>
+
+<?php require_once __DIR__ . '/includes/footer.php'; ?>
