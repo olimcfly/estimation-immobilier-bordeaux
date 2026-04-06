@@ -25,7 +25,12 @@ if (!isset($adminMenu) || !is_array($adminMenu)) {
     <nav class="space-y-2 text-sm" aria-label="Navigation principale">
         <?php foreach ($adminMenu as $index => $item): ?>
             <?php
-            $isActive = $currentPage === $item['key'];
+            $requestUri = isset($_SERVER['REQUEST_URI']) ? (string) $_SERVER['REQUEST_URI'] : '';
+            $itemHref = isset($item['href']) ? (string) $item['href'] : '';
+            $itemKey = isset($item['key']) ? (string) $item['key'] : '';
+            $isActive = ($itemKey !== '' && strpos($requestUri, $itemKey) !== false)
+                || ($itemHref !== '' && strpos($requestUri, $itemHref) !== false)
+                || $currentPage === $itemKey;
             $submenuId = 'submenu-' . $index;
             $hasChildren = !empty($item['children']) && is_array($item['children']);
             $badge = isset($item['badge']) ? (string) $item['badge'] : '';
