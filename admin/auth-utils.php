@@ -37,6 +37,16 @@ function adminEnsureTables(PDO $db): void
     );
 }
 
+
+function adminLowercase(string $value): string
+{
+    if (function_exists('mb_strtolower')) {
+        return mb_strtolower($value, 'UTF-8');
+    }
+
+    return strtolower($value);
+}
+
 function adminRenderEmailTemplate(string $template, array $data = []): string
 {
     $templatePath = __DIR__ . '/../templates/emails/' . $template . '.php';

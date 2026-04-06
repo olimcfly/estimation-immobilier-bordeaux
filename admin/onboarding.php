@@ -29,7 +29,7 @@ try {
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $prenomValue = trim((string) ($_POST['prenom'] ?? ''));
         $nomValue = trim((string) ($_POST['nom'] ?? ''));
-        $emailValue = mb_strtolower(trim((string) ($_POST['email'] ?? '')));
+        $emailValue = adminLowercase(trim((string) ($_POST['email'] ?? '')));
 
         if ($prenomValue === '' || $nomValue === '' || $emailValue === '') {
             $error = 'Tous les champs sont obligatoires.';

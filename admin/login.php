@@ -26,7 +26,7 @@ try {
     }
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $emailValue = mb_strtolower(trim((string) ($_POST['email'] ?? '')));
+        $emailValue = adminLowercase(trim((string) ($_POST['email'] ?? '')));
 
         if ($emailValue === '' || !filter_var($emailValue, FILTER_VALIDATE_EMAIL)) {
             $error = 'Veuillez saisir une adresse email valide.';
