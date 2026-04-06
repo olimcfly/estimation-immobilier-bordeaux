@@ -1,189 +1,65 @@
-# Plan SEO + Google Ads + Automatisation (Bordeaux)
+# Plan SEO/SEA + Automatisation – Bordeaux
 
-Ce document sert de plan d'exécution pour un site d'estimation immobilière en **PHP natif + MySQL**, orienté génération de leads vendeurs, avec extension vers acheteurs et investisseurs.
+## 1. Objectifs
+- **SEO** : Générer 50% du trafic via les pages "Estimation" et le blog.
+- **Google Ads** : Cibler 20 mots-clés high intent (ex: "estimation appartement Bordeaux Chartrons").
+- **Automatisation** : Créer 50+ pages en 1 semaine via des templates PHP.
 
-## 1) Arborescence SEO recommandée (silos)
+## 2. Lexique de mots-clés
 
-### Silo 1 — Estimation (intention: obtenir un prix)
-- `/estimation/`
-- `/estimation/appartement/`
-- `/estimation/maison/`
-- `/estimation/loft/`
-- `/estimation/{type-bien}/{ville}/`
-- `/estimation/{type-bien}/{ville}/{quartier}/`
+| Mot-clé | Volume/mois | Intent | Page cible |
+|---|---:|---|---|
+| estimation appartement bordeaux chartrons | 1200 | High | `/estimation/appartement/bordeaux/chartrons/` |
+| vendre maison mérignac | 800 | High | `/vendre/maison/merignac/` |
+| prix m2 bordeaux 2024 | 2500 | SEO | `/blog/prix-m2-bordeaux-2024/` |
 
-Exemples:
-- `/estimation/appartement/bordeaux/chartrons/`
-- `/estimation/maison/merignac/`
-- `/estimation/loft/bordeaux/centre/`
+## 3. Implémentation technique
 
-### Silo 2 — Vendre (intention: mandat / prise de contact)
-- `/vendre/`
-- `/vendre/{type-bien}/{ville}/`
-- `/vendre/{type-bien}/{ville}/{quartier}/`
+### Classes SEO
+- `core/classes/SEO/KeywordManager.php`
+  - Lecture des mots-clés en base `seo_keywords` par `type_bien`, `ville`, `quartier`.
+  - Génération d'un `title` SEO à partir du mot-clé principal.
+- `core/classes/SEO/PageGenerator.php`
+  - Génération du HTML d'une page estimation depuis `core/templates/seo/estimation.php`.
+  - Injection `TITLE`, `H1`, `META_DESCRIPTION`, `KEYWORDS`.
+- `core/classes/SEO/SchemaMarkup.php`
+  - Génération `RealEstateAgent` et `FAQPage`.
+- `core/classes/SEO/GoogleAdsAPI.php`
+  - Construction d'événements de conversion (pré-intégration API).
 
-Exemples:
-- `/vendre/maison/merignac/`
-- `/vendre/appartement/bordeaux/cauderan/`
+### Routes
+- `/estimation/{type}/{ville}/{quartier?}` -> `core/pages/estimation.php`
+- `/blog/{slug}` -> `core/pages/blog.php`
+- `/vendre/{type}/{ville}` -> `core/pages/vente.php`
 
-### Silo 3 — Achat (intention: acquéreur)
-- `/acheter/`
-- `/acheter/{type-bien}/{ville}/`
-- `/acheter/{type-bien}/{ville}/{quartier}/`
+### Templates
+- `core/templates/seo/meta.php`
+- `core/templates/seo/schema.php`
+- `core/templates/seo/estimation.php`
 
-### Silo 4 — Investissement (intention: rendement)
-- `/investir/`
-- `/investir/{ville}/`
-- `/investir/{ville}/{quartier}/`
+### Configuration locale
+- `site-specific/config/site.php`
+  - villes/quartiers/types de biens ciblés
+  - paramètres Google Ads (`client_id`, `conversion_id`)
 
-### Silo 5 — Blog (capture long terme)
-- `/blog/`
-- `/blog/prix-immobilier-bordeaux-2026/`
-- `/blog/meilleurs-quartiers-investir-bordeaux/`
-- `/blog/rendement-locatif-merignac/`
+## 4. Scripts d'automatisation
 
-## 2) Mapping mots-clés -> pages
-
-### A. High intent (pages transactionnelles)
-- `estimation gratuite appartement bordeaux` -> `/estimation/appartement/bordeaux/`
-- `prix m2 bordeaux chartrons` -> `/estimation/appartement/bordeaux/chartrons/`
-- `vendre maison merignac rapidement` -> `/vendre/maison/merignac/`
-
-### B. Mid intent (comparaison / guide)
-- `agence estimation bordeaux` -> `/estimation/`
-- `combien vaut mon appartement bordeaux` -> `/estimation/appartement/bordeaux/`
-
-### C. Long terme (blog)
-- `prix immobilier bordeaux 2026` -> `/blog/prix-immobilier-bordeaux-2026/`
-- `meilleurs quartiers pour investir à bordeaux` -> `/blog/meilleurs-quartiers-investir-bordeaux/`
-
-## 3) Structure Google Ads (Search)
-
-## Campagnes recommandées
-1. `SEA | Estimation | Bordeaux`
-2. `SEA | Vendre | Mérignac`
-3. `SEA | Vendre | Bordeaux Quartiers`
-4. `SEA | Investir | Bordeaux`
-
-## Groupes d'annonces (ad groups)
-- Par **intention**: Estimer / Vendre / Acheter / Investir
-- Puis par **type de bien**: Appartement / Maison / Loft
-- Puis par **zone**: Ville / Quartier
-
-Exemple: `SEA | Estimation | Bordeaux`
-- AG 1: `Appartement Bordeaux`
-- AG 2: `Maison Bordeaux`
-- AG 3: `Appartement Chartrons`
-
-## Règles clés
-- Correspondances: Exact + Expression en priorité.
-- Mots-clés négatifs globaux: `location`, `stage`, `emploi`, `gratuit pdf`, etc.
-- 1 landing page ultra-alignée par ad group.
-- Extensions: accroches ("estimation en 2 min"), sitelinks (quartiers), extension lieu et appel.
-
-## 4) Automatisation des pages en PHP natif
-
-## 4.1 Modèle de table MySQL (lexique)
-
-```sql
-CREATE TABLE keyword_lexicon (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  intent ENUM('estimer','vendre','acheter','investir','blog') NOT NULL,
-  property_type VARCHAR(50) NOT NULL,
-  city VARCHAR(80) NOT NULL,
-  district VARCHAR(80) DEFAULT NULL,
-  main_keyword VARCHAR(255) NOT NULL,
-  secondary_keywords JSON NULL,
-  cpc_estimate DECIMAL(10,2) DEFAULT NULL,
-  priority TINYINT DEFAULT 3,
-  status ENUM('active','paused') DEFAULT 'active',
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+### Génération de pages
+```bash
+php core/scripts/generate_pages.php --type=appartement --ville=bordeaux --quartier=chartrons
 ```
 
-## 4.2 Route unique + paramètres SEO
-
-Créer un routeur (ou règle `.htaccess`) vers un contrôleur unique, puis charger un template selon `intent` + `type-bien`.
-
-```php
-<?php
-// core/pages/landing-dynamic.php
-$intent = $_GET['intent'] ?? 'estimer';
-$type   = $_GET['type'] ?? 'appartement';
-$city   = $_GET['city'] ?? 'bordeaux';
-$area   = $_GET['district'] ?? null;
-
-$kw = $keywordRepository->findBestKeyword($intent, $type, $city, $area);
-
-$title = ucfirst($kw['main_keyword']) . ' | Estimation Immobilière Bordeaux';
-$description = sprintf(
-    "Obtenez une %s de votre %s à %s%s. Résultat rapide et gratuit.",
-    $intent === 'estimer' ? 'estimation' : $intent,
-    $type,
-    ucfirst($city),
-    $area ? ' (' . ucfirst($area) . ')' : ''
-);
-$h1 = ucfirst($kw['main_keyword']);
-$canonical = 'https://www.exemple.fr/' . $intent . '/' . $type . '/' . $city . ($area ? '/' . $area : '') . '/';
+### Import du lexique
+```bash
+php core/scripts/import_keywords.php --file=lexique.csv
 ```
 
-## 4.3 Gabarits SEO automatiques
+## 5. Structure Google Ads
+- Groupe "Estimation Bordeaux": `estimation appartement bordeaux`, `prix m2 bordeaux`.
+- Groupe "Vente Mérignac": `vendre maison mérignac`, `agence immobilière mérignac`.
+- Landing dédiée par groupe avec correspondance stricte intention -> page.
 
-Règles simples:
-- `title`: `[mot-clé principal] | [marque]`
-- `meta description`: bénéfice + zone + CTA
-- `H1`: exact match ou variante proche du mot-clé principal
-
-## 5) Recommandations SEO technique
-
-- Utiliser une **balise canonique** unique sur toutes les pages locales.
-- Générer un **sitemap XML dynamique** pour les pages `intent/type/ville/quartier` actives.
-- Mettre en place `schema.org`:
-  - `RealEstateAgent` ou `LocalBusiness` sur pages locales.
-  - `FAQPage` sur pages estimation/vendre avec questions utiles.
-  - `BreadcrumbList` sur toutes les pages de silo.
-- Performance:
-  - images WebP + `loading="lazy"`
-  - CSS critique inline sur templates SEO
-  - cache HTTP (`Cache-Control`) et compression Brotli/Gzip
-
-## 6) Stratégie éditoriale (blog)
-
-### Clusters prioritaires
-1. `Prix au m² Bordeaux` (update mensuelle)
-2. `Investir par quartier` (guides durables)
-3. `Vendre rapidement` (guides pratiques + checklist)
-
-### Cadence minimale
-- 2 articles/mois evergreen.
-- 1 page data update/mois (prix, tendances, tension locative).
-
-## 7) KPI à suivre (SEO + SEA)
-
-- SEO:
-  - leads organiques (formulaire estimation)
-  - positions top 3/10 sur requêtes high intent
-  - trafic non-marque sur silos estimation/vendre
-- SEA:
-  - taux de conversion par campagne et ad group
-  - coût par lead (CPL)
-  - Quality Score par groupe d'annonces
-
-## 8) Plan d'implémentation en 30 jours
-
-Semaine 1:
-- finaliser taxonomy `intent/type/ville/quartier`
-- préparer table `keyword_lexicon`
-- définir templates SEO + variables
-
-Semaine 2:
-- déployer routeur dynamique + pages estimation/vendre
-- publier 5 pages high intent (Bordeaux + Mérignac)
-
-Semaine 3:
-- lancer 2 campagnes Google Ads (Estimation + Vendre)
-- brancher tracking conversions (form_submit, call_click)
-
-Semaine 4:
-- publier 2 articles blog
-- optimiser annonces et pages selon premiers taux de conversion
+## 6. Suivi
+- **SEO** : Google Search Console (impressions, CTR, positions).
+- **Google Ads** : taux de conversion et CPL par mot-clé.
+- **Automatisation** : logs de génération dans `var/logs/generation.log`.

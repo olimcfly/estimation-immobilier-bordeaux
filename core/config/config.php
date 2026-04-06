@@ -27,6 +27,34 @@ define('AI_ANTHROPIC_KEY', '');
 define('AI_PERPLEXITY_KEY', '');
 define('AI_MISTRAL_KEY', '');
 
+// Google Ads
+define('GOOGLE_ADS_DEVELOPER_TOKEN', '');
+define('GOOGLE_ADS_CUSTOMER_ID', '');
+define('GOOGLE_ADS_CLIENT_ID', '');
+define('GOOGLE_ADS_CLIENT_SECRET', '');
+define('GOOGLE_ADS_REFRESH_TOKEN', '');
+
+// SEO / Ads lexicon seeds (overridable by DB in production)
+define('SEO_KEYWORD_SEEDS', [
+    'estimer' => [
+        'estimation gratuite appartement bordeaux',
+        'prix m2 bordeaux chartrons',
+    ],
+    'vendre' => [
+        'vendre maison merignac rapidement',
+        'vendre appartement bordeaux',
+    ],
+    'acheter' => [
+        'acheter loft bordeaux centre',
+    ],
+    'investir' => [
+        'investir immobilier bordeaux',
+    ],
+    'blog' => [
+        'prix immobilier bordeaux 2026',
+    ],
+]);
+
 // Sécurité
 define('ADMIN_EMAIL', 'admin@estimia-bordeaux.fr');
 define('SECRET_KEY', bin2hex(random_bytes(32)));

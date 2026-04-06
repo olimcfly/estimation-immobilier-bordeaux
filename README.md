@@ -54,3 +54,13 @@ estimation-immobilier-bordeaux/
 ## Ressources
 
 - Plan SEO/SEA + automatisation: `docs/plan-seo-ads-automation-bordeaux.md`
+
+## Intégration SEO/Ads (implémentation)
+
+- Gestion du lexique: `core/classes/SEO/KeywordManager.php`
+- Génération de pages SEO: `core/classes/SEO/PageGenerator.php`
+- Schema.org: `core/classes/SEO/SchemaMarkup.php`
+- Préparation intégration Google Ads: `core/classes/SEO/GoogleAdsAPI.php`
+- Page dynamique estimation: `core/pages/estimation.php`
+- Templates SEO: `core/templates/seo/meta.php`, `core/templates/seo/schema.php`, `core/templates/seo/estimation.php`
+- Scripts utilitaires: `core/scripts/generate_pages.php`, `core/scripts/import_keywords.php`

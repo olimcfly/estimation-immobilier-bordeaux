@@ -1,5 +1,10 @@
 RewriteEngine On
 
+# SEO pages
+RewriteRule ^estimation/([a-z-]+)/([a-z-]+)(?:/([a-z-]+))?/?$ core/pages/estimation.php?type=$1&ville=$2&quartier=$3 [L,QSA]
+RewriteRule ^blog/([a-z0-9-]+)/?$ core/pages/blog.php?slug=$1 [L,QSA]
+RewriteRule ^vendre/([a-z-]+)/([a-z-]+)/?$ core/pages/vente.php?type=$1&ville=$2 [L,QSA]
+
 # Core routing
 RewriteRule ^admin/(.*)$ core/admin/$1 [L,QSA]
 RewriteRule ^api/(.*)$ core/api/$1 [L,QSA]
