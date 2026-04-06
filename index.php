@@ -102,16 +102,94 @@ declare(strict_types=1);
 
                 <hr class="my-6 border-slate-200">
 
-                <p class="text-center text-sm text-slate-700">Pour affiner cette estimation, parlez à un conseiller</p>
-
-                <form class="mt-4 space-y-3">
-                    <input type="text" placeholder="Prénom" class="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm focus:border-blue-500 focus:outline-none">
-                    <input type="tel" placeholder="Téléphone" class="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm focus:border-blue-500 focus:outline-none">
-                    <input type="email" placeholder="Email" class="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm focus:border-blue-500 focus:outline-none">
-                    <button type="button" class="w-full rounded-xl bg-blue-600 px-4 py-3 font-semibold text-white transition hover:bg-blue-700">
-                        Me faire rappeler
+                <div id="result-workflow" class="space-y-4">
+                    <p class="text-center text-sm text-slate-700">Pour affiner cette estimation, parlez à un conseiller.</p>
+                    <button id="start-bant" type="button" class="w-full rounded-xl bg-gradient-to-r from-blue-700 to-indigo-600 px-4 py-3 font-bold text-white transition hover:from-blue-800 hover:to-indigo-700">
+                        Affiner avec un conseiller
                     </button>
-                </form>
+
+                    <form id="bant-form" class="pointer-events-none max-h-0 -translate-y-2 space-y-4 overflow-hidden opacity-0 transition-all duration-500">
+                        <div>
+                            <p class="mb-2 text-sm font-semibold text-slate-700">Quel est votre projet ?</p>
+                            <div id="projet-pills" class="grid grid-cols-1 gap-2 sm:grid-cols-3">
+                                <label class="cursor-pointer rounded-xl border border-blue-200 px-3 py-2 text-center text-sm font-semibold text-blue-700 transition hover:border-blue-500 hover:bg-blue-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-600 has-[:checked]:text-white">
+                                    <input type="radio" name="projet" value="Vendre mon bien" class="sr-only" required>
+                                    Vendre mon bien
+                                </label>
+                                <label class="cursor-pointer rounded-xl border border-blue-200 px-3 py-2 text-center text-sm font-semibold text-blue-700 transition hover:border-blue-500 hover:bg-blue-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-600 has-[:checked]:text-white">
+                                    <input type="radio" name="projet" value="Acheter un bien" class="sr-only" required>
+                                    Acheter un bien
+                                </label>
+                                <label class="cursor-pointer rounded-xl border border-blue-200 px-3 py-2 text-center text-sm font-semibold text-blue-700 transition hover:border-blue-500 hover:bg-blue-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-600 has-[:checked]:text-white">
+                                    <input type="radio" name="projet" value="Investir dans l'immobilier" class="sr-only" required>
+                                    Investir
+                                </label>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="decisionnaire" class="mb-1 block text-sm font-semibold text-slate-700">Êtes-vous le décisionnaire ?</label>
+                            <select id="decisionnaire" name="decisionnaire" required class="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm focus:border-blue-500 focus:outline-none">
+                                <option value="">Choisir</option>
+                                <option value="Oui, seul(e)">Oui, seul(e)</option>
+                                <option value="Oui, en couple / à plusieurs">Oui, en couple / à plusieurs</option>
+                                <option value="Non, je me renseigne pour quelqu'un">Non, je me renseigne pour quelqu'un</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="budget_bant" class="mb-1 block text-sm font-semibold text-slate-700">Quel est votre budget ou prix de vente souhaité ?</label>
+                            <select id="budget_bant" name="budget_bant" required class="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm focus:border-blue-500 focus:outline-none">
+                                <option value="">Choisir</option>
+                                <option value="Moins de 150 000 €">Moins de 150 000 €</option>
+                                <option value="150 000 € - 300 000 €">150 000 € - 300 000 €</option>
+                                <option value="300 000 € - 500 000 €">300 000 € - 500 000 €</option>
+                                <option value="500 000 € - 800 000 €">500 000 € - 800 000 €</option>
+                                <option value="Plus de 800 000 €">Plus de 800 000 €</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="delai" class="mb-1 block text-sm font-semibold text-slate-700">Quel est votre délai ?</label>
+                            <select id="delai" name="delai" required class="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm focus:border-blue-500 focus:outline-none">
+                                <option value="">Choisir</option>
+                                <option value="Urgent (moins de 3 mois)">Urgent (moins de 3 mois)</option>
+                                <option value="Dans les 6 mois">Dans les 6 mois</option>
+                                <option value="Dans l'année">Dans l'année</option>
+                                <option value="Pas de délai précis">Pas de délai précis</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="raison" class="mb-1 block text-sm font-semibold text-slate-700">Quelle est la raison principale ?</label>
+                            <select id="raison" name="raison" required class="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm focus:border-blue-500 focus:outline-none">
+                                <option value="">Choisir</option>
+                                <option value="Déménagement / mutation">Déménagement / mutation</option>
+                                <option value="Séparation / divorce">Séparation / divorce</option>
+                                <option value="Succession / héritage">Succession / héritage</option>
+                                <option value="Investissement locatif">Investissement locatif</option>
+                                <option value="Résidence principale">Résidence principale</option>
+                                <option value="Agrandissement famille">Agrandissement famille</option>
+                                <option value="Autre">Autre</option>
+                            </select>
+                        </div>
+
+                        <button id="continue-contact" type="button" class="w-full rounded-xl bg-slate-900 px-4 py-3 font-semibold text-white transition hover:bg-slate-800">
+                            Continuer →
+                        </button>
+                    </form>
+
+                    <form id="contact-form" class="pointer-events-none max-h-0 -translate-y-2 space-y-3 overflow-hidden opacity-0 transition-all duration-500">
+                        <input id="prenom" name="prenom" type="text" placeholder="Prénom" required class="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm focus:border-blue-500 focus:outline-none">
+                        <input id="telephone" name="telephone" type="tel" placeholder="Téléphone" required class="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm focus:border-blue-500 focus:outline-none">
+                        <input id="email" name="email" type="email" placeholder="Email" required class="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm focus:border-blue-500 focus:outline-none">
+                        <button id="contact-submit" type="submit" class="w-full rounded-xl bg-gradient-to-r from-blue-700 to-blue-500 px-4 py-3 font-bold text-white transition hover:from-blue-800 hover:to-blue-600">
+                            Me faire rappeler gratuitement →
+                        </button>
+                    </form>
+
+                    <p id="contact-feedback" class="hidden rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-semibold text-green-700"></p>
+                </div>
 
                 <button id="new-estimation" type="button" class="mt-4 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
                     ← Nouvelle estimation
@@ -182,6 +260,15 @@ declare(strict_types=1);
         const range = document.getElementById('result-range');
         const priceM2 = document.getElementById('result-price-m2');
         const newEstimationBtn = document.getElementById('new-estimation');
+        const startBantBtn = document.getElementById('start-bant');
+        const bantForm = document.getElementById('bant-form');
+        const continueContactBtn = document.getElementById('continue-contact');
+        const contactForm = document.getElementById('contact-form');
+        const contactFeedback = document.getElementById('contact-feedback');
+        const contactSubmit = document.getElementById('contact-submit');
+        const projetPills = document.getElementById('projet-pills');
+
+        let latestEstimation = null;
 
         const surfaceLabels = {
             lt30: 'Moins de 30 m²',
@@ -193,11 +280,32 @@ declare(strict_types=1);
         };
 
         const formatPrice = (value) => new Intl.NumberFormat('fr-FR').format(Math.round(value)) + ' €';
+        const showStep = (element) => {
+            element.classList.remove('pointer-events-none', 'max-h-0', '-translate-y-2', 'opacity-0');
+            element.classList.add('pointer-events-auto', 'max-h-[1200px]', 'translate-y-0', 'opacity-100');
+        };
+        const hideStep = (element) => {
+            element.classList.add('pointer-events-none', 'max-h-0', '-translate-y-2', 'opacity-0');
+            element.classList.remove('pointer-events-auto', 'max-h-[1200px]', 'translate-y-0', 'opacity-100');
+        };
+
+        projetPills.addEventListener('change', () => {
+            [...projetPills.querySelectorAll('label')].forEach((label) => {
+                const input = label.querySelector('input[type="radio"]');
+                label.classList.toggle('ring-2', input.checked);
+                label.classList.toggle('ring-blue-200', input.checked);
+            });
+        });
 
         form.addEventListener('submit', async (event) => {
             event.preventDefault();
             feedback.classList.add('hidden');
             feedback.textContent = '';
+            contactFeedback.classList.add('hidden');
+            contactFeedback.textContent = '';
+            hideStep(bantForm);
+            hideStep(contactForm);
+            startBantBtn.classList.remove('hidden');
 
             const submitButton = form.querySelector('button[type="submit"]');
             const buttonText = submitButton.textContent;
@@ -224,6 +332,13 @@ declare(strict_types=1);
                 recap.textContent = `${selectedType} · ${selectedVille} · ${selectedSurface}`;
                 range.textContent = `${formatPrice(data.estimation_basse)} — ${formatPrice(data.estimation_haute)}`;
                 priceM2.textContent = `Prix moyen au m² : ${formatPrice(data.prix_m2)}`;
+                latestEstimation = {
+                    type_bien: selectedType,
+                    ville: selectedVille,
+                    surface_tranche: formData.get('surface_tranche'),
+                    estimation_basse: data.estimation_basse,
+                    estimation_haute: data.estimation_haute
+                };
 
                 resultSection.classList.remove('pointer-events-none', 'max-h-0', '-translate-y-4', 'opacity-0', 'py-0');
                 resultSection.classList.add('max-h-[1200px]', 'translate-y-0', 'opacity-100', 'py-12');
@@ -237,9 +352,77 @@ declare(strict_types=1);
             }
         });
 
+        startBantBtn.addEventListener('click', () => {
+            showStep(bantForm);
+            startBantBtn.classList.add('hidden');
+        });
+
+        continueContactBtn.addEventListener('click', () => {
+            if (!bantForm.reportValidity()) {
+                return;
+            }
+            showStep(contactForm);
+            contactForm.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        });
+
+        contactForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            if (!latestEstimation) {
+                contactFeedback.className = 'rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-700';
+                contactFeedback.textContent = 'Veuillez réaliser une estimation avant de continuer.';
+                return;
+            }
+
+            const buttonText = contactSubmit.textContent;
+            contactSubmit.disabled = true;
+            contactSubmit.textContent = 'Envoi en cours...';
+
+            try {
+                const payload = new FormData();
+                const bantData = new FormData(bantForm);
+                const contactData = new FormData(contactForm);
+                [...bantData.entries(), ...contactData.entries()].forEach(([key, value]) => payload.append(key, value));
+                Object.entries(latestEstimation).forEach(([key, value]) => payload.append(key, String(value)));
+
+                const response = await fetch('/api/contact.php', {
+                    method: 'POST',
+                    body: payload
+                });
+                const data = await response.json();
+
+                if (!response.ok || !data.success) {
+                    throw new Error(data.message || 'Impossible d\'envoyer votre demande.');
+                }
+
+                const prenom = (contactData.get('prenom') || '').toString().trim();
+                contactFeedback.className = 'rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-semibold text-green-700 transition-all duration-500';
+                contactFeedback.textContent = `✅ Merci ${prenom} ! Un conseiller vous rappelle sous 24h.`;
+                contactFeedback.classList.remove('hidden');
+                contactFeedback.animate(
+                    [{ transform: 'scale(0.96)', opacity: 0 }, { transform: 'scale(1)', opacity: 1 }],
+                    { duration: 280, easing: 'ease-out' }
+                );
+                contactForm.reset();
+            } catch (error) {
+                contactFeedback.className = 'rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700';
+                contactFeedback.textContent = error.message || 'Le service est momentanément indisponible.';
+                contactFeedback.classList.remove('hidden');
+            } finally {
+                contactSubmit.disabled = false;
+                contactSubmit.textContent = buttonText;
+            }
+        });
+
         newEstimationBtn.addEventListener('click', () => {
             resultSection.classList.add('pointer-events-none', 'max-h-0', '-translate-y-4', 'opacity-0', 'py-0');
             resultSection.classList.remove('max-h-[1200px]', 'translate-y-0', 'opacity-100', 'py-12');
+            hideStep(bantForm);
+            hideStep(contactForm);
+            startBantBtn.classList.remove('hidden');
+            bantForm.reset();
+            contactForm.reset();
+            contactFeedback.classList.add('hidden');
+            contactFeedback.textContent = '';
             form.scrollIntoView({ behavior: 'smooth', block: 'center' });
         });
     </script>
