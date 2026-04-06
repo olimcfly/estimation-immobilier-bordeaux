@@ -137,3 +137,72 @@ function recordLoginAttempt(string $email, bool $success): void
         $db->prepare('DELETE FROM login_attempts WHERE email = ?')->execute([$email]);
     }
 }
+
+
+// Suivi activité utilisateur admin
+function trackUserActivity(int $userId, string $page): void
+{
+    $db = Database::getConnection();
+
+    $db->prepare(
+        'UPDATE users
+         SET last_page_visited = :page,
+             last_activity = NOW(),
+             is_online = 1
+         WHERE id = :id'
+    )->execute([
+        'page' => mb_substr($page, 0, 255),
+        'id' => $userId,
+    ]);
+
+    $sessionId = session_id();
+    $ip = $_SERVER['REMOTE_ADDR'] ?? null;
+    $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? null;
+
+    $db->prepare(
+        'INSERT INTO user_sessions (user_id, session_id, ip_address, user_agent, page_visited, is_active)
+         VALUES (:user_id, :session_id, :ip_address, :user_agent, :page_visited, 1)
+         ON DUPLICATE KEY UPDATE
+            page_visited = VALUES(page_visited),
+            ip_address = VALUES(ip_address),
+            user_agent = VALUES(user_agent),
+            is_active = 1'
+    )->execute([
+        'user_id' => $userId,
+        'session_id' => $sessionId,
+        'ip_address' => $ip,
+        'user_agent' => $userAgent,
+        'page_visited' => mb_substr($page, 0, 255),
+    ]);
+}
+
+function logoutUser(int $userId): void
+{
+    $db = Database::getConnection();
+    $sessionId = session_id();
+
+    $db->prepare('UPDATE users SET is_online = 0 WHERE id = :id')->execute(['id' => $userId]);
+
+    $db->prepare(
+        'UPDATE user_sessions
+         SET is_active = 0,
+             logout_at = NOW()
+         WHERE user_id = :user_id
+           AND session_id = :session_id
+           AND is_active = 1'
+    )->execute([
+        'user_id' => $userId,
+        'session_id' => $sessionId,
+    ]);
+}
+
+function refreshOnlineStatuses(int $inactiveThresholdMinutes = 15): void
+{
+    $db = Database::getConnection();
+    $db->prepare(
+        'UPDATE users
+         SET is_online = 0
+         WHERE is_online = 1
+           AND (last_activity IS NULL OR last_activity < DATE_SUB(NOW(), INTERVAL :minutes MINUTE))'
+    )->execute(['minutes' => max(1, $inactiveThresholdMinutes)]);
+}

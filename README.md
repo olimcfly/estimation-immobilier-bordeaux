@@ -163,3 +163,27 @@ Usage commercial autorisé. Revente du code interdite.
 ## 🆘 Support
 
 Pour toute question : [votre email]
+
+
+## 🛡️ Administration avancée
+
+### Comptes recommandés
+- Superutilisateur : `superuser@estimation-immobilier-bordeaux.fr`
+- Utilisateur standard : `contact@estimation-immobilier-bordeaux.fr`
+
+Exécutez la migration `sql/admin_security_upgrade.sql` pour créer les colonnes de suivi, la table de sessions, les modules activables et insérer ces comptes.
+
+### Sauvegarde automatique
+- Script : `cron/backup_db.php`
+- Exemple cron quotidien à 02:00 :
+  ```bash
+  0 2 * * * php /home/USER/public_html/estimia/cron/backup_db.php
+  ```
+
+### Note technique `/bin/ld: Permission denied`
+Sur un serveur Linux/cPanel :
+```bash
+chmod -R 755 /home/USER/public_html/estimia
+chown -R USER:USER /home/USER/public_html/estimia
+```
+Vérifiez aussi la disponibilité des outils de compilation (`build-essential`) si nécessaire.

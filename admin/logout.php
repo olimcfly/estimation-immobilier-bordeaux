@@ -2,7 +2,19 @@
 
 declare(strict_types=1);
 
-session_start();
+require_once __DIR__ . '/../includes/security.php';
+
+initSecureSession();
+
+$linkedUserId = (int) ($_SESSION['linked_user_id'] ?? 0);
+if ($linkedUserId > 0) {
+    try {
+        logoutUser($linkedUserId);
+    } catch (Throwable $exception) {
+        // no-op
+    }
+}
+
 $_SESSION = [];
 
 if (ini_get('session.use_cookies')) {

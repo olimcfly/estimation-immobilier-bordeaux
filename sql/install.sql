@@ -136,6 +136,9 @@ CREATE TABLE IF NOT EXISTS users (
     telephone VARCHAR(20),
     actif TINYINT(1) DEFAULT 1,
     last_login DATETIME,
+    last_page_visited VARCHAR(255) DEFAULT NULL,
+    is_online TINYINT(1) DEFAULT 0,
+    last_activity DATETIME DEFAULT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     INDEX idx_email (email),
     INDEX idx_role (role)
@@ -304,5 +307,46 @@ CREATE TABLE IF NOT EXISTS sessions (
     INDEX idx_user (user_id),
     INDEX idx_activity (last_activity)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+
+-- ================================================
+-- TABLE : SUIVI DES SESSIONS UTILISATEURS
+-- ================================================
+CREATE TABLE IF NOT EXISTS user_sessions (
+    id INT(11) NOT NULL AUTO_INCREMENT,
+    user_id INT(11) NOT NULL,
+    session_id VARCHAR(128) NOT NULL,
+    ip_address VARCHAR(45) DEFAULT NULL,
+    user_agent TEXT DEFAULT NULL,
+    page_visited VARCHAR(255) DEFAULT NULL,
+    login_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    logout_at DATETIME DEFAULT NULL,
+    is_active TINYINT(1) DEFAULT 1,
+    PRIMARY KEY (id),
+    UNIQUE KEY uniq_session_user (session_id, user_id),
+    KEY idx_user_id (user_id),
+    CONSTRAINT fk_user_sessions_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ================================================
+-- TABLE : MODULES ADMIN ACTIVABLES
+-- ================================================
+CREATE TABLE IF NOT EXISTS modules (
+    id INT(11) NOT NULL AUTO_INCREMENT,
+    name VARCHAR(100) NOT NULL,
+    description TEXT DEFAULT NULL,
+    is_active TINYINT(1) DEFAULT 1,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    UNIQUE KEY uniq_module_name (name)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+INSERT IGNORE INTO modules (name, description, is_active) VALUES
+('Google Ads', 'Gestion des campagnes Google Ads', 1),
+('Webhooks', 'Intégration des webhooks', 1),
+('Leads', 'Gestion des leads et estimations', 1),
+('Traffic', 'Analyse du trafic', 1),
+('Users', 'Gestion des comptes administrateurs', 1);
 
 SET FOREIGN_KEY_CHECKS = 1;
