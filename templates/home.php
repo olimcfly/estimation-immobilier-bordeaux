@@ -61,5 +61,32 @@ if (defined('CITIES_LIST')) {
                 </div>
             </form>
         </div>
+
+        <section class="mx-auto mt-10 max-w-5xl">
+            <div class="rounded-2xl bg-blue-900 px-6 py-8 text-white shadow-lg">
+                <p class="text-sm font-semibold uppercase tracking-wider text-blue-200">Pourquoi nous sommes différents à Bordeaux</p>
+                <h2 class="mt-2 text-2xl font-bold">3 preuves concrètes face aux gros portails</h2>
+            </div>
+
+            <div class="mt-6 grid gap-5 md:grid-cols-3">
+                <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                    <p class="text-xs font-bold uppercase tracking-wide text-blue-700">UX locale</p>
+                    <h3 class="mt-2 text-lg font-semibold text-slate-900">Parcours en 2 minutes + version quartier</h3>
+                    <p class="mt-3 text-sm leading-relaxed text-slate-600">Texte prêt à intégrer : <strong>"Estimez votre bien en 2 minutes puis découvrez immédiatement l'analyse de votre micro-quartier (Chartrons, Caudéran, Saint-Michel, Bastide...)."</strong></p>
+                </article>
+
+                <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                    <p class="text-xs font-bold uppercase tracking-wide text-emerald-700">Données propriétaires</p>
+                    <h3 class="mt-2 text-lg font-semibold text-slate-900">Comparables ultra-locaux à 500 m</h3>
+                    <p class="mt-3 text-sm leading-relaxed text-slate-600">Texte prêt à intégrer : <strong>"Notre estimation s'appuie sur les ventes réellement signées autour de votre adresse (rayon 500 m), avec ajustement selon étage, extérieur, parking et état du bien."</strong></p>
+                </article>
+
+                <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                    <p class="text-xs font-bold uppercase tracking-wide text-purple-700">Promesse claire</p>
+                    <h3 class="mt-2 text-lg font-semibold text-slate-900">Fourchette précise + plan d'action 30 jours</h3>
+                    <p class="mt-3 text-sm leading-relaxed text-slate-600">Texte prêt à intégrer : <strong>"Recevez une fourchette de prix réaliste, un délai de vente estimé à Bordeaux et 3 actions concrètes pour maximiser votre prix sous 30 jours."</strong></p>
+                </article>
+            </div>
+        </section>
     </section>
 </main>
