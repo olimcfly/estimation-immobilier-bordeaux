@@ -1,5 +1,7 @@
 <?php
 // Configuration EstimIA - Bordeaux
+require_once __DIR__ . '/constantes.php';
+
 define('DEBUG_MODE', false);
 define('MAINTENANCE_MODE', false);
 define('SITE_NAME', 'EstimIA');
